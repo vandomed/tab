@@ -1,0 +1,11 @@
+Package: tab
+Type: Package
+Title: Create Summary Tables for Statistical Reports
+Version: 3.1.3
+Date: 2017-09-14
+Author: Dane R. Van Domelen
+Maintainer: Dane R. Van Domelen <vandomed@gmail.com>
+Description: Contains functions for generating tables for statistical reports written in Microsoft Word or LaTeX. There are functions for I-by-J frequency tables, comparison of means or medians across levels of a categorical variable, and summarizing fitted generalized linear models, generalized estimating equations, and Cox proportional hazards regression. Functions are available to handle data simple random samples or survey data. The package is intended to make it easier for researchers to translate results from statistical analyses in R to their reports or manuscripts.
+License: GPL-2
+Depends: R (>= 2.10)
+Imports: survey, survival, gee, grDevices, graphics, stats, xtable, Kmisc
