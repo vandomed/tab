@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1517863526357.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "3E766F31",
+    "lastKnownWriteTime" : 1518120749,
+    "last_content_update" : 1518120749608,
+    "path" : "C:/Users/Dane/Google Drive/github/tab/R/tabmedians.R",
+    "project_path" : "R/tabmedians.R",
+    "properties" : {
+        "cursorPosition" : "16,2",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

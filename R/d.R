@@ -1,0 +1,33 @@
+#' Example Dataset for \pkg{tab} Package
+#'
+#' Used to illustrate the various functions.
+#'
+#' @name d
+#'
+#' @docType data
+#'
+#' @source
+#' I generated this dataset in R.
+#'
+#' @author Dane R. Van Domelen \cr \email{vandomed@gmail.com}
+#'
+#' @format
+#' Data frame with 300 observations on the following 15 variables.
+#' \describe{
+#' \item{\code{ID}}{a numeric vector}
+#' \item{\code{Group}}{a factor}
+#' \item{\code{Age}}{a numeric vector}
+#' \item{\code{Sex}}{a factor}
+#' \item{\code{Race}}{a factor}
+#' \item{\code{BMI}}{a numeric vector}
+#' \item{\code{time}}{a numeric vector}
+#' \item{\code{delta}}{a numeric vector}
+#' \item{\code{death_1yr}}{a numeric vector}
+#' \item{\code{bp.1}}{a numeric vector}
+#' \item{\code{bp.2}}{a numeric vector}
+#' \item{\code{bp.3}}{a numeric vector}
+#' \item{\code{highbp.1}}{a numeric vector}
+#' \item{\code{highbp.2}}{a numeric vector}
+#' \item{\code{highbp.3}}{a numeric vector}
+#' }
+NULL

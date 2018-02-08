@@ -16,11 +16,11 @@ to make it easier for researchers to translate results from statistical
 analyses in R to their reports or manuscripts.
 }
 \details{
-#' \tabular{ll}{
+\tabular{ll}{
 Package: \tab tab \cr
 Type: \tab Package \cr
 Version: \tab 3.1.3 \cr
-Date: \tab 2018-02-05 \cr
+Date: \tab 2018-02-08 \cr
 License: \tab GPL-2 \cr
 }
 

@@ -1,159 +1,138 @@
-#' Generate Summary Tables of Mean Comparisons for Statistical Reports
+#' Generate Summary Table Comparing Group Means
 #'
-#' Compares the mean of a continuous variable across levels of a categorical
-#' variable and summarizes the results in a clean table (or figure) for a
-#' statistical report.
+#' Creates table (or figure) comparing the mean of \code{y} across levels of
+#' \code{x}.
 #'
-#' If \code{x} has two levels, a t-test is used to test for a difference in
-#' means. If \code{x} has more than two levels, a one-way analysis of variance
-#' is used to test for a difference in means across the groups.
+#' A t-test is used to compare means if \code{x} has two levels, and a one-way
+#' analysis of variance is used if \code{x} has more than two levels.
+#' Observations with missing values for \code{x} and/or \code{y} are dropped.
 #'
-#' Both \code{x} and \code{y} can have missing values. The function drops
-#' observations with missing \code{x} or \code{y}.
+#' @section Note:
+#' If you want to paste your tables into Microsoft Word, you can use either of
+#' these approaches:
 #'
-#' If you wish to paste your tables into Word, you can use either of these
-#' approaches:
+#' \enumerate{
 #'
-#'   1. Use the \code{\link{write.cb}} function in the \pkg{Kmisc} package [2].
-#'   If your table is stored in a character matrix named \code{table1}, use
-#'   \code{write.cb(table1)} to copy the table to your clipboard. Paste the
-#'   result into Word, then highlight the text and go to
-#'   \code{Insert - Table - Convert Text to Table... OK}.
+#' \item 1. Use the \code{\link[Kmisc]{write.cb}} function in \pkg{Kmisc} [2].
+#' If your table is stored in a character matrix named \code{table1}, use
+#' \code{write.cb(table1)} to copy the table to your clipboard. Paste the result
+#' into your document, then highlight the text and go to \code{Insert - Table -
+#' Convert Text to Table... OK}.
 #'
-#'   2. Set \code{print.html = TRUE}. This will result in a .html file writing
-#'   to your current working directory. When you open this file, you will see a
-#'   nice looking table that you can copy and paste into Word. You can control
-#'   the name of this file with \code{html.filename}.
+#' \item 2. Set \code{print.html = TRUE}. This will result in a .html file
+#' being written to your current working directory. When you open this file, you
+#' will see a (hopefully) nice-looking table that you can copy and paste into
+#' your document. You can control the name of this file with
+#' \code{html.filename}.
+#' }
 #'
-#' If you wish to use LaTeX, R Markdown, knitr, Sweave, etc., set
+#' If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
 #' \code{latex = TRUE} and then use \code{\link[xtable]{xtable}} [1]. You may
 #' have to set \code{sanitize.text.function = identity} when calling
-#' \code{\link{print.xtable}}.
+#' \code{\link[xtable]{print.xtable}}.
+#'
 #'
 #' @param x Vector of values for the categorical \code{x} variable.
 #'
 #' @param y Vector of values for the continuous \code{y} variable.
 #'
-#' @param latex If \code{TRUE}, object returned is formatted for printing in
-#' LaTeX using \code{\link[xtable]{xtable}} [1]; if \code{FALSE}, formatted for
-#' copy-and-pasting from RStudio into a word processor.
+#' @param latex Logical value for whether to format table for printing in LaTeX,
+#' e.g. using \code{\link[xtable]{xtable}} [1].
 #'
-#' @param variance Controls whether equal variance t-test or unequal variance
-#' t-test is used when \code{x} has two levels. Possible values are
-#' \code{"equal"} for equal variance, \code{"unequal"} for unequal variance, and
-#' \code{"ftest"} for F test to determine which version of the t-test to use.
-#' Note that unequal variance t-test is less restrictive than equal variance
-#' t-test, and the F test is only valid when \code{y} is normally distributed in
-#' both \code{x} groups.
+#' @param variance Character string specifying which version of the two-sample
+#' t-test to use, supposing \code{x} has two levels. Choices are \code{"equal"}
+#' for equal variance t-test, \code{"unequal"} for unequal variance t-test, and
+#' \code{"ftest"} for F test to determine which to use.
 #'
-#' @param xname Label for the categorical variable. Only used if
-#' \code{fig = TRUE}.
+#' @param xname Character string with a label for the \code{x} variable.
 #'
-#' @param xlevels Optional character vector to label the levels of \code{x},
-#' used in the column headings. If unspecified, the function uses the values
-#' that \code{x} takes on.
+#' @param xlevels Character vector with labels for each level of \code{x}, for
+#' column headings.
 #'
-#' @param yname Optional label for the continuous \code{y} variable. If
-#' unspecified, variable name of \code{y} is used.
+#' @param yname Character string with a label for the \code{y} variable.
 #'
-#' @param quantiles If specified, function compares means of the \code{y}
-#' variable across quantiles of the \code{x} variable. For example, if \code{x}
-#' contains continuous BMI values and \code{y} contains continuous HDL
-#' cholesterol levels, setting \code{quantiles = 3} would result in mean HDL
-#' being compared across tertiles of BMI.
+#' @param quantiles Numeric value. If specified, table compares mean \code{y}
+#' across quantiles of \code{x}. For example, if \code{x} contains BMI values
+#' and \code{y} HDL levels, setting \code{quantiles = 3} compares mean HDL
+#' across BMI tertiles.
 #'
-#' @param quantile.vals If \code{TRUE}, labels for \code{x} show quantile number
-#' and corresponding range of the \code{x} variable, e.g. Q1 [0.00, 0.25). If
-#' \code{FALSE}, labels for quantiles just show quantile number, e.g. Q1. Only
-#' used if \code{xlevels} is not specified.
+#' @param quantile.vals Logical value for whether labels for \code{x} should
+#' show quantile number and corresponding range, e.g. Q1 [0.00, 0.25), rather
+#' than just the quantile number.
 #'
-#' @param parenth Controls what values (if any) are placed in parentheses after
-#' the means in each cell. Possible values are \code{"none"}, \code{"sd"} for
-#' standard deviation, \code{"se"} for standard error, \code{"t.ci"} for 95\%
-#' confidence interval for population mean based on t distribution, and
-#' \code{"z.ci"} for 95\% confidence interval for population mean based on z
-#' distribution.
+#' @param parenth Character string specifying what statistic should appear in
+#' parentheses after the means in each cell. Choices are \code{"none"},
+#' \code{"sd"} for standard deviation, \code{"se"} for standard error,
+#' \code{"t.ci"} for 95\% confidence interval based on t distribution, and
+#' \code{"z.ci"} for 95\% confidence interval based on z distribution.
 #'
-#' @param text.label Optional text to put after the \code{y} variable name,
-#' identifying what cell values and parentheses indicate in the table. If
-#' unspecified, function uses default labels based on \code{parenth}, e.g. M
-#' (SD) if \code{parenth = "sd"}. Set to \code{"none"} for no text labels.
+#' @param text.label Character string with text to put after the \code{y}
+#' variable name, identifying what cell values and parentheses represent.
 #'
-#' @param parenth.sep Optional character specifying the separator between lower
-#' and upper bound of confidence interval (when requested). Usually either
-#' \code{"-"} or \code{", "} depending on user preference.
+#' @param parenth.sep Character string with separator to place between first and
+#' second numbers in parentheses, if applicable. Typically \code{"-"} or
+#' \code{", "}.
 #'
-#' @param decimals Number of decimal places for numeric values in the table
-#' (except p-values). If unspecified, function uses 0 decimal places if the
-#' largest mean (in magnitude) is in [1,000, Inf), 1 decimal place if
-#' [10, 1,000), 2 decimal places if [0.1, 10), 3 decimal places if [0.01, 0.1),
-#' 4 decimal places if [0.001, 0.01), 5 decimal places if [0.0001, 0.001), and 6
-#' decimal places if [0, 0.0001).
+#' @param decimals Numeric value specifying number of decimal places for numbers
+#' other than p-values. If unspecified, function tries to make a reasonable
+#' choice based on the data.
 #'
-#' @param p.include If \code{FALSE}, t-test is not performed and p-value is not
-#' returned.
+#' @param p.include Logical value for whether to include a p-value column.
 #'
-#' @param p.decimals Number of decimal places for p-values. If a vector is
-#' provided rather than a single value, number of decimal places will depend on
-#' what range the p-value lies in. See \code{p.cuts}.
+#' @param p.decimals Numeric value specifying number of decimal places for
+#' p-values. Can be a vector if you want the number of decimals to depend on
+#' what range the p-value is in. See \code{p.cuts}.
 #'
-#' @param p.cuts Cut-point(s) to control number of decimal places used for
-#' p-values. For example, by default \code{p.cuts = 0.1} and
-#' \code{p.decimals = c(2, 3)}. This means that p-values in the range [0.1, 1]
-#' will be printed to two decimal places, while p-values in the range [0, 0.1)
-#' will be printed to three decimal places.
+#' @param p.cuts Numeric value or vector of cutpoints to control number of
+#' decimal places for p-values. For example, by default \code{p.cuts = 0.1} and
+#' \code{p.decimals = c(2, 3)}, meaning p-values in the range [0.1, 1] are
+#' printed to 2 decimal places while p-values in the range [0, 0.1) are printed
+#' to 3.
 #'
-#' @param p.lowerbound Controls cut-point at which p-values are no longer
-#' printed as their value, but rather <lowerbound. For example, by default
-#' \code{p.lowerbound = 0.001}. Under this setting, p-values less than 0.001 are
-#' printed as \code{<0.001}.
+#' @param p.lowerbound Numeric value specifying cutpoint beneath which p-values
+#' appear as <p.lowerbound.
 #'
-#' @param p.leading0 If \code{TRUE}, p-values are printed with 0 before decimal
-#' place; if \code{FALSE}, the leading 0 is omitted.
+#' @param p.leading0 Logical value for whether p-values should appear with
+#' leading 0's before the decimal point.
 #'
-#' @param p.avoid1 If \code{TRUE}, p-values rounded to 1 are not printed as 1,
-#' but as \code{>0.99} (or similarly depending on \code{p.decimals} and
-#' \code{p.cuts}).
+#' @param p.avoid1 Logical value for whether p-values that round to 1 should
+#' appear as \code{>0.99} (or similarly depending on \code{p.decimals} and
+#' \code{p.cuts}) rather than 1.
 #'
-#' @param overall.column If \code{FALSE}, column showing mean of \code{y} in
-#' full sample is suppressed.
+#' @param overall.column Logical value for whether to include a column with the
+#' overall mean of \code{y}.
 #'
-#' @param n.column If \code{TRUE}, the table will have a column for sample size.
+#' @param n.column Logical value for whether to include a column with the
+#' overall sample size.
 #'
-#' @param n.headings If \code{TRUE}, the table will indicate the sample size
-#' overall and in each group in parentheses after the column headings.
+#' @param n.headings Logical value for whether to include sample sizes in
+#' parentheses in column headings.
 #'
-#' @param bold.colnames If \code{TRUE}, column headings are printed in bold
-#' font. Only applies if \code{latex = TRUE}.
+#' @param bold.colnames Logical value for whether to use bold font for column
+#' headings. Only applies if \code{latex = TRUE}.
 #'
-#' @param bold.varnames If \code{TRUE}, variable name in the first column of the
-#' table is printed in bold font. Only applies if \code{latex = TRUE}.
+#' @param bold.varnames Logic value for whether to use bold font for the
+#' \code{y} variable name in the first column. Only used if \code{latex = TRUE}.
 #'
 #' @param variable.colname Character string with desired heading for first
-#' column of table, which shows the \code{y} variable name.
+#' column of table, in case you prefer something other than \code{"Variable"}.
 #'
-#' @param fig If \code{TRUE}, a figure is returned rather than a table. The
-#' figure shows mean (95\% confidence interval) for each level of \code{x}.
+#' @param fig Logical value for whether to generate a figure rather than a
+#' table.
 #'
-#' @param fig.errorbars Controls error bars around mean when \code{fig = TRUE}.
-#' Possible values are \code{"sd"} for +/- 1 standard deviation, \code{"se"} for
-#' +/- 1 standard error, \code{"t.ci"} for 95\% confidence interval based on t
-#' distribution, \code{"z.ci"} for 95\% confidence interval based on z
-#' distribution, and \code{"none"} for no error bars.
+#' @param print.html Logical value for whether to write a .html file with the
+#' table to the current working directory.
 #'
-#' @param fig.title Title of figure. If unspecified, title is set to
-#' \code{"Mean yname by xname"}.
+#' @param html.filename Character string specifying the name of the .html file
+#' that gets written if \code{print.html = TRUE}.
 #'
-#' @param print.html If \code{TRUE}, function prints a .html file to the current
-#' working directory.
+#' @param ... Additional arguments to pass to \code{\link[graphics]{plot}}. Only
+#' used if \code{fig = TRUE}.
 #'
-#' @param html.filename Character string indicating the name of the .html file
-#' that gets printed if \code{print.html = TRUE}.
 #'
-#' @return Character matrix with the requested table comparing mean \code{y}
-#' across levels of \code{x}. If \code{latex = TRUE}, matrix is formatted for
-#' inserting into a Markdown/Sweave/knitr report using the
-#' \code{\link[xtable]{xtable}} package [1].
+#' @return Character matrix with table comparing mean \code{y} across levels of
+#' \code{x}.
+#'
 #'
 #' @examples
 #' # Load in sample dataset d and drop rows with missing values
@@ -186,12 +165,14 @@
 #' # meanstable4 and meanstable5 are equivalent
 #' all(meanstable4 == meanstable5)
 #'
+#'
 #' @references
 #'1. Dahl, D.B. (2016). xtable: Export Tables to LaTeX or HTML. R package
 #'version 1.8-2, \url{https://cran.r-project.org/package=xtable}.
 #'
 #'2. Ushley, K. (2013). Kmisc: Kevin Miscellaneous. R package version 0.5.0.
 #'\url{https://CRAN.R-project.org/package=Kmisc}.
+#'
 #'
 #' @export
 tabmeans <- function(x, y, latex = FALSE, variance = "unequal", xname = NULL,
@@ -202,9 +183,8 @@ tabmeans <- function(x, y, latex = FALSE, variance = "unequal", xname = NULL,
                      p.leading0 = TRUE, p.avoid1 = FALSE, overall.column = TRUE,
                      n.column = FALSE, n.headings = TRUE, bold.colnames = TRUE,
                      bold.varnames = FALSE, variable.colname = "Variable",
-                     fig = FALSE, fig.errorbars = "z.ci", fig.title = NULL,
-                     print.html = FALSE,
-                     html.filename = "table1.html") {
+                     fig = FALSE, print.html = FALSE,
+                     html.filename = "table1.html", ...) {
 
   # If yname or xname unspecified, use variable names
   if (is.null(yname)) {
@@ -297,7 +277,7 @@ tabmeans <- function(x, y, latex = FALSE, variance = "unequal", xname = NULL,
   }
 
   # Drop missing values
-  locs.complete <- which(!is.na(x) & !is.na(y))
+  locs.complete <- which(! is.na(x) & ! is.na(y))
   x <- x[locs.complete]
   y <- y[locs.complete]
 
@@ -340,7 +320,7 @@ tabmeans <- function(x, y, latex = FALSE, variance = "unequal", xname = NULL,
   # If xlevels unspecified, set to actual values
   if (is.null(xlevels)) {
     if (!is.null(quantiles)) {
-      if (quantile.vals == TRUE) {
+      if (quantile.vals) {
         xlevels <- paste("Q", 1:length(xvals), " ", as.character(xvals),
                          sep = "")
       } else {
@@ -353,7 +333,7 @@ tabmeans <- function(x, y, latex = FALSE, variance = "unequal", xname = NULL,
 
   # Calculate p-value based on ANOVA or t-test depending on number of levels of
   # x
-  if (p.include == TRUE) {
+  if (p.include) {
 
     if (length(xlevels) == 2) {
 
@@ -394,10 +374,10 @@ tabmeans <- function(x, y, latex = FALSE, variance = "unequal", xname = NULL,
     p <- NA
   }
 
-  if (fig == FALSE) {
+  if (! fig) {
 
     # Initialize table
-    tbl <- matrix("", nrow = 1, ncol = length(xlevels)+4)
+    tbl <- matrix("", nrow = 1, ncol = length(xlevels) + 4)
 
     # Figure out text.label
     if (is.null(text.label)) {
@@ -427,16 +407,16 @@ tabmeans <- function(x, y, latex = FALSE, variance = "unequal", xname = NULL,
       sds <- tapply(X = y, INDEX = x, FUN = sd)
       tbl[1, 3] <- paste(sprintf(spf, mean(y)), " (", sprintf(spf, sd(y)), ")",
                          sep = "")
-      tbl[1, 4:(ncol(tbl)-1)] <- paste(sprintf(spf, means), " (",
-                                       sprintf(spf, sds), ")", sep = "")
+      tbl[1, 4:(ncol(tbl) - 1)] <- paste(sprintf(spf, means), " (",
+                                         sprintf(spf, sds), ")", sep = "")
     } else if (parenth == "se") {
-      ses <- tapply(X = y, INDEX = x, FUN = function(x) sd(x)/sqrt(length(x)))
+      ses <- tapply(X = y, INDEX = x, FUN = function(x) sd(x) / sqrt(length(x)))
       tbl[1, 3] <- paste(sprintf(spf, mean(y)), " (",
-                         sprintf(spf, sd(y)/sqrt(length(y))), ")", sep = "")
-      tbl[1, 4:(ncol(tbl)-1)] <- paste(sprintf(spf, means), " (",
-                                       sprintf(spf, ses), ")", sep = "")
+                         sprintf(spf, sd(y) / sqrt(length(y))), ")", sep = "")
+      tbl[1, 4: (ncol(tbl) - 1)] <- paste(sprintf(spf, means), " (",
+                                          sprintf(spf, ses), ")", sep = "")
     } else if (parenth == "t.ci") {
-      ses <- tapply(X = y, INDEX = x, FUN = function(x) sd(x)/sqrt(length(x)))
+      ses <- tapply(X = y, INDEX = x, FUN = function(x) sd(x) / sqrt(length(x)))
       ci.lower <- means - qt(p = 0.975, df = ns - 1) * ses
       ci.upper <- means + qt(p = 0.975, df = ns - 1) * ses
       tbl[1, 3] <-
@@ -448,36 +428,36 @@ tabmeans <- function(x, y, latex = FALSE, variance = "unequal", xname = NULL,
               sprintf(spf, mean(y) +
                         qt(p = 0.975, df = length(y) - 1) * sd(y) /
                         sqrt(length(y))), ")", sep = "")
-      tbl[1, 4:(ncol(tbl)-1)] <- paste(sprintf(spf, means), " (",
-                                       sprintf(spf, ci.lower), parenth.sep,
-                                       sprintf(spf, ci.upper), ")", sep = "")
+      tbl[1, 4: (ncol(tbl) - 1)] <- paste(sprintf(spf, means), " (",
+                                          sprintf(spf, ci.lower), parenth.sep,
+                                          sprintf(spf, ci.upper), ")", sep = "")
     } else if (parenth == "z.ci") {
-      ses <- tapply(X = y, INDEX = x, FUN = function(x) sd(x)/sqrt(length(x)))
+      ses <- tapply(X = y, INDEX = x, FUN = function(x) sd(x) / sqrt(length(x)))
       ci.lower <- means - qnorm(0.975) * ses
       ci.upper <- means + qnorm(0.975) * ses
       tbl[1, 3] <-
         paste(sprintf(spf, mean(y)), " (",
-              sprintf(spf, mean(y) - qnorm(0.975) * sd(y)/sqrt(length(y))),
+              sprintf(spf, mean(y) - qnorm(0.975) * sd(y) / sqrt(length(y))),
               parenth.sep,
-              sprintf(spf, mean(y) + qnorm(0.975) * sd(y)/sqrt(length(y))),
+              sprintf(spf, mean(y) + qnorm(0.975) * sd(y) / sqrt(length(y))),
               ")", sep = "")
-      tbl[1, 4:(ncol(tbl)-1)] <- paste(sprintf(spf, means), " (",
-                                       sprintf(spf, ci.lower), parenth.sep,
-                                       sprintf(spf, ci.upper), ")", sep = "")
+      tbl[1, 4: (ncol(tbl) - 1)] <- paste(sprintf(spf, means), " (",
+                                          sprintf(spf, ci.lower), parenth.sep,
+                                          sprintf(spf, ci.upper), ")", sep = "")
     } else if (parenth == "none") {
       tbl[1, 3] <- sprintf(spf, mean(y))
-      tbl[1, 4:(ncol(tbl)-1)] <- sprintf(spf, means)
+      tbl[1, 4: (ncol(tbl) - 1)] <- sprintf(spf, means)
     }
 
     # Add p-value from t-test
-    if (p.include == TRUE) {
+    if (p.include) {
       tbl[1, ncol(tbl)] <- formatp(p = p, cuts = p.cuts, decimals = p.decimals,
                                    lowerbound = p.lowerbound,
                                    leading0 = p.leading0, avoid1 = p.avoid1)
     }
 
     # Add column names, with sample sizes for each group if requested
-    if (n.headings == FALSE) {
+    if (! n.headings) {
       colnames(tbl) <- c(variable.colname, "N", "Overall", xlevels, "P")
     } else {
       colnames(tbl) <- c(variable.colname, "N",
@@ -486,99 +466,147 @@ tabmeans <- function(x, y, latex = FALSE, variance = "unequal", xname = NULL,
     }
 
     # Drop N column if requested
-    if (n.column == FALSE) {
+    if (! n.column) {
       tbl <- tbl[, -which(colnames(tbl) == "N"), drop = FALSE]
     }
 
     # Drop overall column if requested
-    if (overall.column == FALSE) {
+    if (! overall.column) {
       tbl <- tbl[, -grep("^Overall", colnames(tbl)), drop = FALSE]
     }
 
     # Drop p column if requested
-    if (p.include == FALSE) {
+    if (! p.include) {
       tbl <- tbl[, -which(colnames(tbl) == "P"), drop = FALSE]
     }
 
     # If latex is TRUE, do some re-formatting
-    if (latex == TRUE) {
-      if (p.include == TRUE) {
+    if (latex) {
+      if (p.include) {
         plocs <- which(substr(tbl[, "P"], 1, 1) == "<")
         if (length(plocs) > 0) {
           tbl[plocs, "P"] <- paste("$<$", substring(tbl[plocs, "P"], 2),
                                    sep = "")
         }
       }
-      if (bold.colnames == TRUE) {
+      if (bold.colnames) {
         colnames(tbl) <- paste("$\\textbf{", colnames(tbl), "}$", sep = "")
       }
-      if (bold.varnames == TRUE) {
+      if (bold.varnames) {
         tbl[1, 1] <- paste("$\\textbf{", tbl[1, 1], "}$")
       }
     }
 
+    # Print html version of table if requested
+    if (print.html) {
+
+      tbl.xtable <-
+        xtable(tbl, align = paste("ll",
+                                  paste(rep("r", ncol(tbl) - 1), collapse = ""),
+                                  sep = "", collapse = ""))
+      print(tbl.xtable, include.rownames = FALSE, type = "html",
+            file = html.filename, sanitize.text.function = function(x) {
+              ifelse(substr(x, 1, 1) == " ", paste("&nbsp &nbsp", x), x)
+            })
+
+    }
+
   } else {
 
-    if (fig.errorbars == "sd") {
+    if (parenth == "sd") {
 
       lowerbars <- means - tapply(X = y, INDEX = x, FUN = sd)
       upperbars <- means + tapply(X = y, INDEX = x, FUN = sd)
       ylabel <- paste(yname, " (Mean +/- 1 SD)", sep = "")
 
-    } else if (fig.errorbars == "se") {
+    } else if (parenth == "se") {
 
       lowerbars <- means - tapply(X = y, INDEX = x, FUN = function(x)
-        sd(x)/sqrt(length(x)))
+        sd(x) / sqrt(length(x)))
       upperbars <- means + tapply(X = y, INDEX = x, FUN = function(x)
-        sd(x)/sqrt(length(x)))
+        sd(x) / sqrt(length(x)))
       ylabel <- paste(yname, " (Mean +/- 1 SE)", sep = "")
 
-    } else if (fig.errorbars == "t.ci") {
+    } else if (parenth == "t.ci") {
 
       lowerbars <- means - qt(p = 0.975, df = ns - 1) *
-        tapply(X = y, INDEX = x, FUN = function(x) sd(x)/sqrt(length(x)))
+        tapply(X = y, INDEX = x, FUN = function(x) sd(x) / sqrt(length(x)))
       upperbars <- means + qt(p = 0.975, df = ns - 1) *
-        tapply(X = y, INDEX = x, FUN = function(x) sd(x)/sqrt(length(x)))
+        tapply(X = y, INDEX = x, FUN = function(x) sd(x) / sqrt(length(x)))
       ylabel <- paste(yname, " (Mean +/- 95% CI)", sep = "")
 
-    } else if (fig.errorbars == "z.ci") {
+    } else if (parenth == "z.ci") {
 
       lowerbars <- means - qnorm(p = 0.975) *
-        tapply(X = y, INDEX = x, FUN = function(x) sd(x)/sqrt(length(x)))
+        tapply(X = y, INDEX = x, FUN = function(x) sd(x) / sqrt(length(x)))
       upperbars <- means + qnorm(p = 0.975) *
-        tapply(X = y, INDEX = x, FUN = function(x) sd(x)/sqrt(length(x)))
+        tapply(X = y, INDEX = x, FUN = function(x) sd(x) / sqrt(length(x)))
       ylabel <- paste(yname, " (Mean +/- 95% CI)", sep = "")
 
     }
 
-    if (fig.errorbars == "none") {
+    # Save ... into extra.args list
+    extra.args <- list(...)
 
-      bar.range <- max(means) - min(means)
-      ylim1 <- min(means) - 0.2*bar.range
-      ylim2 <- max(means) + 0.2*bar.range
+    if (parenth == "none") {
 
-      tbl <- plot(x = 1:length(means), y = means,
-                  main = paste("Mean ", yname, " by ", xname, sep = ""),
-                  xlim = c(0.5, (length(xlevels)+0.5)), ylim = c(ylim1, ylim2),
-                  ylab = paste(yname, " (Mean)", sep = ""), xlab = xname,
-                  xaxt = "n", cex.lab = 1.1, pch = 19)
-      axis(side = 1, at = 1:length(xlevels), labels = xlevels)
+      # Figure out plot inputs if not specified
+      if (is.null(extra.args$main)) {
+        extra.args$main <- paste("Mean ", yname, " by ", xname, sep = "")
+      }
+      if (is.null(extra.args$xlim)) {
+        extra.args$xlim <- c(0.5, (length(xlevels) + 0.5))
+      }
+      if (is.null(extra.args$ylim)) {
+        bar.range <- max(means) - min(means)
+        extra.args$ylim <- c(min(means) - 0.2 * bar.range,
+                             max(means) + 0.2 * bar.range)
+      }
+      if (is.null(extra.args$xlab)) {
+        extra.args$xlab <- xname
+      }
+      if (is.null(extra.args$ylab)) {
+        extra.args$ylab <- paste(yname, " (Mean)", sep = "")
+      }
+      if (is.null(extra.args$cex.lab)) {
+        extra.args$cex.lab <- 1.1
+      }
+      if (is.null(extra.args$pch)) {
+        extra.args$pch <- 19
+      }
 
+      # Create figure
+      tbl <- do.call(plot, c(list(x = 1: length(means), y = means,
+                                  xaxt = "n"), extra.args))
+      axis(side = 1, at = 1: length(xlevels), labels = xlevels)
 
     } else {
 
-      bar.range <- max(c(lowerbars, upperbars)) - min(c(lowerbars, upperbars))
-      ylim1 <- min(c(lowerbars, upperbars) - 0.1*bar.range)
-      ylim2 <- max(c(lowerbars, upperbars) + 0.1*bar.range)
-
-      if (is.null(fig.title)) {
-        fig.title <- paste("Mean ", yname, " by ", xname, sep = "")
+      # Figure out plot inputs if not specified
+      if (is.null(extra.args$main)) {
+        extra.args$main <- paste("Mean ", yname, " by ", xname, sep = "")
+      }
+      if (is.null(extra.args$xlim)) {
+        extra.args$xlim <- c(0.5, length(xlevels) + 0.5)
+      }
+      if (is.null(extra.args$ylim)) {
+        bar.range <- max(c(lowerbars, upperbars)) - min(c(lowerbars, upperbars))
+        ylim1 <- min(c(lowerbars, upperbars) - 0.1 * bar.range)
+        ylim2 <- max(c(lowerbars, upperbars) + 0.1 * bar.range)
+        extra.args$ylim <- c(ylim1, ylim2)
+      }
+      if (is.null(extra.args$xlab)) {
+        extra.args$xlab <- xname
+      }
+      if (is.null(extra.args$cex.lab)) {
+        extra.args$cex.lab <- 1.1
+      }
+      if (is.null(extra.args$ylab)) {
+        extra.args$ylab <- ylabel
       }
 
-      tbl <- plot(x = NULL, y = NULL, main = fig.title,
-                  xlim = c(0.5, (length(xlevels)+0.5)), ylim = c(ylim1, ylim2),
-                  ylab = ylabel, xlab = xname, xaxt = "n", cex.lab = 1.1)
-
+      # Create figure
+      tbl <- do.call(plot, c(list(x = NULL, y = NULL, xaxt = "n"), extra.args))
       for (ii in 1:length(lowerbars)) {
 
         endpoints <- c(lowerbars[ii], upperbars[ii])
@@ -593,20 +621,6 @@ tabmeans <- function(x, y, latex = FALSE, variance = "unequal", xname = NULL,
     }
 
     tbl <- recordPlot()
-
-  }
-
-  # Print html version of table if requested
-  if (print.html) {
-
-    tbl.xtable <-
-      xtable(tbl, align = paste("ll",
-                                paste(rep("r", ncol(tbl) - 1), collapse = ""),
-                                sep = "", collapse = ""))
-    print(tbl.xtable, include.rownames = FALSE, type = "html",
-          file = html.filename, sanitize.text.function = function(x) {
-            ifelse(substr(x, 1, 1) == " ", paste("&nbsp &nbsp", x), x)
-          })
 
   }
 
