@@ -16,8 +16,8 @@
 #' \item 1. Use the \code{\link[Kmisc]{write.cb}} function in \pkg{Kmisc} [2].
 #' If your table is stored in a character matrix named \code{table1}, use
 #' \code{write.cb(table1)} to copy the table to your clipboard. Paste the result
-#' into your document, then highlight the text and go to \code{Insert - Table -
-#' Convert Text to Table... OK}.
+#' into your document, then highlight the text and go to
+#' \code{Insert -> Table -> Convert Text to Table... OK}.
 #'
 #' \item 2. Set \code{print.html = TRUE}. This will result in a .html file
 #' being written to your current working directory. When you open this file, you
@@ -109,7 +109,7 @@
 #' parentheses in column headings.
 #'
 #' @param bold.colnames Logical value for whether to use bold font for column
-#' headings. Only applies if \code{latex = TRUE}.
+#' headings. Only used if \code{latex = TRUE}.
 #'
 #' @param bold.varnames Logic value for whether to use bold font for the
 #' \code{y} variable name in the first column. Only used if \code{latex = TRUE}.

@@ -9,5 +9,6 @@ Description: Contains functions for generating tables for statistical reports wr
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
-Imports: gee, graphics, grDevices, Kmisc, stats, survey, survival, xtable
+Depends: gee
+Imports: graphics, grDevices, Kmisc, stats, survey, survival, xtable
 RoxygenNote: 6.0.1
