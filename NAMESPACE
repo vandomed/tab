@@ -2,6 +2,7 @@
 
 export(formatp)
 export(tabfreq)
+export(tabglm)
 export(tabmeans)
 export(tabmedians)
 export(tabmulti)
