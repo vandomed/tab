@@ -1,0 +1,59 @@
+data(d)
+d <- d[complete.cases(d), ]
+
+# Create labels for race levels
+races <- c("White", "Black", "Mexican American", "Other")
+
+# Test whether race is associated with survival
+coxtable1 <- tabcox_old(x = d$Race, time = d$time, delta = d$delta, 
+                        xlabels = c("Race", races))
+coxtable1
+
+surv.obj <- Surv(time = d$time, event = d$delta)
+coxfit <- coxph(surv.obj ~ Age + Race + BMI, data = d)
+summary(coxfit)
+
+
+
+
+# Load in sample dataset d and drop rows with missing values
+data(d)
+d <- d[complete.cases(d), ]
+
+# Test whether race is associated with survival
+coxfit1 <- coxph(Surv(time = d$time, event = d$delta) ~ Race, data = d)
+coxtable1 <- tabcox(coxfit1)
+
+# Test whether age, sex, race, and treatment group are associated with
+# survival
+coxfit2 <- coxph(Surv(time = d$time, event = d$delta) ~ Age + Sex + Race + 
+                   Group, data = d)
+coxtable2 <- tabcox(coxfit2)  
+
+
+tabcox_old(x = d[,c("Age", "Sex", "Race", "Group")],
+             time = d$time, delta = d$delta,
+             xlabels = c("Age", "Male", "Race", races, "Treatment"))
+
+# Create labels for race levels
+races <- c("White", "Black", "Mexican American", "Other")
+
+#' # Test whether age, sex, race, and treatment group are associated with BMI
+#' glmfit1 <- glm(BMI ~ Age + Sex + Race + Group, data = d)
+#' lintable <- tabglm(glmfit = glmfit1,
+#'                    xlabels = c("Intercept", "Age", "Male", "Race", races,
+#'                                "Treatment"))
+#'                                
+#'                                
+
+# Test whether race is associated with survival
+coxfit1 <- coxph(Surv(time = d$time, event = d$delta) ~ Race, data = d)
+coxtable1b <- tabcox(coxfit = coxfit1,
+                    xlabels = c("Race", races))
+
+# Test whether age, sex, race, and treatment group are associated with
+# survival
+coxtable2 <-
+  tabcox_old(x = d[,c("Age", "Sex", "Race", "Group")],
+             time = d$time, delta = d$delta,
+             xlabels = c("Age", "Male", "Race", races, "Treatment"))

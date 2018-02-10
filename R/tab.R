@@ -13,8 +13,8 @@
 #' Package: \tab tab \cr
 #' Type: \tab Package \cr
 #' Version: \tab 3.1.3 \cr
-#' Date: \tab 2018-02-08 \cr
-#' License: \tab GPL-2 \cr
+#' Date: \tab 2018-02-10 \cr
+#' License: \tab GPL-3 \cr
 #' }
 #'
 #' See \href{https://cran.r-project.org/package=tab}{CRAN documentation} for

@@ -223,13 +223,13 @@ tabglm <- function(glmfit, latex = FALSE, xlabels = NULL, ci.beta = TRUE,
     class.ii <- variable.classes[ii]
     if (! class.ii == "factor" |
         (class.ii == "factor" & length(unique(model.ii)) == 2 &
-         binary.compress == TRUE)) {
+         binary.compress)) {
       predcounter <- predcounter + 1
     } else {
       predcounter <- predcounter + length(unique(model.ii)) + 1
     }
   }
-  if (intercept == TRUE) {
+  if (intercept) {
     pred <- c(1, pred + 1)
   }
 
@@ -271,9 +271,11 @@ tabglm <- function(glmfit, latex = FALSE, xlabels = NULL, ci.beta = TRUE,
     coefindex <- coefindex + 1
   }
 
-  # If there are one or more interaction terms OR basic.form is TRUE, just do
-  # basic formatting straight from the table of coefficients
   if ((":" %in% unlist(strsplit(rownames(coef), ""))) | basic.form) {
+
+    # If there are one or more interaction terms OR basic.form is TRUE, just do
+    # basic formatting straight from the table of coefficients
+
     beta <- coef[2: nrow(coef), 1]
     se <- coef[2: nrow(coef), 2]
     stat <- coef[2: nrow(coef), 3]
