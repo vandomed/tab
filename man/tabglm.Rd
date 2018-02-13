@@ -4,36 +4,35 @@
 \alias{tabglm}
 \title{Generate Summary Table for Fitted Generalized Linear Model (GLM)}
 \usage{
-tabglm(glmfit, latex = FALSE, xlabels = NULL, ci.beta = TRUE,
-  inference = "wald", decimals = 2, p.decimals = c(2, 3), p.cuts = 0.01,
-  p.lowerbound = 0.001, p.leading0 = TRUE, p.avoid1 = FALSE,
-  basic.form = FALSE, intercept = TRUE, n = FALSE, events = FALSE,
-  greek.beta = FALSE, binary.compress = TRUE, bold.colnames = TRUE,
-  bold.varnames = FALSE, bold.varlevels = FALSE,
+tabglm(glmfit, columns = NULL, xlabels = NULL, compress.factors = FALSE,
+  ci.sep = ", ", xtable = FALSE, decimals = 2, p.decimals = c(2, 3),
+  p.cuts = 0.01, p.lowerbound = 0.001, p.leading0 = TRUE,
+  p.avoid1 = FALSE, greek.beta = FALSE, bold.colnames = TRUE,
   variable.colname = "Variable", print.html = FALSE,
   html.filename = "table1.html")
 }
 \arguments{
 \item{glmfit}{Object returned from \code{\link[stats]{glm}}.}
 
-\item{latex}{Logical value for whether to format table for printing in LaTeX,
-e.g. using \code{\link[xtable]{xtable}} [1].}
+\item{columns}{Character vector specifying what columns to include. Choices
+for each element are \code{"beta"}, \code{"se"}, \code{"beta.se"},
+\code{"beta.betaci"}, \code{"betaci"}, \code{"or"}, \code{"or.orci"},
+\code{"orci"}, \code{"test"} (for z/t test statistic), and \code{"p"}.}
 
 \item{xlabels}{Character vector with labels for the \code{x} variables and
 their levels. Often useful to leave as \code{NULL} first, see how the table
-gets displayed, and then re-run with meaningful labels where they need to be.}
+looks, and then re-run with labels where they need to be.}
 
-\item{ci.beta}{Logical value for whether to include a column with Wald 95\%
-confidence intervals for the regression coefficients.}
+\item{compress.factors}{Logical value for whether to display factor variables should
+as one row for each of the non-reference group levels, as opposed to one row
+for the variable name and one row for each of the levels including the
+reference group.}
 
-\item{inference}{Character string specifying method for inference. Choices
-are \code{"wald"} for inference based on t or z statistics, depending on the
-GLM family (e.g. Gaussian, Poisson, binomial, etc.); \code{"wald.z"} for
-inference based on z statistics; \code{"profile"} for confidence intervals
-based on profile likelihood (\code{\link[stats]{confint}} function) and
-p-values based on t or z statistics, depending on the GLM family; and
-\code{"profile.z"}, for confidence intervals based on profile likelihood and
-p-values based on z statistics.}
+\item{ci.sep}{Character string with separator to place between lower and
+upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.}
+
+\item{xtable}{Logical value for whether to format table to give to
+\code{\link[xtable]{xtable}} for printing in LaTeX.}
 
 \item{decimals}{Numeric value specifying number of decimal places for numbers
 other than p-values.}
@@ -58,32 +57,11 @@ leading 0's before the decimal point.}
 appear as \code{>0.99} (or similarly depending on \code{p.decimals} and
 \code{p.cuts}) rather than 1.}
 
-\item{basic.form}{Logical value for whether to use a "basic" format for
-factor variables, rather than attempt to neatly format them.}
-
-\item{intercept}{Logical value for whether to include a row for the
-intercept.}
-
-\item{n}{Logical value for whether to include a sample size column.}
-
-\item{events}{Logical value for whether to include a number of events column.
-Only meaningful when the outcome variable is binary.}
-
 \item{greek.beta}{Logical value for whether to display the Greek letter beta
 rather than "Beta". Only used if \code{latex = TRUE}.}
 
-\item{binary.compress}{Logical value for whether binary \code{x} factor
-variables should be displayed as a single row rather than two.}
-
 \item{bold.colnames}{Logical value for whether to use bold font for column
-headings. Only used if \code{latex = TRUE}.}
-
-\item{bold.varnames}{Logic value for whether to use bold font for the
-\code{y} variable name in the first column. Only used if \code{latex = TRUE}.}
-
-\item{bold.varlevels}{Logical value for whether levels of factor \code{x}
-variables should appear in bold font in the first column. Only used if
-\code{latex = TRUE}.}
+headings. Only used if \code{xtable = TRUE}.}
 
 \item{variable.colname}{Character string with desired heading for first
 column of table, in case you prefer something other than \code{"Variable"}.}
@@ -95,19 +73,11 @@ table to the current working directory.}
 that gets written if \code{print.html = TRUE}.}
 }
 \value{
-Character matrix with table summarizing the fitted GLM.
+Character matrix summarizing the fitted GLM.
 }
 \description{
 Creates table summarizing a GLM fit using the \code{\link[stats]{glm}}
 function.
-}
-\details{
-Interaction and polynomial terms are compatible with \code{tabglm}. If
-interaction terms are included, the table will be formatted a little
-differently. Basically including an interaction is equivalent to setting
-\code{basic.form = TRUE}. All variable names and levels will be exactly as
-they appear when you run \code{summary(glmfit)}, where \code{glmfit} is the
-object returned from a call to \code{\link[stats]{glm}}.
 }
 \section{Note}{
 
@@ -130,8 +100,8 @@ your document. You can control the name of this file with
 }
 
 If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-\code{latex = TRUE} and then use \code{\link[xtable]{xtable}} [1]. You may
-have to set \code{sanitize.text.function = identity} when calling
+\code{xtable = TRUE}. You may have to set
+\code{sanitize.text.function = identity} when calling
 \code{\link[xtable]{print.xtable}}.
 }
 
@@ -140,23 +110,20 @@ have to set \code{sanitize.text.function = identity} when calling
 data(d)
 d <- d[complete.cases(d), ]
 
-# Create labels for race levels
-races <- c("White", "Black", "Mexican American", "Other")
-
-# Test whether age, sex, race, and treatment group are associated with BMI
+# Linear regression: BMI vs. age, sex, race, and treatment
 glmfit1 <- glm(BMI ~ Age + Sex + Race + Group, data = d)
-lintable <- tabglm(glmfit = glmfit1,
-                   xlabels = c("Intercept", "Age", "Male", "Race", races,
-                               "Treatment"))
+(lintable <- tabglm(glmfit = glmfit))
 
-# Test whether age, sex, race, and treatment group are associated with 1-year
-# mortality
+# Logistic regression: 1-year mortality vs. age, sex, race, and treatment.
+# Also, use "compressed" format for factors
 glmfit2 <- glm(death_1yr ~ Age + Sex + Race + Group, data = d,
                family = binomial)
+(logtable1 <- tabglm(glmfit = glmfit2, compress.factors = TRUE))
 
-logtable <- tabglm(glmfit = glmfit2, ci.beta = FALSE,
-                   xlabels = c("Intercept", "Age", "Male", "Race", races,
-                               "Treatment"))
+# Logistic regression with higher-order terms
+glmfit3 <- glm(death_1yr ~ poly(Age, 2, raw = TRUE) + Sex + BMI + Sex * BMI,
+               data = d, family = "binomial")
+(logtable2 <- tabglm(glmfit = glmfit3))
 
 
 }

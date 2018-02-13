@@ -27,8 +27,8 @@
 #' }
 #'
 #' If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-#' \code{latex = TRUE} and then use \code{\link[xtable]{xtable}} [1]. You may
-#' have to set \code{sanitize.text.function = identity} when calling
+#' \code{xtable = TRUE}. You may have to set
+#' \code{sanitize.text.function = identity} when calling
 #' \code{\link[xtable]{print.xtable}}.
 #'
 #'
@@ -36,8 +36,8 @@
 #'
 #' @param y Vector of values for the continuous \code{y} variable.
 #'
-#' @param latex Logical value for whether to format table for printing in LaTeX,
-#' e.g. using \code{\link[xtable]{xtable}} [1].
+#' @param xtable Logical value for whether to format table to give to
+#' \code{\link[xtable]{xtable}} for printing in LaTeX.
 #'
 #' @param variance Character string specifying which version of the two-sample
 #' t-test to use, supposing \code{x} has two levels. Choices are \code{"equal"}
@@ -74,8 +74,7 @@
 #' \code{", "}.
 #'
 #' @param decimals Numeric value specifying number of decimal places for numbers
-#' other than p-values. If unspecified, function tries to make a reasonable
-#' choice based on the data.
+#' other than p-values.
 #'
 #' @param p.include Logical value for whether to include a p-value column.
 #'
@@ -109,10 +108,10 @@
 #' parentheses in column headings.
 #'
 #' @param bold.colnames Logical value for whether to use bold font for column
-#' headings. Only used if \code{latex = TRUE}.
+#' headings. Only used if \code{xtable = TRUE}.
 #'
 #' @param bold.varnames Logic value for whether to use bold font for the
-#' \code{y} variable name in the first column. Only used if \code{latex = TRUE}.
+#' \code{y} variable name in the first column. Only used if \code{xtable = TRUE}.
 #'
 #' @param variable.colname Character string with desired heading for first
 #' column of table, in case you prefer something other than \code{"Variable"}.
@@ -175,7 +174,7 @@
 #'
 #'
 #' @export
-tabmeans <- function(x, y, latex = FALSE, variance = "unequal", xname = NULL,
+tabmeans <- function(x, y, xtable = FALSE, variance = "unequal", xname = NULL,
                      xlevels = NULL, yname = NULL, quantiles = NULL,
                      quantile.vals = FALSE, parenth = "sd", text.label = NULL,
                      parenth.sep = "-", decimals = NULL, p.include = TRUE,
@@ -201,8 +200,8 @@ tabmeans <- function(x, y, latex = FALSE, variance = "unequal", xname = NULL,
   }
 
   # If any inputs are not correct class, return error
-  if (!is.logical(latex)) {
-    stop("For latex input, please enter TRUE or FALSE")
+  if (!is.logical(xtable)) {
+    stop("For xtable input, please enter TRUE or FALSE")
   }
   if (! variance %in% c("equal", "unequal", "ftest")) {
     stop("For variance input, please enter 'equal', 'unequal', or 'ftest'")
@@ -386,7 +385,7 @@ tabmeans <- function(x, y, latex = FALSE, variance = "unequal", xname = NULL,
       } else if (parenth == "se") {
         text.label <- ", M (SE)"
       } else if (parenth %in% c("t.ci", "z.ci")) {
-        if (latex == TRUE) {
+        if (xtable) {
           text.label <- ", M (95\\% CI)"
         } else {
           text.label <- ", M (95% CI)"
@@ -480,8 +479,8 @@ tabmeans <- function(x, y, latex = FALSE, variance = "unequal", xname = NULL,
       tbl <- tbl[, -which(colnames(tbl) == "P"), drop = FALSE]
     }
 
-    # If latex is TRUE, do some re-formatting
-    if (latex) {
+    # If xtable is TRUE, do some re-formatting
+    if (xtable) {
       if (p.include) {
         plocs <- which(substr(tbl[, "P"], 1, 1) == "<")
         if (length(plocs) > 0) {

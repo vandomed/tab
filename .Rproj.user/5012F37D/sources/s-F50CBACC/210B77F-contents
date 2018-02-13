@@ -1,3 +1,37 @@
+ # Load in sample dataset d and drop rows with missing values
+ data(d)
+ d <- d[complete.cases(d), ]
+
+ # Create labels for race levels
+ races <- c("White", "Black", "Mexican American", "Other")
+
+ # Test whether age, sex, race, and treatment group are associated with BMI
+ d$Age2 <- quant_groups(d$Age, ordered_result = TRUE)
+ glmfit <- glm(BMI ~ poly(Age, 2, raw = TRUE) + Age2 + Sex + Race + Group, data = d)
+ glmfit$terms
+ 
+ lintable <- tabglm(glmfit = glmfit1,
+                    xlabels = c("Intercept", "Age", "Male", "Race", races,
+                                "Treatment"))
+
+ # Test whether age, sex, race, and treatment group are associated with 1-year
+ # mortality
+ glmfit2 <- glm(death_1yr ~ Age + Sex + Race + Group, data = d,
+                family = binomial)
+
+ logtable <- tabglm(glmfit = glmfit2, ci.beta = FALSE,
+                    xlabels = c("Intercept", "Age", "Male", "Race", races,
+                                "Treatment"))
+
+
+
+ glmfit <- glm(BMI ~ poly(Age, 2, raw = TRUE) + Age2 + Sex + Race - 1, data = d)
+ 
+
+
+
+
+
 data(d)
 d <- d[complete.cases(d), ]
 
@@ -26,7 +60,7 @@ coxtable1 <- tabcox(coxfit1)
 
 # Test whether age, sex, race, and treatment group are associated with
 # survival
-coxfit2 <- coxph(Surv(time = d$time, event = d$delta) ~ Age + Sex + Race + 
+coxfit2 <- coxph(Surv(time = d$time, event = d$delta) ~ poly(Age, 2, raw = TRUE) + Sex + Race + 
                    Group, data = d)
 coxtable2 <- tabcox(coxfit2)  
 
@@ -38,13 +72,13 @@ tabcox_old(x = d[,c("Age", "Sex", "Race", "Group")],
 # Create labels for race levels
 races <- c("White", "Black", "Mexican American", "Other")
 
-#' # Test whether age, sex, race, and treatment group are associated with BMI
-#' glmfit1 <- glm(BMI ~ Age + Sex + Race + Group, data = d)
-#' lintable <- tabglm(glmfit = glmfit1,
-#'                    xlabels = c("Intercept", "Age", "Male", "Race", races,
-#'                                "Treatment"))
-#'                                
-#'                                
+ # Test whether age, sex, race, and treatment group are associated with BMI
+ glmfit1 <- glm(BMI ~ Age + Sex + Race + Group, data = d)
+ lintable <- tabglm(glmfit = glmfit1,
+                    xlabels = c("Intercept", "Age", "Male", "Race", races,
+                                "Treatment"))
+                                
+                                
 
 # Test whether race is associated with survival
 coxfit1 <- coxph(Surv(time = d$time, event = d$delta) ~ Race, data = d)
@@ -57,3 +91,97 @@ coxtable2 <-
   tabcox_old(x = d[,c("Age", "Sex", "Race", "Group")],
              time = d$time, delta = d$delta,
              xlabels = c("Age", "Male", "Race", races, "Treatment"))
+
+
+
+
+
+
+
+
+
+
+
+ # Load in sample dataset d and drop rows with missing values
+ data(d)
+ d <- d[complete.cases(d), ]
+
+ # Create labels for race levels
+ races <- c("White", "Black", "Mexican American", "Other")
+
+ # Test whether age, sex, race, and treatment group are associated with BMI
+ glmfit1 <- glm(BMI ~ Age + Sex + Race + Group, data = d)
+ lintable <- tabglm(glmfit = glmfit1)
+
+ # Test whether age, sex, race, and treatment group are associated with 1-year
+ # mortality
+ glmfit2 <- glm(death_1yr ~ Age + Sex + Race + Group, data = d, 
+                family = binomial)
+ logtable <- tabglm(glmfit = glmfit2, columns = c("beta", "or.orci", "p"))
+ 
+glmfit <- glm(death_1yr ~ Age*Race, data = d, family = "binomial")
+logtable <- tabglm(glmfit = glmfit)
+
+glmfit <- glm(death_1yr ~ Age + Race + Age*Race, data = d, family = "binomial")
+logtable <- tabglm(glmfit = glmfit)
+
+glmfit <- glm(death_1yr ~ Age + Race + Age*Race + poly(BMI, 2, raw = TRUE), 
+              data = d, family = "binomial")
+
+
+abc <- load.gains(tickers = c("^VIX", "XIV"))
+#abc <- abc[-which(rownames(abc) == "2018-02-06"), ]
+fig1 <- onemetric.overtime.graph(gains = abc, y.metric = "alpha", window.units = 5)
+
+abc2 <- tail(abc, 3)
+plot(abc2[, 1], abc2[, 2])
+plot(abc2[, 1], abc2[, 2], xlim = c(-0.25, 0.25), ylim = c(-0.2, 0.2))
+points(c(-2, 2), c(-2, 2), type = "l")
+gains.graph(gains = abc)
+
+dates <- as.Date(rownames(abc))
+abc1 <- abc[dates <= as.Date("2018-02-05"), ]
+abc2 <- abc[dates >= as.Date("2018-02-07"), ]
+gains.graph(gains = abc1)
+points(x = abc2[, 1], y = abc2[, 2], type = "p", col = "red", pch = 16)
+
+
+
+
+
+# Load in sample dataset d and drop rows with missing values
+data(d)
+d <- d[complete.cases(d), ]
+
+# Linear regression: BMI vs. age, sex, race, and treatment
+glmfit1 <- glm(BMI ~ Age + Sex + Race + Group, data = d)
+(lintable <- tabglm(glmfit = glmfit))
+
+# Logistic regression: 1-year mortality vs. age, sex, race, and treatment. 
+# Also, use "compressed" format for factors
+glmfit2 <- glm(death_1yr ~ Age + Sex + Race + Group, data = d,
+               family = binomial)
+(logtable1 <- tabglm(glmfit = glmfit2, compress.factors = TRUE))
+
+# Logistic regression with higher-order terms
+glmfit3 <- glm(death_1yr ~ poly(Age, 2, raw = TRUE) + Sex + BMI +
+                 Sex * BMI, data = d, family = "binomial")
+(logtable2 <- tabglm(glmfit = glmfit3))
+
+
+
+
+ data(d)
+ d2 <- reshape(data = d, varying = c("bp.1", "bp.2", "bp.3", "highbp.1",
+                                     "highbp.2", "highbp.3"),
+               timevar = "bp.visit", direction = "long")
+ d2 <- d2[order(d2$id), ]
+
+ # Create labels for race levels
+ races <- c("White", "Black", "Mexican American", "Other")
+
+ # Test whether predictors are associated with blood pressure at 1, 2, and 3
+ # months
+ geefit1 <- gee(bp ~ Age + Sex + Race + BMI + Group, id = id, data = d2,
+                corstr = "unstructured")
+

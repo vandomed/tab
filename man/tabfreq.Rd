@@ -20,9 +20,6 @@ tabfreq(x = NULL, y, latex = FALSE, xlevels = NULL, yname = NULL,
 
 \item{y}{Vector indicating group membership for rows of IxJ table.}
 
-\item{latex}{Logical value for whether to format table for printing in LaTeX,
-e.g. using \code{\link[xtable]{xtable}} [1].}
-
 \item{xlevels}{Character vector with labels for each level of \code{x}, for
 column headings.}
 
@@ -115,10 +112,10 @@ controlled by \code{compress.val}.}
 when \code{compress = TRUE}.}
 
 \item{bold.colnames}{Logical value for whether to use bold font for column
-headings. Only used if \code{latex = TRUE}.}
+headings. Only used if \code{xtable = TRUE}.}
 
 \item{bold.varnames}{Logic value for whether to use bold font for the
-\code{y} variable name in the first column. Only used if \code{latex = TRUE}.}
+\code{y} variable name in the first column. Only used if \code{xtable = TRUE}.}
 
 \item{bold.varlevels}{Logical value for whether levels of \code{y} should
 appear in bold font in the first column. Only used if \code{latex = TRUE}.}
@@ -161,8 +158,8 @@ your document. You can control the name of this file with
 }
 
 If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-\code{latex = TRUE} and then use \code{\link[xtable]{xtable}} [1]. You may
-have to set \code{sanitize.text.function = identity} when calling
+\code{xtable = TRUE}. You may have to set
+\code{sanitize.text.function = identity} when calling
 \code{\link[xtable]{print.xtable}}.
 }
 

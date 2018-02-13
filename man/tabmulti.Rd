@@ -41,9 +41,6 @@ levels.}
 values for any \code{y} variable should be excluded entirely (as opposed to
 using all available data for each comparison).}
 
-\item{latex}{Logical value for whether to format table for printing in LaTeX,
-e.g. using \code{\link[xtable]{xtable}} [1].}
-
 \item{xlevels}{Character vector with labels for each level of \code{x}, for
 column headings.}
 
@@ -160,7 +157,7 @@ parentheses in column headings.}
 be displayed as a single row rather than two.}
 
 \item{bold.colnames}{Logical value for whether to use bold font for column
-headings. Only used if \code{latex = TRUE}.}
+headings. Only used if \code{xtable = TRUE}.}
 
 \item{bold.varnames}{Logic value for whether to use bold font for
 \code{y} variable names in the first column. Only used if \code{latex = TRUE}.}
@@ -209,8 +206,8 @@ your document. You can control the name of this file with
 }
 
 If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-\code{latex = TRUE} and then use \code{\link[xtable]{xtable}} [1]. You may
-have to set \code{sanitize.text.function = identity} when calling
+\code{xtable = TRUE}. You may have to set
+\code{sanitize.text.function = identity} when calling
 \code{\link[xtable]{print.xtable}}.
 }
 

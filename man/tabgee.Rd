@@ -16,19 +16,12 @@ tabgee(geefit, latex = FALSE, xlabels = NULL, ci.beta = TRUE,
 \arguments{
 \item{geefit}{Object returned from \code{\link[gee]{gee}}.}
 
-\item{latex}{Logical value for whether to format table for printing in LaTeX,
-e.g. using \code{\link[xtable]{xtable}} [1].}
-
 \item{xlabels}{Character vector with labels for the \code{x} variables and
 their levels. Often useful to leave as \code{NULL} first, see how the table
-gets displayed, and then re-run with meaningful labels where they need to be.}
-
-\item{ci.beta}{Logical value for whether to include a column with Wald 95\%
-confidence intervals for the regression coefficients.}
+looks, and then re-run with labels where they need to be.}
 
 \item{decimals}{Numeric value specifying number of decimal places for numbers
-other than p-values. If unspecified, function tries to make a reasonable
-choice based on the data.}
+other than p-values.}
 
 \item{p.decimals}{Numeric value specifying number of decimal places for
 p-values. Can be a vector if you want the number of decimals to depend on
@@ -50,12 +43,6 @@ leading 0's before the decimal point.}
 appear as \code{>0.99} (or similarly depending on \code{p.decimals} and
 \code{p.cuts}) rather than 1.}
 
-\item{basic.form}{Logical value for whether to use a "basic" format for
-factor variables, rather than attempt to neatly format them.}
-
-\item{intercept}{Logical value for whether to include a row for the
-intercept.}
-
 \item{n.id}{Logical value for whether to include a column for the number of
 unique IDs (i.e. clusters).}
 
@@ -75,18 +62,11 @@ predictors is a factor variable and \code{basic.form = FALSE}.}
 \item{greek.beta}{Logical value for whether to display the Greek letter beta
 rather than "Beta". Only used if \code{latex = TRUE}.}
 
-\item{binary.compress}{Logical value for whether binary \code{x} factor
-variables should be displayed as a single row rather than two.}
-
 \item{bold.colnames}{Logical value for whether to use bold font for column
-headings. Only used if \code{latex = TRUE}.}
+headings. Only used if \code{xtable = TRUE}.}
 
 \item{bold.varnames}{Logic value for whether to use bold font for the
-\code{y} variable name in the first column. Only used if \code{latex = TRUE}.}
-
-\item{bold.varlevels}{Logical value for whether levels of factor \code{x}
-variables should appear in bold font in the first column. Only used if
-\code{latex = TRUE}.}
+\code{y} variable name in the first column. Only used if \code{xtable = TRUE}.}
 
 \item{variable.colname}{Character string with desired heading for first
 column of table, in case you prefer something other than \code{"Variable"}.}
@@ -133,8 +113,8 @@ your document. You can control the name of this file with
 }
 
 If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-\code{latex = TRUE} and then use \code{\link[xtable]{xtable}} [1]. You may
-have to set \code{sanitize.text.function = identity} when calling
+\code{xtable = TRUE}. You may have to set
+\code{sanitize.text.function = identity} when calling
 \code{\link[xtable]{print.xtable}}.
 }
 

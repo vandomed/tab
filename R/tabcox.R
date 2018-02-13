@@ -59,7 +59,6 @@
 #' \url{https://CRAN.R-project.org/package=Kmisc}.
 #'
 #'
-#' @export
 tabcox <- function(coxfit, latex = FALSE, xlabels = NULL, decimals = 2,
                    p.decimals = c(2, 3), p.cuts = 0.01, p.lowerbound = 0.001,
                    p.leading0 = TRUE, p.avoid1 = FALSE, n = FALSE,

@@ -19,9 +19,6 @@ tabmedians(x, y, latex = FALSE, xname = NULL, xlevels = NULL,
 
 \item{y}{Vector of values for the continuous \code{y} variable.}
 
-\item{latex}{Logical value for whether to format table for printing in LaTeX,
-e.g. using \code{\link[xtable]{xtable}} [1].}
-
 \item{xname}{Character string with a label for the \code{x} variable.}
 
 \item{xlevels}{Character vector with labels for each level of \code{x}, for
@@ -53,8 +50,7 @@ second numbers in parentheses, if applicable. Typically \code{"-"} or
 \code{", "}.}
 
 \item{decimals}{Numeric value specifying number of decimal places for numbers
-other than p-values. If unspecified, function tries to make a reasonable
-choice based on the data.}
+other than p-values.}
 
 \item{p.include}{Logical value for whether to include a p-value column.}
 
@@ -88,10 +84,10 @@ overall sample size.}
 parentheses in column headings.}
 
 \item{bold.colnames}{Logical value for whether to use bold font for column
-headings. Only used if \code{latex = TRUE}.}
+headings. Only used if \code{xtable = TRUE}.}
 
 \item{bold.varnames}{Logic value for whether to use bold font for the
-\code{y} variable name in the first column. Only used if \code{latex = TRUE}.}
+\code{y} variable name in the first column. Only used if \code{xtable = TRUE}.}
 
 \item{variable.colname}{Character string with desired heading for first
 column of table, in case you prefer something other than \code{"Variable"}.}
@@ -145,8 +141,8 @@ your document. You can control the name of this file with
 }
 
 If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-\code{latex = TRUE} and then use \code{\link[xtable]{xtable}} [1]. You may
-have to set \code{sanitize.text.function = identity} when calling
+\code{xtable = TRUE}. You may have to set
+\code{sanitize.text.function = identity} when calling
 \code{\link[xtable]{print.xtable}}.
 }
 
