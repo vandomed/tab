@@ -19,21 +19,19 @@
 #'
 #' @param geefit Object returned from \code{\link[gee]{gee}}.
 #'
-#' @param n.id Logical value for whether to include a column for the number of
-#' unique IDs (i.e. clusters).
+#' @param columns Character vector specifying what columns to include. Choices
+#' for each element are \code{"beta"}, \code{"se"}, \code{"beta.se"},
+#' \code{"beta.betaci"}, \code{"betaci"}, \code{"or"}, \code{"or.orci"},
+#' \code{"orci"}, \code{"z"}, and \code{"p"}.
 #'
-#' @param n.total Logical value for whether to include a column for the total
-#' number of observations used.
-#'
-#' @param or Logical value for whether to include columns for odds ratios and
-#' associated Wald 95\% confidence intervals. Only used for logistic regression.
-#'
-#' @param robust Logical value for whether robust standard errors should be used
-#' (i.e. from sandwich estimator).
+#' @param robust Logical value for whether 'robust' standard errors should be
+#' used for inference.
 #'
 #' @param data Data frame containing variables passed to \code{\link[gee]{gee}}
 #' to create \code{geefit}. Only needs to be specified when one or more of the
-#' predictors is a factor variable and \code{basic.form = FALSE}.
+#' predictors is a factor variable and \code{compres.factors = FALSE}.
+#'
+#'
 #'
 #'
 #' @return Character matrix with table summarizing the fitted GEE.
@@ -47,28 +45,16 @@
 #'               timevar = "bp.visit", direction = "long")
 #' d2 <- d2[order(d2$id), ]
 #'
-#' # Create labels for race levels
-#' races <- c("White", "Black", "Mexican American", "Other")
-#'
-#' # Test whether predictors are associated with blood pressure at 1, 2, and 3
-#' # months
+#' # GEE: Blood pressure at 1, 2, and 3 months vs. predictors
 #' geefit1 <- gee(bp ~ Age + Sex + Race + BMI + Group, id = id, data = d2,
 #'                corstr = "unstructured")
+#' (geetable1 <- tabgee(geefit = geefit1, data = d2))
 #'
-#' # Create summary table using tabgee
-#' geetable1 <- tabgee(geefit = geefit1, data = d2, n.id = TRUE, n.total = TRUE,
-#'                     xlabels = c("Intercept", "Age", "Male", "Race", races,
-#'                                 "BMI", "Treatment"))
-#'
-#' # Test whether predictors are associated with high blood pressure at 1, 2,
-#' # and 3 months
+#' # GEE: High blood pressure at 1, 2, and 3 months vs. predictors. Display
+#' # factors in "compressed" format
 #' geefit2 <- gee(highbp ~ Age + Sex + Race + BMI + Group, id = id, data = d2,
 #'                family = binomial, corstr = "unstructured")
-#'
-#' # Create summary table using tabgee
-#' geetable2 <- tabgee(geefit = geefit2, data = d2, ci.beta = FALSE,
-#'                     xlabels = c("Intercept", "Age", "Male", "Race", races,
-#'                                 "BMI", "Treatment"))
+#' (geetable2 <- tabgee(geefit = geefit2, data = d2, compress.factors = TRUE))
 #'
 #'
 #' @references
@@ -83,376 +69,325 @@
 #'\url{https://CRAN.R-project.org/package=Kmisc}.
 #'
 #'
-tabgee <- function(geefit, latex = FALSE, xlabels = NULL, ci.beta = TRUE,
-                   decimals = 2, p.decimals = c(2, 3), p.cuts = 0.01,
-                   p.lowerbound = 0.001, p.leading0 = TRUE, p.avoid1 = FALSE,
-                   basic.form = FALSE, intercept = TRUE, n.id = FALSE,
-                   n.total = FALSE, or = TRUE, robust = TRUE, data = NULL,
-                   greek.beta = FALSE, binary.compress = TRUE,
-                   bold.colnames = TRUE, bold.varnames = FALSE,
-                   bold.varlevels = FALSE, variable.colname = "Variable",
-                   print.html = FALSE, html.filename = "table1.html") {
+#'@export
+tabgee <- function(geefit, columns = NULL, robust = TRUE, xlabels = NULL,
+                   compress.factors = FALSE, data = NULL, ci.sep = ", ",
+                   format.xtable = FALSE, decimals = 2, p.decimals = c(2, 3),
+                   p.cuts = 0.01, p.lowerbound = 0.001, p.leading0 = TRUE,
+                   p.avoid1 = FALSE, greek.beta = FALSE, bold.colnames = TRUE,
+                   variable.colname = "Variable", print.html = FALSE,
+                   html.filename = "table1.html") {
 
-  # If any inputs are not correct class, return error
-  if (! all(class(geefit) == c("gee", "glm"))) {
-    stop("For geefit input, please enter an object returned from the gee function")
+  # Extract info from geefit
+  summary.geefit <- summary(geefit)
+  coefmat <- summary.geefit$coefficients
+  rownames.coefmat <- rownames(coefmat)
+  betas <- coefmat[, "Estimate"]
+  if (robust) {
+    ses <- coefmat[, "Robust S.E."]
+    zs <- coefmat[, "Robust z"]
+  } else {
+    ses <- coefmat[, "Naive S.E."]
+    zs <- coefmat[, "Naive z"]
   }
-  if (! is.logical(latex)) {
-    stop("For latex input, please enter TRUE or FALSE")
-  }
-  if (! is.logical(ci.beta)) {
-    stop("For ci.beta input, please enter TRUE or FALSE")
-  }
-  if (! is.numeric(decimals)) {
-    stop("For decimals input, please enter numeric value")
-  }
-  if (! is.numeric(p.decimals)) {
-    stop("For p.decimals input, please enter numeric value or vector")
-  }
-  if (! is.numeric(p.cuts)) {
-    stop("For p.cuts input, please enter numeric value or vector")
-  }
-  if (! is.numeric(p.lowerbound)) {
-    stop("For p.lowerbound input, please enter numeric value")
-  }
-  if (! is.logical(p.leading0)) {
-    stop("For p.leading0 input, please enter TRUE or FALSE")
-  }
-  if (! is.logical(p.avoid1)) {
-    stop("For p.avoid1 input, please enter TRUE or FALSE")
-  }
-  if (! is.logical(basic.form)) {
-    stop("For basic.form input, please enter TRUE or FALSE")
-  }
-  if (! is.logical(intercept)) {
-    stop("For intercept input, please enter TRUE or FALSE")
-  }
-  if (! is.logical(n.id)) {
-    stop("For n.id input, please enter TRUE or FALSE")
-  }
-  if (! is.logical(n.total)) {
-    stop("For n.total input, please enter TRUE or FALSE")
-  }
-  if (! is.logical(or)) {
-    stop("For or input, please enter TRUE or FALSE")
-  }
-  if (! is.logical(robust)) {
-    stop("For robust input, please enter TRUE or FALSE")
-  }
-  if (! is.null(data)) {
-    if (!(is.data.frame(data) | is.matrix(data))) {
-      stop("For data input, please enter data frame or matrix.")
-    }
-  }
-  if (! is.logical(greek.beta)) {
-    stop("For greek.beta input, please enter TRUE or FALSE")
-  }
-  if (! is.logical(binary.compress)) {
-    stop("For binary.compress input, please enter TRUE or FALSE")
-  }
-  if (! is.logical(bold.colnames)) {
-    stop("For bold.colnames input, please enter TRUE or FALSE")
-  }
-  if (! is.logical(bold.varnames)) {
-    stop("For bold.varnames input, please enter TRUE or FALSE")
-  }
-  if (! is.logical(bold.varlevels)) {
-    stop("For bold.varlevels input, please enter TRUE or FALSE")
-  }
-  if (! is.character(variable.colname)) {
-    stop("For variable.colname input, please enter a character string")
-  }
+  ps <- pnorm(-abs(zs)) * 2
+  intercept <- rownames.coefmat[1] == "(Intercept)"
+  gee.fam <- geefit$family$family
+  gee.link <- geefit$family$link
 
-  # Convert decimals to variable for sprintf
-  spf <- paste("%0.", decimals, "f", sep = "")
-
-  # Store gee.fit results
-  coef <- summary(geefit)$coefficients
-  model <- attr(geefit$terms, "dataClasses")
-  xvars <- c()
-  xnames <- c()
-  variable.classes <- c()
-  for (ii in 2: (length(model) - 1)) {
-    class.split <- unlist(strsplit(model[ii], "[.]"))
-    if (class.split[1] == "nmatrix") {
-      name.ii <- substring(strsplit(names(class.split)[2], ",")[[1]][1], 6)
-      order.ii <- as.numeric(class.split[2])
-      variable.classes <- c(variable.classes, rep("numeric", order.ii))
-      xvars <- c(xvars, name.ii)
-      xnames <- c(xnames, name.ii)
-      if (order.ii >= 2) {
-        xnames <- c(xnames, paste(name.ii, "squared"))
-      }
-      if (order.ii >= 3) {
-        xnames <- c(xnames, paste(name.ii, "cubed"))
-      }
-      if (order.ii >= 4) {
-        xnames <- c(xnames, paste(name.ii, "^", 4: order.ii))
-      }
+  # Default columns to include depending on family of GEE
+  if (is.null(columns)) {
+    if (gee.fam == "binomial" & gee.link == "logit") {
+      columns <- c("beta.se", "or.orci", "p")
     } else {
-      variable.classes <- c(variable.classes, model[ii])
-      xvars <- c(xvars, names(model)[ii])
-      xnames <- c(xnames, names(model)[ii])
+      columns <- c("beta.se", "p")
     }
   }
 
-  # Get subset of data with no missing values
-  if (!is.null(data)) {
-    data <- data[, xvars]
-    data <- data[complete.cases(data), ]
+  # Determine whether xlabels has to be created
+  create.xlabels <- is.null(xlabels)
+
+  # Choose version of beta and leading spaces to use
+  space.char <- ifelse(format.xtable, "$\\hskip .4cm$", "  ")
+  beta.char <- ifelse(format.xtable & greek.beta, "$\\hat{\\beta}$", "Beta")
+
+  # Determine whether there are factors, interactions, or polynomials
+  classes <- attr(geefit$terms, "dataClasses")
+  x.factors <- names(classes)[classes == "factor"]
+  factors <- length(x.factors) > 0
+
+  interactions <- length(grep(pattern = ":", x = rownames.coefmat)) > 1
+
+  polynomial.rows <- grep(pattern = "poly(", x = rownames.coefmat, fixed = TRUE)
+  polynomials <- length(polynomial.rows) > 0
+
+  # If necessary, force compress.factors to be TRUE and notify user for reason
+  if (interactions & ! compress.factors) {
+    message("The 'compress.factors' input is being switched to TRUE because the fitted GEE includes interaction terms. This limitation may be addressed in future versions of 'tabgee'.")
+    compress.factors <- TRUE
+  } else if (compress.factors & is.null(data) & create.xlabels) {
+    message("The compress.factors input is being switched to TRUE because reference group labels are not available. If you really want compress.factors = FALSE, you'll need to re-run with 'data' or 'xlabels' specified.")
+    compress.factors <- TRUE
   }
 
-  # Column for SE's and Z's based on robust input
-  secol <- ifelse(! robust, 2, 4)
-  zcol <- ifelse(! robust, 3, 5)
+  # Determine row indices for table entries and create xlabels vector
+  if (compress.factors) {
 
-  # Initialized vectors for formatting factor variables in table
-  spaces <- c()
-  refs <- c()
+    # Compressed factor formatting
 
-  # Get indices of variable names
-  predcounter <- 0
-  pred <- c()
-  for (ii in 2: (length(model) - 1)) {
-    pred[ii - 1] <- predcounter + 1
-    if (substr(model[ii], 1, 7) == "nmatrix") {
-      predcounter <- predcounter +
-        as.numeric(strsplit(model[ii], "[.]")[[1]][2])
-    } else if (! model[ii] == "factor" |
-               (model[ii] == "factor" &
-                length(unique(data[, names(model)[ii]])) == 2 &
-                binary.compress)) {
-      predcounter <- predcounter + 1
-    } else {
-      predcounter <- predcounter + length(unique(data[, names(model)[ii]]))
+    # All rows of table have entries
+    ref.rows <- c()
+    entry.rows <- 1: nrow(coefmat)
+
+    # Create xlabels
+    if (create.xlabels) {
+
+      # Start with row names
+      if (intercept) {
+        xlabels <- c("Intercept", rownames.coefmat[-1])
+      } else {
+        xlabels <- rownames.coefmat
+      }
+
+      # Clean up polynomials
+      if (polynomials) {
+
+        for (ii in polynomial.rows) {
+          xlabel.parts <- unlist(strsplit(x = xlabels[ii], split = ","))
+          varname.ii <- substring(xlabel.parts[1], first = 6)
+          poly.order <- as.numeric(substring(xlabel.parts[3],
+                                             first = nchar(xlabel.parts[3])))
+          if (poly.order == 1) {
+            xlabels[ii] <- varname.ii
+          } else if (poly.order == 2) {
+            xlabels[ii] <- paste(varname.ii, "squared")
+          } else if (poly.order == 3) {
+            xlabels[ii] <- paste(varname.ii, "cubed")
+          } else {
+            xlabels[ii] <- paste(varname.ii, poly.order, sep = "^")
+          }
+        }
+
+      }
+
+      # Clean up factors (imperfect solution - could go wrong!)
+      if (factors | interactions) {
+
+        for (ii in 1: length(x.factors)) {
+          xlabels <- unlist(lapply(xlabels, function(x)
+            gsub(pattern = x.factors[ii], replacement = "", x = x)))
+        }
+
+      }
+
+    }
+
+  } else {
+
+    # Expanded factor formatting
+    rowcount <- ifelse(intercept, 1, 0)
+    entry.rows <- rowcount
+    ref.rows <- c()
+    if (create.xlabels & intercept) {
+      xlabels <- "Intercept"
+    }
+    for (ii in 1:
+         length(unlist(strsplit(x = deparse(geefit$call, width.cutoff = 500),
+                                split = "+", fixed = TRUE)))) {
+
+      rowcount <- rowcount + 1
+      varname.ii <- deparse(geefit$terms[ii][[3]])
+      if (substr(varname.ii, 1, 4) == "poly") {
+
+        # Clean up polynomial
+        varname.ii.split <-
+          unlist(strsplit(substring(varname.ii, first = 6), split = ","))
+        varname.ii <- varname.ii.split[1]
+        poly.order <- as.numeric(varname.ii.split[2])
+        if (create.xlabels) {
+          if (poly.order == 1) {
+            xlabels[rowcount] <- varname.ii
+          } else if (poly.order == 2) {
+            xlabels[rowcount: (rowcount + 1)] <-
+              c(varname.ii, paste(varname.ii, "squared"))
+          } else if (poly.order == 3) {
+            xlabels[rowcount: (rowcount + 2)] <-
+              c(varname.ii, paste(varname.ii, c("squared", "cubed")))
+          } else {
+            xlabels[rowcount: (rowcount + poly.order - 1)] <-
+              c(varname.ii, paste(varname.ii, 2: poly.order, sep = "^"))
+          }
+        }
+        entry.rows <- c(entry.rows, rowcount: (rowcount + poly.order - 1))
+        rowcount <- rowcount + poly.order - 1
+
+      } else if (varname.ii %in% x.factors) {
+
+        # Clean up factor
+        locs <- which(substr(rownames.coefmat, start = 1,
+                             stop = nchar(varname.ii)) == varname.ii)
+        levels.ii <- levels(data[[varname.ii]])
+        nlevels.ii <- length(levels.ii)
+        new.entries <- (rowcount + 1): (rowcount + nlevels.ii)
+        if (create.xlabels) {
+          xlabels[rowcount] <- varname.ii
+          xlabels[new.entries] <- levels.ii
+        }
+        xlabels[new.entries] <-
+          paste(space.char, xlabels[new.entries], sep = "")
+        xlabels[rowcount + 1] <- paste(xlabels[rowcount + 1], "(ref)")
+        entry.rows <- c(entry.rows, (rowcount + 2): (rowcount + nlevels.ii))
+        ref.rows <- c(ref.rows, rowcount + 1)
+        rowcount <- rowcount + nlevels.ii
+
+      } else {
+
+        entry.rows <- c(entry.rows, rowcount)
+        if (create.xlabels) {
+          xlabels[rowcount] <- varname.ii
+        }
+
+      }
     }
   }
 
   # Initialize table
-  tbl <- matrix("", nrow = 100, ncol = 8)
-  tbl[1, 2] <- length(unique(geefit$id))
-  tbl[1, 3] <- sprintf("%0.0f", geefit$nobs)
+  tbl <- matrix(xlabels, ncol = 1, dimnames = list(NULL, variable.colname))
+  nrows <- nrow(tbl)
 
-  # Create index variables for table and gee coefficients
-  tabindex <- 1
-  coefindex <- 1
+  # Convert decimals to variable for sprintf
+  spf <- paste("%0.", decimals, "f", sep = "")
 
-  # Enter intercept information if available
-  if (rownames(coef)[1] == "(Intercept)" & intercept) {
-    beta <- coef[1, 1]
-    se <- coef[1, secol]
-    z <- coef[1, zcol]
-    p <- pnorm(-abs(z)) * 2
-    tbl[1, 1] <- "Intercept"
-    tbl[1, 4] <- paste(sprintf(spf, coef[1, 1]), " (", sprintf(spf, se), ")",
-                       sep = "")
-    tbl[1, 5] <- paste("(", sprintf(spf, beta - 1.96 * se), ", ",
-                       sprintf(spf, beta + 1.96 * se), ")", sep = "")
-    tbl[1, 6: 7] <- "-"
-    tbl[1, 8] <- formatp(p = p, cuts = p.cuts, decimals = p.decimals,
-                         lowerbound = p.lowerbound, leading0 = p.leading0,
-                         avoid1 = p.avoid1)
-    tabindex <- tabindex + 1
-    coefindex <- coefindex + 1
+  # Loop through column input and add each
+  for (ii in 1: length(columns)) {
 
-  } else {
-    coefindex <- coefindex + 1
-  }
+    column.ii <- columns[ii]
 
-  if ((":" %in% unlist(strsplit(rownames(coef), ""))) | basic.form |
-      (sum(model == "factor") > 0 & is.null(data))) {
+    if (column.ii == "n") {
 
-    # If there are one or more interaction terms OR basic.form is TRUE, just do
-    # basic formatting straight from the table of coefficients
+      # N
+      tbl <- cbind(tbl, matrix(c(length(geefit$residuals), rep("", nrows - 1)),
+                               ncol = 1, dimnames = list(NULL, "N")))
 
-    beta <- coef[2:nrow(coef), 1]
-    se <- coef[2:nrow(coef), secol]
-    or <- exp(beta)
-    z <- coef[tabindex: nrow(coef), zcol]
-    p <- pnorm(-abs(z)) * 2
-    tbl[2: nrow(coef), 1] <- rownames(coef)[-1]
-    tbl[2: nrow(coef), 4] <- paste(sprintf(spf, beta), " (", sprintf(spf, se),
-                                  ")", sep = "")
-    tbl[2: nrow(coef), 5] <- paste("(", sprintf(spf, beta - 1.96 * se), ", ",
-                                  sprintf(spf, beta + 1.96 * se), ")", sep = "")
-    tbl[2: nrow(coef), 6] <- sprintf(spf, exp(beta))
-    tbl[2: nrow(coef), 7] <-
-      paste("(", sprintf(spf, exp(beta - 1.96 * se)), ", ",
-            sprintf(spf, exp(beta + 1.96 * se)), ")", sep = "")
-    tbl[tabindex: nrow(coef), 8] <-
-      formatp(p = p, cuts = p.cuts, decimals = p.decimals,
-              lowerbound = p.lowerbound, leading0 = p.leading0,
-              avoid1 = p.avoid1)
-    tabindex <- nrow(coef) + 1
-  } else {
+    } else if (column.ii == "events") {
 
-    # Otherwise format factors neatly
-    for (ii in 1: length(xnames)) {
+      # Events
+      tbl <- cbind(tbl, matrix(c(sum(geefit$model[, 1]), rep("", nrows - 1)),
+                               ncol = 1, dimnames = list(NULL, "Events")))
 
-      if (variable.classes[ii] != "factor" ||
-          (variable.classes[ii] == "factor" &
-           length(unique(data[, xnames[ii]])) == 2 & binary.compress))  {
-        beta <- coef[coefindex, 1]
-        se <- coef[coefindex, secol]
-        or <- exp(beta)
-        z <- coef[coefindex, zcol]
-        p <- pnorm(-abs(z)) * 2
-        tbl[tabindex, 1] <- xnames[ii]
-        tbl[tabindex, 4] <-
-          paste(sprintf(spf, beta), " (", sprintf(spf, se), ")", sep = "")
-        tbl[tabindex, 5] <- paste("(", sprintf(spf, beta - 1.96 * se), ", ",
-                                  sprintf(spf, beta + 1.96 * se), ")", sep = "")
-        tbl[tabindex, 6] <- sprintf(spf, exp(beta))
-        tbl[tabindex, 7] <-
-          paste("(", sprintf(spf, exp(beta - 1.96 * se)), ", ",
-                sprintf(spf, exp(beta + 1.96 * se)), ")", sep = "")
-        tbl[tabindex, 8] <-
-          formatp(p = p, cuts = p.cuts, decimals = p.decimals,
-                  lowerbound = p.lowerbound, leading0 = p.leading0,
-                  avoid1 = p.avoid1)
-        tabindex <- tabindex + 1
-        coefindex <- coefindex + 1
+    } else if (column.ii == "beta") {
 
-      } else {
-        levels <- sort(unique(data[, xnames[ii]]))
-        if (length(levels) == 2 & binary.compress) {
-          beta <- coef[coefindex, 1]
-          se <- coef[coefindex, secol]
-          or <- exp(beta)
-          z <- coef[coefindex, zcol]
-          p <- pnorm(-abs(z)) * 2
-          tbl[tabindex, 1] <- xnames[coefindex]
-          tbl[tabindex, 4] <-
-            paste(sprintf(spf, beta), " (", sprintf(spf, se), ")", sep = "")
-          tbl[tabindex, 5] <-
-            paste("(", sprintf(spf, beta - 1.96 * se), ", ",
-                  sprintf(spf, beta + 1.96 * se), ")", sep = "")
-          tbl[tabindex, 6] <- sprintf(spf, exp(beta))
-          tbl[tabindex, 7] <-
-            paste("(", sprintf(spf, exp(beta - 1.96 * se)), ", ",
-                  sprintf(spf, exp(beta + 1.96 * se)), ")", sep = "")
-          tbl[tabindex, 8] <-
-            formatp(p = p, cuts = p.cuts, decimals = p.decimals,
-                    lowerbound = p.lowerbound, leading0 = p.leading0,
-                    avoid1 = p.avoid1)
-          tabindex <- tabindex + 1
-          coefindex <- coefindex + 1
-        } else {
-          tbl[tabindex, 1] <- xnames[ii]
-          tabindex <- tabindex + 1
-          tbl[tabindex, 1] <- paste("  ", levels[1], " (ref)", sep = "")
-          tbl[tabindex, 4: 8] <- "-"
-          spaces <- c(spaces, tabindex)
-          refs <- c(refs, tabindex)
-          tabindex <- tabindex + 1
+      # Beta
+      newcol <- matrix("", ncol = 1, nrow = nrows,
+                       dimnames = list(NULL, beta.char))
+      newcol[entry.rows, 1] <- sprintf(spf, betas)
+      newcol[ref.rows, 1] <- "-"
 
-          for (jj in 2: length(levels)) {
-            tbl[tabindex, 1] <- paste("  ", levels[jj], sep = "")
-            beta <- coef[coefindex, 1]
-            se <- coef[coefindex, secol]
-            or <- exp(beta)
-            z <- coef[coefindex, zcol]
-            p <- pnorm(-abs(z)) * 2
-            tbl[tabindex, 4] <-
-              paste(sprintf(spf, beta), " (", sprintf(spf, se), ")", sep = "")
-            tbl[tabindex, 5] <-
-              paste("(", sprintf(spf, beta - 1.96 * se), ", ",
-                    sprintf(spf, beta + 1.96 * se), ")", sep = "")
-            tbl[tabindex, 6] <- sprintf(spf, exp(beta))
-            tbl[tabindex, 7] <-
-              paste("(", sprintf(spf, exp(beta - 1.96 * se)), ", ",
-                    sprintf(spf, exp(beta + 1.96 * se)), ")", sep = "")
-            tbl[tabindex, 8] <-
-              formatp(p = p, cuts = p.cuts, decimals = p.decimals,
-                      lowerbound = p.lowerbound, leading0 = p.leading0,
-                      avoid1 = p.avoid1)
-            spaces <- c(spaces, tabindex)
-            tabindex <- tabindex + 1
-            coefindex <- coefindex + 1
-          }
-        }
+    } else if (column.ii == "se") {
+
+      # SE
+      newcol <- matrix("-", ncol = 1, nrow = nrows, dimnames = list(NULL, "SE"))
+      newcol[entry.rows, 1] <- sprintf(spf, ses)
+      newcol[ref.rows, 1] <- "-"
+
+    } else if (column.ii == "beta.se") {
+
+      # Beta (SE)
+      newcol <- matrix("", ncol = 1, nrow = nrows,
+                       dimnames = list(NULL, paste(beta.char, "(SE)")))
+      newcol[entry.rows, 1] <-
+        paste(sprintf(spf, betas), " (", sprintf(spf, ses), ")", sep = "")
+      newcol[ref.rows, 1] <- "-"
+
+    } else if (column.ii == "beta.betaci") {
+
+      # Beta (95% CI)
+      newcol <- matrix("", ncol = 1, nrow = nrows,
+                       dimnames = list(NULL, paste(beta.char, "(95% CI)")))
+      zcrit <- qnorm(0.975)
+      newcol[entry.rows, 1] <- paste(sprintf(spf, betas), " (",
+                                     sprintf(spf, betas - zcrit * ses), ci.sep,
+                                     sprintf(spf, betas + zcrit * ses), ")",
+                                    sep = "")
+      newcol[ref.rows, 1] <- "-"
+
+    } else if (column.ii == "betaci") {
+
+      # 95% CI for Beta
+      newcol <- matrix("", ncol = 1, nrow = nrows,
+                       dimnames = list(NULL, paste("95% CI for", beta.char)))
+      zcrit <- qnorm(0.975)
+      newcol[entry.rows, 1] <- paste(sprintf(spf, betas - zcrit * ses), ci.sep,
+                                     sprintf(spf, betas + zcrit * ses), ")",
+                                     sep = "")
+      newcol[ref.rows, 1] <- "-"
+
+    } else if (column.ii == "or") {
+
+      # OR
+      newcol <- matrix("", ncol = 1, nrow = nrows, dimnames = list(NULL, "OR"))
+      newcol[entry.rows, 1] <- sprintf(spf, exp(betas))
+      if (intercept) {
+        newcol[1, 1] <- "-"
       }
-    }
-  }
+      newcol[ref.rows, 1] <- "-"
 
-  # Truncate table at correct number of rows
-  tbl <- tbl[1: (tabindex - 1),, drop = FALSE]
+    } else if (column.ii == "or.orci") {
 
-  # Add column names
-  colnames(tbl) <- c(variable.colname, "Clusters", "Observations", "Beta (SE)",
-                     "95% CI for Beta", "OR", "95% CI for OR", "P")
-
-  # Remove n columns if requested
-  if (! n.id) {
-    tbl <- tbl[, -which(colnames(tbl) == "Clusters"), drop = FALSE]
-  }
-  if (! n.total) {
-    tbl <- tbl[, -which(colnames(tbl) == "Observations"), drop = FALSE]
-  }
-
-  # Remove CI column if requested
-  if (! ci.beta) {
-    tbl <- tbl[, -which(colnames(tbl) == "95% CI for Beta"), drop = FALSE]
-  }
-
-  # Adjust OR columns if necessary
-  if (geefit$family$link == "log") {
-    colnames(tbl)[colnames(tbl) == "OR"] <- "exp(Beta)"
-    colnames(tbl)[colnames(tbl) == "95% CI for OR"] <- "95% CI for exp(Beta)"
-  } else if (! (geefit$family$link == "logit" & geefit$family$family %in%
-                c("binomial", "quasi", "quasibibinomial"))) {
-    tbl <-
-      tbl[, -which(colnames(tbl) %in% c("OR", "95% CI for OR")), drop = FALSE]
-  }
-
-  # Add variable labels if possible
-  if (! is.null(xlabels)) {
-    xlabels[spaces] <- paste("  ", xlabels[spaces], sep = "")
-    xlabels[refs] <- paste(xlabels[refs], "(ref)")
-    tbl[1: nrow(tbl), 1] <- xlabels
-  }
-
-  # If latex is TRUE, do some re-formatting
-  if (latex) {
-    if (greek.beta) {
-      colnames(tbl)[which(colnames(tbl) == "Beta (SE)")] <-
-        "$\\hat{\\beta}$ (SE)"
-      colnames(tbl)[which(colnames(tbl) == "95% CI for Beta")] <-
-        "95% CI for $\\beta$"
-      colnames(tbl)[which(colnames(tbl) == "exp(Beta)")] <- "exp($\\beta)$"
-      colnames(tbl)[which(colnames(tbl) == "95% CI for exp(Beta)")] <-
-        "95\\% CI for exp($\\beta$)"
-    }
-    plocs <- which(substr(tbl[, "P"], 1, 1) == "<")
-    if (length(plocs) > 0) {
-      tbl[plocs, "P"] <- paste("$<$", substring(tbl[plocs, "P"], 2), sep = "")
-    }
-    spacelocs <- which(substr(tbl[, variable.colname], 1, 2) == "  ")
-    if (length(spacelocs) > 0) {
-      tbl[spacelocs, variable.colname] <-
-        paste("$\\hskip .4cm$",
-              substring(tbl[spacelocs, variable.colname], 3), sep = "")
-    }
-    chars <- strsplit(colnames(tbl), "")
-    for (ii in 1: length(chars)) {
-      percentlocs <- which(chars[[ii]] == "%")
-      if (length(percentlocs) > 0) {
-        chars[[ii]][percentlocs] <- "\\%"
+      # OR (95% CI)
+      newcol <- matrix("-", ncol = 1, nrow = nrows,
+                       dimnames = list(NULL, "OR (95% CI)"))
+      zcrit <- pnorm(0.975)
+      newcol[entry.rows, 1] <-
+        paste(sprintf(spf, exp(betas)), " (",
+              sprintf(spf, exp(betas - zcrit * ses)), ci.sep,
+              sprintf(spf, exp(betas + zcrit * ses)), ")", sep = "")
+      if (intercept) {
+        newcol[1, 1] <- "-"
       }
+      newcol[ref.rows, 1] <- "-"
+
+    } else if (column.ii == "orci") {
+
+      # 95% CI for OR
+      newcol <- matrix("-", ncol = 1, nrow = nrows,
+                       dimnames = list(NULL, "95% CI for OR"))
+      zcrit <- pnorm(0.975)
+      newcol[entry.rows, 1] <-
+        paste(sprintf(spf, exp(betas - zcrit * ses)), ci.sep,
+              sprintf(spf, exp(betas + zcrit * ses)), sep = "")
+      if (intercept) {
+        newcol[1, 1] < -"-"
+      }
+      newcol[ref.rows, 1] <- "-"
+
+    } else if (column.ii == "z") {
+
+      # z
+      newcol <- matrix("-", ncol = 1, nrow = nrows, dimnames = list(NULL, "z"))
+      newcol[entry.rows, 1] <- sprintf(spf, zs)
+      newcol[ref.rows, 1] <- "-"
+
+    } else if (column.ii == "p") {
+
+      # P
+      newcol <- matrix("", ncol = 1, nrow = nrows, dimnames = list(NULL, "P"))
+      newcol[entry.rows, 1] <-
+        formatp(p = ps, cuts = p.cuts, decimals = p.decimals,
+                lowerbound = p.lowerbound, leading0 = p.leading0,
+                avoid1 = p.avoid1)
+      newcol[ref.rows, 1] <- "-"
+
     }
-    colnames(tbl) <- sapply(chars, function(x)
-      paste(x, sep = "", collapse = ""))
-    if (bold.colnames == TRUE) {
-      colnames(tbl) <- paste("$\\textbf{", colnames(tbl), "}$", sep = "")
-    }
-    if (bold.varnames == TRUE) {
-      tbl[pred, 1] <- paste("$\\textbf{", tbl[pred, 1], "}$")
-    }
-    if (bold.varlevels == TRUE) {
-      tbl[c(1: nrow(tbl))[! c(1:nrow(tbl)) %in% pred], 1] <-
-        paste("$\\textbf{", tbl[c(1: nrow(tbl))[! c(1:nrow(tbl)) %in% pred], 1],
-              "}$", sep = "")
-    }
+
+    # Add column to table
+    tbl <- cbind(tbl, newcol)
+
+  }
+
+  # Add bold column names if requested
+  if (format.xtable & bold.colnames) {
+    colnames(tbl) <- paste("$\\textbf{", colnames(tbl), "}$", sep = "")
   }
 
   # Print html version of table if requested

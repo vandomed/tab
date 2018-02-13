@@ -4,21 +4,40 @@
 \alias{tabgee}
 \title{Generate Summary Table for Fitted Generalized Estimating Equation (GEE) Model}
 \usage{
-tabgee(geefit, latex = FALSE, xlabels = NULL, ci.beta = TRUE,
-  decimals = 2, p.decimals = c(2, 3), p.cuts = 0.01,
-  p.lowerbound = 0.001, p.leading0 = TRUE, p.avoid1 = FALSE,
-  basic.form = FALSE, intercept = TRUE, n.id = FALSE, n.total = FALSE,
-  or = TRUE, robust = TRUE, data = NULL, greek.beta = FALSE,
-  binary.compress = TRUE, bold.colnames = TRUE, bold.varnames = FALSE,
-  bold.varlevels = FALSE, variable.colname = "Variable",
-  print.html = FALSE, html.filename = "table1.html")
+tabgee(geefit, columns = NULL, robust = TRUE, xlabels = NULL,
+  compress.factors = FALSE, data = NULL, ci.sep = ", ",
+  format.xtable = FALSE, decimals = 2, p.decimals = c(2, 3),
+  p.cuts = 0.01, p.lowerbound = 0.001, p.leading0 = TRUE,
+  p.avoid1 = FALSE, greek.beta = FALSE, bold.colnames = TRUE,
+  variable.colname = "Variable", print.html = FALSE,
+  html.filename = "table1.html")
 }
 \arguments{
 \item{geefit}{Object returned from \code{\link[gee]{gee}}.}
 
+\item{columns}{Character vector specifying what columns to include. Choices
+for each element are \code{"beta"}, \code{"se"}, \code{"beta.se"},
+\code{"beta.betaci"}, \code{"betaci"}, \code{"or"}, \code{"or.orci"},
+\code{"orci"}, \code{"z"}, and \code{"p"}.}
+
+\item{robust}{Logical value for whether 'robust' standard errors should be
+used for inference.}
+
 \item{xlabels}{Character vector with labels for the \code{x} variables and
 their levels. Often useful to leave as \code{NULL} first, see how the table
 looks, and then re-run with labels where they need to be.}
+
+\item{compress.factors}{Logical value for whether to display factor variables should
+as one row for each of the non-reference group levels, as opposed to one row
+for the variable name and one row for each of the levels including the
+reference group.}
+
+\item{data}{Data frame containing variables passed to \code{\link[gee]{gee}}
+to create \code{geefit}. Only needs to be specified when one or more of the
+predictors is a factor variable and \code{compres.factors = FALSE}.}
+
+\item{ci.sep}{Character string with separator to place between lower and
+upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.}
 
 \item{decimals}{Numeric value specifying number of decimal places for numbers
 other than p-values.}
@@ -43,30 +62,11 @@ leading 0's before the decimal point.}
 appear as \code{>0.99} (or similarly depending on \code{p.decimals} and
 \code{p.cuts}) rather than 1.}
 
-\item{n.id}{Logical value for whether to include a column for the number of
-unique IDs (i.e. clusters).}
-
-\item{n.total}{Logical value for whether to include a column for the total
-number of observations used.}
-
-\item{or}{Logical value for whether to include columns for odds ratios and
-associated Wald 95\% confidence intervals. Only used for logistic regression.}
-
-\item{robust}{Logical value for whether robust standard errors should be used
-(i.e. from sandwich estimator).}
-
-\item{data}{Data frame containing variables passed to \code{\link[gee]{gee}}
-to create \code{geefit}. Only needs to be specified when one or more of the
-predictors is a factor variable and \code{basic.form = FALSE}.}
-
 \item{greek.beta}{Logical value for whether to display the Greek letter beta
 rather than "Beta". Only used if \code{latex = TRUE}.}
 
 \item{bold.colnames}{Logical value for whether to use bold font for column
 headings. Only used if \code{xtable = TRUE}.}
-
-\item{bold.varnames}{Logic value for whether to use bold font for the
-\code{y} variable name in the first column. Only used if \code{xtable = TRUE}.}
 
 \item{variable.colname}{Character string with desired heading for first
 column of table, in case you prefer something other than \code{"Variable"}.}
@@ -126,28 +126,16 @@ d2 <- reshape(data = d, varying = c("bp.1", "bp.2", "bp.3", "highbp.1",
               timevar = "bp.visit", direction = "long")
 d2 <- d2[order(d2$id), ]
 
-# Create labels for race levels
-races <- c("White", "Black", "Mexican American", "Other")
-
-# Test whether predictors are associated with blood pressure at 1, 2, and 3
-# months
+# GEE: Blood pressure at 1, 2, and 3 months vs. predictors
 geefit1 <- gee(bp ~ Age + Sex + Race + BMI + Group, id = id, data = d2,
                corstr = "unstructured")
+(geetable1 <- tabgee(geefit = geefit1, data = d2))
 
-# Create summary table using tabgee
-geetable1 <- tabgee(geefit = geefit1, data = d2, n.id = TRUE, n.total = TRUE,
-                    xlabels = c("Intercept", "Age", "Male", "Race", races,
-                                "BMI", "Treatment"))
-
-# Test whether predictors are associated with high blood pressure at 1, 2,
-# and 3 months
+# GEE: High blood pressure at 1, 2, and 3 months vs. predictors. Display
+# factors in "compressed" format
 geefit2 <- gee(highbp ~ Age + Sex + Race + BMI + Group, id = id, data = d2,
                family = binomial, corstr = "unstructured")
-
-# Create summary table using tabgee
-geetable2 <- tabgee(geefit = geefit2, data = d2, ci.beta = FALSE,
-                    xlabels = c("Intercept", "Age", "Male", "Race", races,
-                                "BMI", "Treatment"))
+(geetable2 <- tabgee(geefit = geefit2, data = d2, compress.factors = TRUE))
 
 
 }

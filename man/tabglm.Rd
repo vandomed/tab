@@ -5,8 +5,8 @@
 \title{Generate Summary Table for Fitted Generalized Linear Model (GLM)}
 \usage{
 tabglm(glmfit, columns = NULL, xlabels = NULL, compress.factors = FALSE,
-  ci.sep = ", ", xtable = FALSE, decimals = 2, p.decimals = c(2, 3),
-  p.cuts = 0.01, p.lowerbound = 0.001, p.leading0 = TRUE,
+  ci.sep = ", ", format.xtable = FALSE, decimals = 2, p.decimals = c(2,
+  3), p.cuts = 0.01, p.lowerbound = 0.001, p.leading0 = TRUE,
   p.avoid1 = FALSE, greek.beta = FALSE, bold.colnames = TRUE,
   variable.colname = "Variable", print.html = FALSE,
   html.filename = "table1.html")
@@ -30,9 +30,6 @@ reference group.}
 
 \item{ci.sep}{Character string with separator to place between lower and
 upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.}
-
-\item{xtable}{Logical value for whether to format table to give to
-\code{\link[xtable]{xtable}} for printing in LaTeX.}
 
 \item{decimals}{Numeric value specifying number of decimal places for numbers
 other than p-values.}
@@ -115,7 +112,7 @@ glmfit1 <- glm(BMI ~ Age + Sex + Race + Group, data = d)
 (lintable <- tabglm(glmfit = glmfit))
 
 # Logistic regression: 1-year mortality vs. age, sex, race, and treatment.
-# Also, use "compressed" format for factors
+# Display factors in "compressed" format
 glmfit2 <- glm(death_1yr ~ Age + Sex + Race + Group, data = d,
                family = binomial)
 (logtable1 <- tabglm(glmfit = glmfit2, compress.factors = TRUE))

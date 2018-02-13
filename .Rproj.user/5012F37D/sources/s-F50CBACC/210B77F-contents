@@ -169,6 +169,8 @@ glmfit3 <- glm(death_1yr ~ poly(Age, 2, raw = TRUE) + Sex + BMI +
 (logtable2 <- tabglm(glmfit = glmfit3))
 
 
+glmfit <- glm(death_1yr ~ poly(Age, 2, raw = TRUE) + Sex + BMI + Sex*BMI, 
+              data = d, family = "binomial")
 
 
  data(d)
@@ -185,3 +187,100 @@ glmfit3 <- glm(death_1yr ~ poly(Age, 2, raw = TRUE) + Sex + BMI +
  geefit1 <- gee(bp ~ Age + Sex + Race + BMI + Group, id = id, data = d2,
                 corstr = "unstructured")
 
+ 
+ 
+ abc <- onemetric.overtime.graph(tickers = c("^VIX", "SVXY"), y.metric = "beta")
+ gains <- load.gains(tickers = c("SPY", "^VIX", "XIV", "SVXY"))
+ 
+ plot(gains[, 1], gains[, 3])
+ gains <- load.gains(tickers = c("SPY", "^VIX", "XIV", "SVXY"), time.scale = "monthly")
+ plot(gains[, 1], gains[, 3])
+ locs <- which(abs(gains[, 1]) < 0.01)
+ hist(gains[locs, 3])
+ mean(gains[locs, 1])
+ median(gains[locs, 1])
+ mean(gains[locs, 3])
+ median(gains[locs, 3])
+ mean(gains[locs, 3] > 0)
+ sum(gains[locs, 3] > 0)
+ 
+ median(gains[locs, 3]) 
+ fit <- lm(gains[, 4] ~ gains[, 1])
+ summary(fit)
+ 
+locs <- which(gains[, 1] < 0)
+table(gains[locs, 3] > 0)
+table(gains[-locs, 3] > 0)
+sort(gains[locs, 3])
+
+locs <- which(abs(gains[, 1]) < 0.01)
+length(locs)
+hist(gains[locs, 3])
+mean(gains[locs, 3])
+median(gains[locs, 3])
+
+abc <- onemetric.overtime.graph(tickers = c("^VIX", "VMIN"), 
+                                y.metric = "r.squared", window.units = 50)
+gains <- load.gains(tickers = c("^VIX", "VMAX"), time.scale = "monthly")
+plot(gains[, 1], gains[, 2])
+
+# Load in sample dataset d and convert to long format
+data(d)
+d2 <- reshape(data = d, varying = c("bp.1", "bp.2", "bp.3", "highbp.1",
+                                    "highbp.2", "highbp.3"),
+              timevar = "bp.visit", direction = "long")
+d2 <- d2[order(d2$id), ]
+
+# Create labels for race levels
+races <- c("White", "Black", "Mexican American", "Other")
+
+# Test whether predictors are associated with blood pressure at 1, 2, and 3
+# months
+geefit1 <- gee(bp ~ Age + Sex + Race + BMI + Group, id = id, data = d2,
+               corstr = "unstructured")
+
+ # Create summary table using tabgee
+ geetable1 <- tabgee(geefit = geefit1, data = d2, n.id = TRUE, n.total = TRUE,
+                     xlabels = c("Intercept", "Age", "Male", "Race", races,
+                                 "BMI", "Treatment"))
+
+ # Test whether predictors are associated with high blood pressure at 1, 2,
+ # and 3 months
+ geefit2 <- gee(highbp ~ Age + Sex + Race + BMI + Group, id = id, data = d2,
+                family = binomial, corstr = "unstructured")
+
+ # Create summary table using tabgee
+ geetable2 <- tabgee(geefit = geefit2, data = d2, ci.beta = FALSE,
+                     xlabels = c("Intercept", "Age", "Male", "Race", races,
+                                 "BMI", "Treatment"))
+ 
+ 
+ 
+ 
+ # Load in sample dataset d and convert to long format
+ data(d)
+ d2 <- reshape(data = d, varying = c("bp.1", "bp.2", "bp.3", "highbp.1",
+                                     "highbp.2", "highbp.3"),
+               timevar = "bp.visit", direction = "long")
+ d2 <- d2[order(d2$id), ]
+ 
+ # GEE: Blood pressure at 1, 2, and 3 months vs. predictors
+ geefit1 <- gee(bp ~ Age + Sex + Race + BMI + Group, id = id, data = d2,
+                corstr = "unstructured")
+ geetable1 <- tabgee(geefit = geefit1, data = d2)
+ 
+ # GEE: High blood pressure at 1, 2, and 3 months vs. predictors. Display 
+ # factors in "compressed" format
+ geefit2 <- gee(highbp ~ Age + Sex + Race + BMI + Group, id = id, data = d2,
+                family = binomial, corstr = "unstructured")
+ geetable2 <- tabgee(geefit = geefit2, data = d2, compress.factors = TRUE)
+ 
+ 
+ 
+ 
+ data(d)
+ d <- d[complete.cases(d), ]
+
+ # Linear regression: BMI vs. age, sex, race, and treatment
+ glmfit1 <- glm(BMI ~ Age + Sex + Race + Group, data = d)
+ 

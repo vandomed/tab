@@ -45,7 +45,7 @@
 #' (lintable <- tabglm(glmfit = glmfit))
 #'
 #' # Logistic regression: 1-year mortality vs. age, sex, race, and treatment.
-#' # Also, use "compressed" format for factors
+#' # Display factors in "compressed" format
 #' glmfit2 <- glm(death_1yr ~ Age + Sex + Race + Group, data = d,
 #'                family = binomial)
 #' (logtable1 <- tabglm(glmfit = glmfit2, compress.factors = TRUE))
@@ -58,10 +58,10 @@
 #'
 #' @export
 tabglm <- function(glmfit, columns = NULL, xlabels = NULL,
-                   compress.factors = FALSE, ci.sep = ", ", xtable = FALSE,
-                   decimals = 2, p.decimals = c(2, 3), p.cuts = 0.01,
-                   p.lowerbound = 0.001, p.leading0 = TRUE, p.avoid1 = FALSE,
-                   greek.beta = FALSE, bold.colnames = TRUE,
+                   compress.factors = FALSE, ci.sep = ", ",
+                   format.xtable = FALSE, decimals = 2, p.decimals = c(2, 3),
+                   p.cuts = 0.01, p.lowerbound = 0.001, p.leading0 = TRUE,
+                   p.avoid1 = FALSE, greek.beta = FALSE, bold.colnames = TRUE,
                    variable.colname = "Variable", print.html = FALSE,
                    html.filename = "table1.html") {
 
@@ -87,67 +87,97 @@ tabglm <- function(glmfit, columns = NULL, xlabels = NULL,
   }
 
   # Determine whether xlabels has to be created
-  if (is.null(xlabels)) {
-    create.xlabels <- TRUE
-    if (intercept) {
-      xlabels <- "Intercept"
-    } else {
-      xlabels <- c()
-    }
-  }
+  create.xlabels <- is.null(xlabels)
+
+  # Choose version of beta and leading spaces to use
+  space.char <- ifelse(format.xtable, "$\\hskip .4cm$", "  ")
+  beta.char <- ifelse(format.xtable & greek.beta, "$\\hat{\\beta}$", "Beta")
 
   # Determine whether there are factors, interactions, or polynomials
   glmfit.xlevels <- glmfit$xlevels
   x.factors <- names(glmfit.xlevels)
   factors <- length(x.factors) > 0
 
-  interactions <- length(grep(pattern = ":", x = rownames.coefmat)) > 1
+  interaction.rows <- grep(pattern = ":", x = rownames.coefmat)
+  interactions <- length(interaction.rows) > 1
 
   polynomial.rows <- grep(pattern = "poly(", x = rownames.coefmat, fixed = TRUE)
   polynomials <- length(polynomial.rows) > 0
 
-  # Choose version of beta and leading spaces to use
-  space.char <- ifelse(xtable, "$\\hskip .4cm$", "  ")
-  beta.char <- ifelse(xtable & greek.beta, "$\\hat{\\beta}$", "Beta")
+  # If necessary, force compress.factors to be TRUE and notify user for reason
+  if (interactions & ! compress.factors) {
+    message("The 'compress.factors' input is being switched to TRUE because the fitted GLM includes interaction terms. This limitation may be addressed in future versions of 'tabgee'.")
+    compress.factors <- TRUE
+  }
 
   # Determine row indices for table entries and create xlabels vector
-  if (interactions) {
+  if (compress.factors) {
 
-    # If there are interactions, just do basic formatting
+    # Compressed factor formatting
+
+    # All rows of table have entries
+    ref.rows <- c()
     entry.rows <- 1: nrow(coefmat)
+
+    # Create xlabels
     if (create.xlabels) {
+
+      # Start with row names
       if (intercept) {
-        xlabels <- c(xlabels, rownames(coefmat)[-1])
+        xlabels <- c("Intercept", rownames.coefmat[-1])
       } else {
-        xlabels <- rownames(coefmat)
+        xlabels <- rownames.coefmat
       }
-    }
-    for (ii in 1: length(x.factors)) {
-      xlabels <- unlist(lapply(xlabels, function(x)
-        gsub(pattern = x.factors[ii], replacement = "", x = x)))
-    }
-    if (polynomials & create.xlabels) {
-      for (ii in polynomial.rows) {
-        xlabel.parts <- unlist(strsplit(x = xlabels[ii], split = ","))
-        varname.ii <- substr(xlabel.parts[1], start = 6, stop = 100)
-        poly.order <- as.numeric(xlabel.parts[2])
-        if (poly.order == 1) {
-          xlabels[ii] <- varname.ii
-        } else if (poly.order == 2) {
-          xlabels[ii] <- paste(varname.ii, "squared")
-        } else if (poly.order == 3) {
-          xlabels[ii] <- paste(varname.ii, "cubed")
-        } else {
-          xlabels[ii] <- paste(varname.ii, poly.order, sep = "^")
+
+      # Clean up polynomials
+      if (polynomials) {
+
+        for (ii in polynomial.rows) {
+          xlabel.parts <- unlist(strsplit(x = xlabels[ii], split = ","))
+          varname.ii <- substring(xlabel.parts[1], first = 6)
+          poly.order <- as.numeric(substring(xlabel.parts[3],
+                                             first = nchar(xlabel.parts[3])))
+          if (poly.order == 1) {
+            xlabels[ii] <- varname.ii
+          } else if (poly.order == 2) {
+            xlabels[ii] <- paste(varname.ii, "squared")
+          } else if (poly.order == 3) {
+            xlabels[ii] <- paste(varname.ii, "cubed")
+          } else {
+            xlabels[ii] <- paste(varname.ii, poly.order, sep = "^")
+          }
+        }
+
+      }
+
+      # Clean up factors
+      if (factors) {
+        for (ii in 1: length(x.factors)) {
+          xlabels <- unlist(lapply(xlabels, function(x)
+            gsub(pattern = x.factors[ii], replacement = "", x = x)))
         }
       }
+
+      # Clean up interactions
+      if (interactions) {
+        for (ii in 1: length(x.factors)) {
+          xlabels[interaction.rows] <-
+            unlist(lapply(xlabels[interaction.rows], function(x)
+              gsub(pattern = x.factors[ii], replacement = "", x = x)))
+        }
+      }
+
     }
+
   } else {
 
-    # Otherwise, format more neatly
-    rowcount <- 1
-    entry.rows <- 1
+    # Expanded factor formatting
+    rowcount <- ifelse(intercept, 1, 0)
+    entry.rows <- rowcount
     ref.rows <- c()
+    if (create.xlabels & intercept) {
+      xlabels <- "Intercept"
+    }
     for (ii in 1:
          length(unlist(strsplit(x = deparse(glmfit$call, width.cutoff = 500),
                                 split = "+", fixed = TRUE)))) {
@@ -156,7 +186,7 @@ tabglm <- function(glmfit, columns = NULL, xlabels = NULL,
       varname.ii <- deparse(glmfit$terms[ii][[3]])
       if (substr(varname.ii, 1, 4) == "poly") {
 
-        # If X is polynomial...
+        # Clean up polynomial
         varname.ii.split <-
           unlist(strsplit(substr(varname.ii, start = 6, stop = 100), split = ","))
         varname.ii <- varname.ii.split[1]
@@ -180,33 +210,28 @@ tabglm <- function(glmfit, columns = NULL, xlabels = NULL,
 
       } else if (varname.ii %in% x.factors) {
 
-        # If X is a factor variable...
+        # Clean up factor
         levels.ii <- as.character(unlist(glmfit$xlevels[varname.ii]))
         nlevels.ii <- length(levels.ii)
-        if (compress.factors) {
-          if (create.xlabels) {
-            xlabels[rowcount: (rowcount + nlevels.ii - 2)] <- levels.ii[-1]
-          }
-          entry.rows <- c(entry.rows, rowcount: (rowcount + nlevels.ii - 2))
-          rowcount <- rowcount + nlevels.ii - 2
-        } else {
-          if (create.xlabels) {
-            xlabels[rowcount: (rowcount + nlevels.ii)] <- c(varname.ii, levels.ii)
-          }
-          xlabels[(rowcount + 1): (rowcount + nlevels.ii)] <-
-            paste(space.char, xlabels[(rowcount + 1): (rowcount + nlevels.ii)],
-                  sep = "")
-          xlabels[rowcount + 1] <-
-            paste(xlabels[rowcount + 1], " (ref)", sep = "")
-          entry.rows <- c(entry.rows, (rowcount + 2): (rowcount + nlevels.ii))
-          ref.rows <- c(ref.rows, rowcount + 1)
-          rowcount <- rowcount + nlevels.ii
+        new.entries <- (rowcount + 1): (rowcount + nlevels.ii)
+        if (create.xlabels) {
+          xlabels[rowcount] <- varname.ii
+          xlabels[new.entries] <- levels.ii
         }
+        xlabels[new.entries] <-
+          paste(space.char, xlabels[new.entries], sep = "")
+        xlabels[rowcount + 1] <- paste(xlabels[rowcount + 1], "(ref)")
+        entry.rows <- c(entry.rows, (rowcount + 2): (rowcount + nlevels.ii))
+        ref.rows <- c(ref.rows, rowcount + 1)
+        rowcount <- rowcount + nlevels.ii
+
       } else {
+
+        entry.rows <- c(entry.rows, rowcount)
         if (create.xlabels) {
           xlabels[rowcount] <- varname.ii
         }
-        entry.rows <- c(entry.rows, rowcount)
+
       }
     }
   }
@@ -219,7 +244,6 @@ tabglm <- function(glmfit, columns = NULL, xlabels = NULL,
   spf <- paste("%0.", decimals, "f", sep = "")
 
   # Loop through column input and add each
-  # Note: May want to do LaTeX formatting here...
   for (ii in 1: length(columns)) {
 
     column.ii <- columns[ii]
@@ -241,21 +265,24 @@ tabglm <- function(glmfit, columns = NULL, xlabels = NULL,
       # Beta
       newcol <- matrix("", ncol = 1, nrow = nrows,
                         dimnames = list(NULL, beta.char))
-      newcol[entry.rows, ] <- sprintf(spf, betas)
+      newcol[entry.rows, 1] <- sprintf(spf, betas)
+      newcol[ref.rows, 1] <- "-"
 
     } else if (column.ii == "se") {
 
       # SE
       newcol <- matrix("-", ncol = 1, nrow = nrows, dimnames = list(NULL, "SE"))
-      newcol[entry.rows, ] <- sprintf(spf, ses)
+      newcol[entry.rows, 1] <- sprintf(spf, ses)
+      newcol[ref.rows, 1] <- "-"
 
     } else if (column.ii == "beta.se") {
 
       # Beta (SE)
       newcol <- matrix("", ncol = 1, nrow = nrows,
                        dimnames = list(NULL, paste(beta.char, "(SE)")))
-      newcol[entry.rows, ] <-
+      newcol[entry.rows, 1] <-
         paste(sprintf(spf, betas), " (", sprintf(spf, ses), ")", sep = "")
+      newcol[ref.rows, 1] <- "-"
 
     } else if (column.ii == "beta.betaci") {
 
@@ -263,9 +290,11 @@ tabglm <- function(glmfit, columns = NULL, xlabels = NULL,
       ci.glmfit <- confint(glmfit)
       newcol <- matrix("", ncol = 1, nrow = nrows,
                        dimnames = list(NULL, paste(beta.char, "(95% CI)")))
-      newcol[entry.rows, ] <- paste(sprintf(spf, betas), " (",
-                                    sprintf(spf, ci.glmfit[, 1]), ci.sep,
-                                    sprintf(spf, ci.glmfit[, 2]), ")", sep = "")
+      newcol[entry.rows, 1] <-
+        paste(sprintf(spf, betas), " (",
+              sprintf(spf, ci.glmfit[, 1]), ci.sep,
+              sprintf(spf, ci.glmfit[, 2]), ")", sep = "")
+      newcol[ref.rows, 1] <- "-"
 
     } else if (column.ii == "betaci") {
 
@@ -273,17 +302,19 @@ tabglm <- function(glmfit, columns = NULL, xlabels = NULL,
       ci.glmfit <- confint(glmfit)
       newcol <- matrix("", ncol = 1, nrow = nrows,
                        dimnames = list(NULL, paste("95% CI for", beta.char)))
-      newcol[entry.rows, ] <- paste(sprintf(spf, ci.glmfit[, 1]), ci.sep,
-                                    sprintf(spf, ci.glmfit[, 2]), sep = "")
+      newcol[entry.rows, 1] <- paste(sprintf(spf, ci.glmfit[, 1]), ci.sep,
+                                     sprintf(spf, ci.glmfit[, 2]), sep = "")
+      newcol[ref.rows, 1] <- "-"
 
     } else if (column.ii == "or") {
 
       # OR
       newcol <- matrix("", ncol = 1, nrow = nrows, dimnames = list(NULL, "OR"))
-      newcol[entry.rows, ] <- sprintf(spf, exp(betas))
+      newcol[entry.rows, 1] <- sprintf(spf, exp(betas))
       if (intercept) {
-        newcol[1, ] <- "-"
+        newcol[1, 1] <- "-"
       }
+      newcol[ref.rows, 1] <- "-"
 
     } else if (column.ii == "or.orci") {
 
@@ -291,10 +322,14 @@ tabglm <- function(glmfit, columns = NULL, xlabels = NULL,
       ci.glmfit <- confint(glmfit)
       newcol <- matrix("-", ncol = 1, nrow = nrows,
                        dimnames = list(NULL, "OR (95% CI)"))
-      newcol[entry.rows, ] <-
+      newcol[entry.rows, 1] <-
         paste(sprintf(spf, exp(betas)), " (",
               sprintf(spf, exp(ci.glmfit[, 1])), ci.sep,
               sprintf(spf, exp(ci.glmfit[, 2])), ")", sep = "")
+      if (intercept) {
+        newcol[1, 1] <- "-"
+      }
+      newcol[ref.rows, 1] <- "-"
 
     } else if (column.ii == "orci") {
 
@@ -302,8 +337,13 @@ tabglm <- function(glmfit, columns = NULL, xlabels = NULL,
       ci.glmfit <- confint(glmfit)
       newcol <- matrix("-", ncol = 1, nrow = nrows,
                        dimnames = list(NULL, "95% CI for OR"))
-      newcol[entry.rows, ] <- paste(sprintf(spf, exp(ci.glmfit[, 1])), ci.sep,
-                                    sprintf(spf, exp(ci.glmfit[, 2])), sep = "")
+      newcol[entry.rows, 1] <-
+        paste(sprintf(spf, exp(ci.glmfit[, 1])), ci.sep,
+              sprintf(spf, exp(ci.glmfit[, 2])), sep = "")
+      if (intercept) {
+        newcol[1, 1] <- "-"
+      }
+      newcol[ref.rows, 1] <- "-"
 
     } else if (column.ii == "test") {
 
@@ -312,27 +352,28 @@ tabglm <- function(glmfit, columns = NULL, xlabels = NULL,
         matrix("-", ncol = 1, nrow = nrows,
                dimnames = list(NULL, substr(colnames(coefmat)[3],
                                             start = 1, stop = 1)))
-      newcol[entry.rows, ] <- sprintf(spf, coefmat[, 3])
+      newcol[entry.rows, 1] <- sprintf(spf, coefmat[, 3])
+      newcol[ref.rows, 1] <- "-"
 
     } else if (column.ii == "p") {
 
       # P
       newcol <- matrix("", ncol = 1, nrow = nrows, dimnames = list(NULL, "P"))
-      newcol[entry.rows] <-
+      newcol[entry.rows, 1] <-
         formatp(p = ps, cuts = p.cuts, decimals = p.decimals,
                 lowerbound = p.lowerbound, leading0 = p.leading0,
                 avoid1 = p.avoid1)
+      newcol[ref.rows, 1] <- "-"
 
     }
 
-    # Add dash to reference group cells and add column to table
-    newcol[ref.rows, ] <- "-"
+    # Add column to table
     tbl <- cbind(tbl, newcol)
 
   }
 
   # Add bold column names if requested
-  if (xtable & bold.colnames) {
+  if (format.xtable & bold.colnames) {
     colnames(tbl) <- paste("$\\textbf{", colnames(tbl), "}$", sep = "")
   }
 
