@@ -8,7 +8,7 @@
 #' interaction terms are included, the table will be formatted a little
 #' differently. Basically including an interaction is equivalent to setting
 #' \code{basic.form = TRUE}. All variable names and levels will be exactly as
-#' they appear when you run \code{summary(geefit)}, where \code{geefit} is the
+#' they appear when you run \code{summary(fit)}, where \code{fit} is the
 #' object returned from a call to \code{\link[gee]{gee}}.
 #'
 #'
@@ -17,7 +17,7 @@
 #' @inheritParams tabglm
 #'
 #'
-#' @param geefit Object returned from \code{\link[gee]{gee}}.
+#' @param fit Object returned from \code{\link[gee]{gee}}.
 #'
 #' @param columns Character vector specifying what columns to include. Choices
 #' for each element are \code{"beta"}, \code{"se"}, \code{"beta.se"},
@@ -28,7 +28,7 @@
 #' used for inference.
 #'
 #' @param data Data frame containing variables passed to \code{\link[gee]{gee}}
-#' to create \code{geefit}. Only needs to be specified when one or more of the
+#' to create \code{fit}. Only needs to be specified when one or more of the
 #' predictors is a factor variable and \code{compres.factors = FALSE}.
 #'
 #'
@@ -48,13 +48,13 @@
 #' # GEE: Blood pressure at 1, 2, and 3 months vs. predictors
 #' geefit1 <- gee(bp ~ Age + Sex + Race + BMI + Group, id = id, data = d2,
 #'                corstr = "unstructured")
-#' (geetable1 <- tabgee(geefit = geefit1, data = d2))
+#' (geetable1 <- tabgee(fit = geefit1, data = d2))
 #'
 #' # GEE: High blood pressure at 1, 2, and 3 months vs. predictors. Display
 #' # factors in "compressed" format
 #' geefit2 <- gee(highbp ~ Age + Sex + Race + BMI + Group, id = id, data = d2,
 #'                family = binomial, corstr = "unstructured")
-#' (geetable2 <- tabgee(geefit = geefit2, data = d2, compress.factors = TRUE))
+#' (geetable2 <- tabgee(fit = geefit2, data = d2, compress.factors = TRUE))
 #'
 #'
 #' @references
@@ -70,7 +70,7 @@
 #'
 #'
 #'@export
-tabgee <- function(geefit, columns = NULL, robust = TRUE, xlabels = NULL,
+tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
                    compress.factors = FALSE, data = NULL, ci.sep = ", ",
                    format.xtable = FALSE, decimals = 2, p.decimals = c(2, 3),
                    p.cuts = 0.01, p.lowerbound = 0.001, p.leading0 = TRUE,
@@ -78,9 +78,9 @@ tabgee <- function(geefit, columns = NULL, robust = TRUE, xlabels = NULL,
                    variable.colname = "Variable", print.html = FALSE,
                    html.filename = "table1.html") {
 
-  # Extract info from geefit
-  summary.geefit <- summary(geefit)
-  coefmat <- summary.geefit$coefficients
+  # Extract info from fit
+  summary.fit <- summary(fit)
+  coefmat <- summary.fit$coefficients
   rownames.coefmat <- rownames(coefmat)
   betas <- coefmat[, "Estimate"]
   if (robust) {
@@ -92,8 +92,8 @@ tabgee <- function(geefit, columns = NULL, robust = TRUE, xlabels = NULL,
   }
   ps <- pnorm(-abs(zs)) * 2
   intercept <- rownames.coefmat[1] == "(Intercept)"
-  gee.fam <- geefit$family$family
-  gee.link <- geefit$family$link
+  gee.fam <- fit$family$family
+  gee.link <- fit$family$link
 
   # Default columns to include depending on family of GEE
   if (is.null(columns)) {
@@ -112,7 +112,7 @@ tabgee <- function(geefit, columns = NULL, robust = TRUE, xlabels = NULL,
   beta.char <- ifelse(format.xtable & greek.beta, "$\\hat{\\beta}$", "Beta")
 
   # Determine whether there are factors, interactions, or polynomials
-  classes <- attr(geefit$terms, "dataClasses")
+  classes <- attr(fit$terms, "dataClasses")
   x.factors <- names(classes)[classes == "factor"]
   factors <- length(x.factors) > 0
 
@@ -121,7 +121,7 @@ tabgee <- function(geefit, columns = NULL, robust = TRUE, xlabels = NULL,
   polynomial.rows <- grep(pattern = "poly(", x = rownames.coefmat, fixed = TRUE)
   polynomials <- length(polynomial.rows) > 0
 
-  # If necessary, force compress.factors to be TRUE and notify user for reason
+  # If necessary, force compress.factors to be TRUE and notify user of reason
   if (interactions & ! compress.factors) {
     message("The 'compress.factors' input is being switched to TRUE because the fitted GEE includes interaction terms. This limitation may be addressed in future versions of 'tabgee'.")
     compress.factors <- TRUE
@@ -192,11 +192,11 @@ tabgee <- function(geefit, columns = NULL, robust = TRUE, xlabels = NULL,
       xlabels <- "Intercept"
     }
     for (ii in 1:
-         length(unlist(strsplit(x = deparse(geefit$call, width.cutoff = 500),
+         length(unlist(strsplit(x = deparse(fit$call, width.cutoff = 500),
                                 split = "+", fixed = TRUE)))) {
 
       rowcount <- rowcount + 1
-      varname.ii <- deparse(geefit$terms[ii][[3]])
+      varname.ii <- deparse(fit$terms[ii][[3]])
       if (substr(varname.ii, 1, 4) == "poly") {
 
         # Clean up polynomial
@@ -266,13 +266,13 @@ tabgee <- function(geefit, columns = NULL, robust = TRUE, xlabels = NULL,
     if (column.ii == "n") {
 
       # N
-      tbl <- cbind(tbl, matrix(c(length(geefit$residuals), rep("", nrows - 1)),
+      tbl <- cbind(tbl, matrix(c(length(fit$residuals), rep("", nrows - 1)),
                                ncol = 1, dimnames = list(NULL, "N")))
 
     } else if (column.ii == "events") {
 
       # Events
-      tbl <- cbind(tbl, matrix(c(sum(geefit$model[, 1]), rep("", nrows - 1)),
+      tbl <- cbind(tbl, matrix(c(sum(fit$model[, 1]), rep("", nrows - 1)),
                                ncol = 1, dimnames = list(NULL, "Events")))
 
     } else if (column.ii == "beta") {

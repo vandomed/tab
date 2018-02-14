@@ -4,7 +4,7 @@
 \alias{tabgee}
 \title{Generate Summary Table for Fitted Generalized Estimating Equation (GEE) Model}
 \usage{
-tabgee(geefit, columns = NULL, robust = TRUE, xlabels = NULL,
+tabgee(fit, columns = NULL, robust = TRUE, xlabels = NULL,
   compress.factors = FALSE, data = NULL, ci.sep = ", ",
   format.xtable = FALSE, decimals = 2, p.decimals = c(2, 3),
   p.cuts = 0.01, p.lowerbound = 0.001, p.leading0 = TRUE,
@@ -13,7 +13,7 @@ tabgee(geefit, columns = NULL, robust = TRUE, xlabels = NULL,
   html.filename = "table1.html")
 }
 \arguments{
-\item{geefit}{Object returned from \code{\link[gee]{gee}}.}
+\item{fit}{Object returned from \code{\link[gee]{gee}}.}
 
 \item{columns}{Character vector specifying what columns to include. Choices
 for each element are \code{"beta"}, \code{"se"}, \code{"beta.se"},
@@ -33,11 +33,14 @@ for the variable name and one row for each of the levels including the
 reference group.}
 
 \item{data}{Data frame containing variables passed to \code{\link[gee]{gee}}
-to create \code{geefit}. Only needs to be specified when one or more of the
+to create \code{fit}. Only needs to be specified when one or more of the
 predictors is a factor variable and \code{compres.factors = FALSE}.}
 
 \item{ci.sep}{Character string with separator to place between lower and
 upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.}
+
+\item{format.xtable}{Logical value for whether to format table for
+converting to \code{\link[xtable]{xtable}} object and printing in LaTeX.}
 
 \item{decimals}{Numeric value specifying number of decimal places for numbers
 other than p-values.}
@@ -89,7 +92,7 @@ Interaction and polynomial terms are compatible with \code{tabgee}. If
 interaction terms are included, the table will be formatted a little
 differently. Basically including an interaction is equivalent to setting
 \code{basic.form = TRUE}. All variable names and levels will be exactly as
-they appear when you run \code{summary(geefit)}, where \code{geefit} is the
+they appear when you run \code{summary(fit)}, where \code{fit} is the
 object returned from a call to \code{\link[gee]{gee}}.
 }
 \section{Note}{
@@ -99,13 +102,13 @@ these approaches:
 
 \enumerate{
 
-\item 1. Use the \code{\link[Kmisc]{write.cb}} function in \pkg{Kmisc} [2].
+\item Use the \code{\link[Kmisc]{write.cb}} function in \pkg{Kmisc} [2].
 If your table is stored in a character matrix named \code{table1}, use
 \code{write.cb(table1)} to copy the table to your clipboard. Paste the result
 into your document, then highlight the text and go to
 \code{Insert -> Table -> Convert Text to Table... OK}.
 
-\item 2. Set \code{print.html = TRUE}. This will result in a .html file
+\item Set \code{print.html = TRUE}. This will result in a .html file
 being written to your current working directory. When you open this file, you
 will see a (hopefully) nice-looking table that you can copy and paste into
 your document. You can control the name of this file with
@@ -113,7 +116,7 @@ your document. You can control the name of this file with
 }
 
 If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-\code{xtable = TRUE}. You may have to set
+\code{format.xtable = TRUE}. You may have to set
 \code{sanitize.text.function = identity} when calling
 \code{\link[xtable]{print.xtable}}.
 }
@@ -129,13 +132,13 @@ d2 <- d2[order(d2$id), ]
 # GEE: Blood pressure at 1, 2, and 3 months vs. predictors
 geefit1 <- gee(bp ~ Age + Sex + Race + BMI + Group, id = id, data = d2,
                corstr = "unstructured")
-(geetable1 <- tabgee(geefit = geefit1, data = d2))
+(geetable1 <- tabgee(fit = geefit1, data = d2))
 
 # GEE: High blood pressure at 1, 2, and 3 months vs. predictors. Display
 # factors in "compressed" format
 geefit2 <- gee(highbp ~ Age + Sex + Race + BMI + Group, id = id, data = d2,
                family = binomial, corstr = "unstructured")
-(geetable2 <- tabgee(geefit = geefit2, data = d2, compress.factors = TRUE))
+(geetable2 <- tabgee(fit = geefit2, data = d2, compress.factors = TRUE))
 
 
 }

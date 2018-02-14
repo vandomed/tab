@@ -4,7 +4,7 @@
 \alias{tabglm}
 \title{Generate Summary Table for Fitted Generalized Linear Model (GLM)}
 \usage{
-tabglm(glmfit, columns = NULL, xlabels = NULL, compress.factors = FALSE,
+tabglm(fit, columns = NULL, xlabels = NULL, compress.factors = FALSE,
   ci.sep = ", ", format.xtable = FALSE, decimals = 2, p.decimals = c(2,
   3), p.cuts = 0.01, p.lowerbound = 0.001, p.leading0 = TRUE,
   p.avoid1 = FALSE, greek.beta = FALSE, bold.colnames = TRUE,
@@ -12,7 +12,7 @@ tabglm(glmfit, columns = NULL, xlabels = NULL, compress.factors = FALSE,
   html.filename = "table1.html")
 }
 \arguments{
-\item{glmfit}{Object returned from \code{\link[stats]{glm}}.}
+\item{fit}{Object returned from \code{\link[stats]{glm}}.}
 
 \item{columns}{Character vector specifying what columns to include. Choices
 for each element are \code{"beta"}, \code{"se"}, \code{"beta.se"},
@@ -30,6 +30,9 @@ reference group.}
 
 \item{ci.sep}{Character string with separator to place between lower and
 upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.}
+
+\item{format.xtable}{Logical value for whether to format table for
+converting to \code{\link[xtable]{xtable}} object and printing in LaTeX.}
 
 \item{decimals}{Numeric value specifying number of decimal places for numbers
 other than p-values.}
@@ -83,13 +86,13 @@ these approaches:
 
 \enumerate{
 
-\item 1. Use the \code{\link[Kmisc]{write.cb}} function in \pkg{Kmisc} [2].
+\item Use the \code{\link[Kmisc]{write.cb}} function in \pkg{Kmisc} [2].
 If your table is stored in a character matrix named \code{table1}, use
 \code{write.cb(table1)} to copy the table to your clipboard. Paste the result
 into your document, then highlight the text and go to
 \code{Insert -> Table -> Convert Text to Table... OK}.
 
-\item 2. Set \code{print.html = TRUE}. This will result in a .html file
+\item Set \code{print.html = TRUE}. This will result in a .html file
 being written to your current working directory. When you open this file, you
 will see a (hopefully) nice-looking table that you can copy and paste into
 your document. You can control the name of this file with
@@ -97,7 +100,7 @@ your document. You can control the name of this file with
 }
 
 If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-\code{xtable = TRUE}. You may have to set
+\code{format.xtable = TRUE}. You may have to set
 \code{sanitize.text.function = identity} when calling
 \code{\link[xtable]{print.xtable}}.
 }
@@ -109,18 +112,18 @@ d <- d[complete.cases(d), ]
 
 # Linear regression: BMI vs. age, sex, race, and treatment
 glmfit1 <- glm(BMI ~ Age + Sex + Race + Group, data = d)
-(lintable <- tabglm(glmfit = glmfit))
+(lintable <- tabglm(fit = glmfit))
 
 # Logistic regression: 1-year mortality vs. age, sex, race, and treatment.
 # Display factors in "compressed" format
 glmfit2 <- glm(death_1yr ~ Age + Sex + Race + Group, data = d,
                family = binomial)
-(logtable1 <- tabglm(glmfit = glmfit2, compress.factors = TRUE))
+(logtable1 <- tabglm(fit = glmfit2, compress.factors = TRUE))
 
 # Logistic regression with higher-order terms
 glmfit3 <- glm(death_1yr ~ poly(Age, 2, raw = TRUE) + Sex + BMI + Sex * BMI,
                data = d, family = "binomial")
-(logtable2 <- tabglm(glmfit = glmfit3))
+(logtable2 <- tabglm(fit = glmfit3))
 
 
 }

@@ -94,13 +94,13 @@ these approaches:
 
 \enumerate{
 
-\item 1. Use the \code{\link[Kmisc]{write.cb}} function in \pkg{Kmisc} [2].
+\item Use the \code{\link[Kmisc]{write.cb}} function in \pkg{Kmisc} [2].
 If your table is stored in a character matrix named \code{table1}, use
 \code{write.cb(table1)} to copy the table to your clipboard. Paste the result
 into your document, then highlight the text and go to
 \code{Insert -> Table -> Convert Text to Table... OK}.
 
-\item 2. Set \code{print.html = TRUE}. This will result in a .html file
+\item Set \code{print.html = TRUE}. This will result in a .html file
 being written to your current working directory. When you open this file, you
 will see a (hopefully) nice-looking table that you can copy and paste into
 your document. You can control the name of this file with
@@ -108,7 +108,7 @@ your document. You can control the name of this file with
 }
 
 If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-\code{xtable = TRUE}. You may have to set
+\code{format.xtable = TRUE}. You may have to set
 \code{sanitize.text.function = identity} when calling
 \code{\link[xtable]{print.xtable}}.
 }

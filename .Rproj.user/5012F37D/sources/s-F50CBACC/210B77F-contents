@@ -145,9 +145,19 @@ abc2 <- abc[dates >= as.Date("2018-02-07"), ]
 gains.graph(gains = abc1)
 points(x = abc2[, 1], y = abc2[, 2], type = "p", col = "red", pch = 16)
 
+gains <- load.gains(tickers = c("^VIX", "XIV"), to = "2018-02-05")
+tail(gains)
+summary(lm(gains[, 2] ~ gains[, 1]))
+summary(lm(gains[, 2] ~ log(gains[, 1])))
 
+prices <- load.prices(tickers = "^VIX")
+logprices <- log(prices)
 
+fig1 <- onemetric.overtime.graph(prices = prices, y.metric = "auto.pearson")
+mean(fig1 < 0)
 
+fig2 <- onemetric.overtime.graph(prices = logprices, y.metric = "auto.pearson")
+mean(fig2 < 0)
 
 # Load in sample dataset d and drop rows with missing values
 data(d)
@@ -283,4 +293,21 @@ geefit1 <- gee(bp ~ Age + Sex + Race + BMI + Group, id = id, data = d2,
 
  # Linear regression: BMI vs. age, sex, race, and treatment
  glmfit1 <- glm(BMI ~ Age + Sex + Race + Group, data = d)
+
  
+ 
+ 
+ 
+ # Load in sample dataset d and drop rows with missing values
+ data(d)
+ d <- d[complete.cases(d), ]
+
+ # Cox PH: Survival vs. race
+ coxfit1 <- coxph(Surv(time = d$time, event = d$delta) ~ Race, data = d)
+ coxtable1 <- tabcox(coxfit1)
+
+ # Test whether age, sex, race, and treatment group are associated with
+ # survival
+ coxfit2 <- coxph(Surv(time = d$time, event = d$delta) ~ Age + Sex + Race +
+                  Group, data = d)
+ coxtable2 <- tabcox(coxfit2) 

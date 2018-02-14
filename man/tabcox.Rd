@@ -4,20 +4,35 @@
 \alias{tabcox}
 \title{Generate Summary Table for Fitted Cox Proportional Hazards (Cox PH) Model}
 \usage{
-tabcox(coxfit, latex = FALSE, xlabels = NULL, decimals = 2,
-  p.decimals = c(2, 3), p.cuts = 0.01, p.lowerbound = 0.001,
-  p.leading0 = TRUE, p.avoid1 = FALSE, n = FALSE, events = FALSE,
-  beta.se = TRUE, hr.ci = TRUE, ci.sep = ", ", p = TRUE,
-  greek.beta = FALSE, binary.compress = TRUE, bold.colnames = TRUE,
-  variable.colname = "Variable", print.html = FALSE,
-  html.filename = "table1.html")
+tabcox(fit, columns = c("beta.se", "p"), xlabels = NULL,
+  compress.factors = FALSE, ci.sep = ", ", format.xtable = FALSE,
+  decimals = 2, p.decimals = c(2, 3), p.cuts = 0.01,
+  p.lowerbound = 0.001, p.leading0 = TRUE, p.avoid1 = FALSE,
+  greek.beta = FALSE, bold.colnames = TRUE, variable.colname = "Variable",
+  print.html = FALSE, html.filename = "table1.html")
 }
 \arguments{
-\item{coxfit}{Object returned from \code{\link[survival]{coxph}}.}
+\item{fit}{Object returned from \code{\link[survival]{coxph}}.}
+
+\item{columns}{Character vector specifying what columns to include. Choices
+for each element are \code{"beta"}, \code{"se"}, \code{"beta.se"},
+\code{"beta.betaci"}, \code{"betaci"}, \code{"hr"}, \code{"hr.hrci"},
+\code{"hrci"}, \code{"z"}, and \code{"p"}.}
 
 \item{xlabels}{Character vector with labels for the \code{x} variables and
 their levels. Often useful to leave as \code{NULL} first, see how the table
 looks, and then re-run with labels where they need to be.}
+
+\item{compress.factors}{Logical value for whether to display factor variables should
+as one row for each of the non-reference group levels, as opposed to one row
+for the variable name and one row for each of the levels including the
+reference group.}
+
+\item{ci.sep}{Character string with separator to place between lower and
+upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.}
+
+\item{format.xtable}{Logical value for whether to format table for
+converting to \code{\link[xtable]{xtable}} object and printing in LaTeX.}
 
 \item{decimals}{Numeric value specifying number of decimal places for numbers
 other than p-values.}
@@ -42,19 +57,6 @@ leading 0's before the decimal point.}
 appear as \code{>0.99} (or similarly depending on \code{p.decimals} and
 \code{p.cuts}) rather than 1.}
 
-\item{events}{Logical value for whether to include a number of events
-(i.e. uncensored observations) column.}
-
-\item{beta.se}{Logical value for whether to include Beta (SE) column.}
-
-\item{hr.ci}{Logical value for whether to include HR (95\% CI) column showing
-estimated hazard ratio and associated confidence interval.}
-
-\item{ci.sep}{Character string with separator to place between lower and
-upper bound of confidence interval. Typically \code{"-"} or \code{", "}.}
-
-\item{p}{Logical value for whether to include p-value column.}
-
 \item{greek.beta}{Logical value for whether to display the Greek letter beta
 rather than "Beta". Only used if \code{latex = TRUE}.}
 
@@ -71,7 +73,7 @@ table to the current working directory.}
 that gets written if \code{print.html = TRUE}.}
 }
 \value{
-Character matrix with table summarizing the fitted Cox PH model.
+Character matrix summarizing the fitted Cox PH model.
 }
 \description{
 Fits a Cox PH regression model using the \pkg{survival} package [1, 2] and
@@ -84,13 +86,13 @@ these approaches:
 
 \enumerate{
 
-\item 1. Use the \code{\link[Kmisc]{write.cb}} function in \pkg{Kmisc} [2].
+\item Use the \code{\link[Kmisc]{write.cb}} function in \pkg{Kmisc} [2].
 If your table is stored in a character matrix named \code{table1}, use
 \code{write.cb(table1)} to copy the table to your clipboard. Paste the result
 into your document, then highlight the text and go to
 \code{Insert -> Table -> Convert Text to Table... OK}.
 
-\item 2. Set \code{print.html = TRUE}. This will result in a .html file
+\item Set \code{print.html = TRUE}. This will result in a .html file
 being written to your current working directory. When you open this file, you
 will see a (hopefully) nice-looking table that you can copy and paste into
 your document. You can control the name of this file with
@@ -98,7 +100,7 @@ your document. You can control the name of this file with
 }
 
 If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-\code{xtable = TRUE}. You may have to set
+\code{format.xtable = TRUE}. You may have to set
 \code{sanitize.text.function = identity} when calling
 \code{\link[xtable]{print.xtable}}.
 }
@@ -110,13 +112,13 @@ d <- d[complete.cases(d), ]
 
 # Test whether race is associated with survival
 coxfit1 <- coxph(Surv(time = d$time, event = d$delta) ~ Race, data = d)
-coxtable1 <- tabcox(coxfit1)
+coxtable1 <- tabcox(fit = coxfit1)
 
 # Test whether age, sex, race, and treatment group are associated with
 # survival
 coxfit2 <- coxph(Surv(time = d$time, event = d$delta) ~ Age + Sex + Race +
                  Group, data = d)
-coxtable2 <- tabcox(coxfit2)
+coxtable2 <- tabcox(fit = coxfit2)
 
 
 }

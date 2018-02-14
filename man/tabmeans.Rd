@@ -4,7 +4,7 @@
 \alias{tabmeans}
 \title{Generate Summary Table Comparing Group Means}
 \usage{
-tabmeans(x, y, xtable = FALSE, variance = "unequal", xname = NULL,
+tabmeans(x, y, format.xtable = FALSE, variance = "unequal", xname = NULL,
   xlevels = NULL, yname = NULL, quantiles = NULL, quantile.vals = FALSE,
   parenth = "sd", text.label = NULL, parenth.sep = "-", decimals = NULL,
   p.include = TRUE, p.decimals = c(2, 3), p.cuts = 0.01,
@@ -19,8 +19,8 @@ tabmeans(x, y, xtable = FALSE, variance = "unequal", xname = NULL,
 
 \item{y}{Vector of values for the continuous \code{y} variable.}
 
-\item{xtable}{Logical value for whether to format table to give to
-\code{\link[xtable]{xtable}} for printing in LaTeX.}
+\item{format.xtable}{Logical value for whether to format table for
+converting to \code{\link[xtable]{xtable}} object and printing in LaTeX.}
 
 \item{variance}{Character string specifying which version of the two-sample
 t-test to use, supposing \code{x} has two levels. Choices are \code{"equal"}
@@ -131,13 +131,13 @@ these approaches:
 
 \enumerate{
 
-\item 1. Use the \code{\link[Kmisc]{write.cb}} function in \pkg{Kmisc} [2].
+\item Use the \code{\link[Kmisc]{write.cb}} function in \pkg{Kmisc} [2].
 If your table is stored in a character matrix named \code{table1}, use
 \code{write.cb(table1)} to copy the table to your clipboard. Paste the result
 into your document, then highlight the text and go to
 \code{Insert -> Table -> Convert Text to Table... OK}.
 
-\item 2. Set \code{print.html = TRUE}. This will result in a .html file
+\item Set \code{print.html = TRUE}. This will result in a .html file
 being written to your current working directory. When you open this file, you
 will see a (hopefully) nice-looking table that you can copy and paste into
 your document. You can control the name of this file with
@@ -145,7 +145,7 @@ your document. You can control the name of this file with
 }
 
 If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-\code{xtable = TRUE}. You may have to set
+\code{format.xtable = TRUE}. You may have to set
 \code{sanitize.text.function = identity} when calling
 \code{\link[xtable]{print.xtable}}.
 }
