@@ -27,10 +27,9 @@
 #' }
 #'
 #' If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-#' \code{format.latex = TRUE}. Then, you can pass the returned object to
-#' \code{\link[xtable]{xtable}} or \code{\link[kable]{kable}} for printing. For
-#' \code{\link[xtable]{xtable}}, you may have to set
-#' \code{sanitize.text.function = identity} when printing.
+#' \code{format.xtable = TRUE}. You may have to set
+#' \code{sanitize.text.function = identity} when calling
+#' \code{\link[xtable]{print.xtable}}.
 #'
 #'
 #' @param x Vector of values for the categorical \code{x} variable.
@@ -72,9 +71,8 @@
 #' should show quantile number and corresponding range, e.g. Q1 [0.00, 0.25),
 #' rather than just the quantile number.
 #'
-#' @param format.latex Logical value for whether to format table so it is
-#' ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
-#' \code{\link[kable]{kable}}.
+#' @param format.xtable Logical value for whether to format table so it is
+#' ready to be passed to \code{\link[xtable]{xtable}} for printing in LaTeX.
 #'
 #' @param decimals Numeric value specifying number of decimal places for numbers
 #' other than p-values.
@@ -162,7 +160,7 @@ tabmeans <- function(x, y, columns = c("xgroups", "p"), parenth = "sd",
                      sep.char = ", ", variance = "unequal", xname = NULL,
                      xlevels = NULL, yname = NULL, text.label = NULL,
                      quantiles = NULL, quantile.vals = FALSE,
-                     format.latex = FALSE, decimals = NULL,
+                     format.xtable = FALSE, decimals = NULL,
                      p.decimals = c(2, 3), p.cuts = 0.01, p.lowerbound = 0.001,
                      p.leading0 = TRUE, p.avoid1 = FALSE, n.headings = TRUE,
                      bold.colnames = TRUE, variable.colname = "Variable",
@@ -422,7 +420,7 @@ tabmeans <- function(x, y, columns = c("xgroups", "p"), parenth = "sd",
     }
 
     # Make column names bold if requested
-    if (format.latex & bold.colnames) {
+    if (format.xtable & bold.colnames) {
       colnames(tbl) <- paste("$\\textbf{", colnames(tbl), "}$", sep = "")
     }
 

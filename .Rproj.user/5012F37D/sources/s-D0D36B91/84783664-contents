@@ -27,10 +27,9 @@
 #' }
 #'
 #' If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-#' \code{format.latex = TRUE}. Then, you can pass the returned object to
-#' \code{\link[xtable]{xtable}} or \code{\link[kable]{kable}} for printing. For
-#' \code{\link[xtable]{xtable}}, you may have to set
-#' \code{sanitize.text.function = identity} when printing.
+#' \code{format.latex = TRUE}. You may have to set
+#' \code{sanitize.text.function = identity} when calling
+#' \code{\link[xtable]{print.xtable}}.
 #'
 #'
 #' @param x Vector of values for the categorical \code{x} variable.
@@ -73,8 +72,7 @@
 #' rather than just the quantile number.
 #'
 #' @param format.latex Logical value for whether to format table so it is
-#' ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
-#' \code{\link[kable]{kable}}.
+#' ready to be passed to \code{\link[xtable]{xtable}} for printing in LaTeX.
 #'
 #' @param decimals Numeric value specifying number of decimal places for numbers
 #' other than p-values.

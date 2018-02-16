@@ -1,15 +1,7 @@
-#' Generate Summary Table for Fitted Generalized Estimating Equation (GEE) Model
+#' Generate Summary Table for Fitted Cox Proportional Hazards (Cox PH) Model
 #'
-#'
-#' Creates table summarizing a GEE model fit using the \code{\link[gee]{gee}}
-#' function [1].
-#'
-#' Interaction and polynomial terms are compatible with \code{tabgee}. If
-#' interaction terms are included, the table will be formatted a little
-#' differently. Basically including an interaction is equivalent to setting
-#' \code{basic.form = TRUE}. All variable names and levels will be exactly as
-#' they appear when you run \code{summary(fit)}, where \code{fit} is the
-#' object returned from a call to \code{\link[gee]{gee}}.
+#' Fits a Cox PH regression model using the \pkg{survival} package [1, 2] and
+#' creates a table summarizing the results.
 #'
 #'
 #' @inheritSection tabmeans Note
@@ -17,63 +9,51 @@
 #' @inheritParams tabglm
 #'
 #'
-#' @param fit Object returned from \code{\link[gee]{gee}}.
+#' @param fit Object returned from \code{\link[survival]{coxph}}.
 #'
-#' @param columns Character vector specifying what columns to include. Choices
-#' for each element are \code{"n"}, \code{"events"} (for binary outcomes)
-#' \code{"beta"}, \code{"se"}, \code{"beta.se"}, \code{"beta.betaci"},
-#' \code{"betaci"}, \code{"or"}, \code{"or.orci"}, \code{"orci"}, \code{"z"},
-#' and \code{"p"}.
-#'
-#' @param robust Logical value for whether 'robust' standard errors should be
-#' used for inference.
-#'
-#' @param data Data frame containing variables passed to \code{\link[gee]{gee}}
-#' to create \code{fit}. Only needs to be specified when one or more of the
-#' predictors is a factor variable and \code{compres.factors = FALSE}.
+#' @param columns Character vector specifying what columns to include. Choies
+#' for each element are \code{"events"}, \code{"beta"}, \code{"se"},
+#' \code{"beta.se"}, \code{"beta.betaci"}, \code{"betaci"}, \code{"hr"},
+#' \code{"hr.hrci"}, \code{"hrci"}, \code{"z"}, and \code{"p"}.
 #'
 #'
-#'
-#'
-#' @return Character matrix with table summarizing the fitted GEE.
+#' @return Character matrix summarizing the fitted Cox PH model.
 #'
 #'
 #' @examples
-#' # Load in sample dataset d and convert to long format
+#' # Load in sample dataset d and drop rows with missing values
 #' data(d)
-#' d2 <- reshape(data = d, varying = c("bp.1", "bp.2", "bp.3", "highbp.1",
-#'                                     "highbp.2", "highbp.3"),
-#'               timevar = "bp.visit", direction = "long")
-#' d2 <- d2[order(d2$id), ]
+#' d <- d[complete.cases(d), ]
 #'
-#' # GEE: Blood pressure at 1, 2, and 3 months vs. predictors
-#' geefit1 <- gee(bp ~ Age + Sex + Race + BMI + Group, id = id, data = d2,
-#'                corstr = "unstructured")
-#' (geetable1 <- tabgee(fit = geefit1, data = d2))
+#' # Test whether race is associated with survival
+#' coxfit1 <- coxph(Surv(time = d$time, event = d$delta) ~ Race, data = d)
+#' coxtable1 <- tabcox(fit = coxfit1)
 #'
-#' # GEE: High blood pressure at 1, 2, and 3 months vs. predictors. Display
-#' # factors in "compressed" format
-#' geefit2 <- gee(highbp ~ Age + Sex + Race + BMI + Group, id = id, data = d2,
-#'                family = binomial, corstr = "unstructured")
-#' (geetable2 <- tabgee(fit = geefit2, data = d2, compress.factors = TRUE))
+#' # Test whether age, sex, race, and treatment group are associated with
+#' # survival
+#' coxfit2 <- coxph(Surv(time = d$time, event = d$delta) ~ Age + Sex + Race +
+#'                  Group, data = d)
+#' coxtable2 <- tabcox(fit = coxfit2)
 #'
 #'
 #' @references
-#' 1. Carey, V.J. (2015). gee: Generalized Estimation Equation Solver. R package
-#' version 4.13-19. Ported to R by Thomas Lumley and Brian Ripley.
-#' \url{https://cran.r-project.org/package=gee}.
+#' 1. Therneau, T. (2015). A Package for Survival Analysis in S. R package
+#' version 2.38. \url{https://cran.r-project.org/package=survival}.
 #'
-#' 2. Dahl, D.B. (2016). xtable: Export Tables to LaTeX or HTML. R package
+#' 2. Therneau, T.M. and Grambsch, P.M. (2000). Modeling Survival Data:
+#' Extending the Cox Model. Springer, New York. ISBN 0-387-98784-3.
+#'
+#' 3. Dahl, D.B. (2016). xtable: Export Tables to LaTeX or HTML. R package
 #' version 1.8-2, \url{https://cran.r-project.org/package=xtable}.
 #'
-#' 3. Ushley, K. (2013). Kmisc: Kevin Miscellaneous. R package version 0.5.0.
-#'\url{https://CRAN.R-project.org/package=Kmisc}.
+#' 4. Ushley, K. (2013). Kmisc: Kevin Miscellaneous. R package version 0.5.0.
+#' \url{https://CRAN.R-project.org/package=Kmisc}.
 #'
 #'
 #'@export
-tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
-                   compress.factors = FALSE, data = NULL, sep.char = ", ",
-                   format.latex = FALSE, decimals = 2, p.decimals = c(2, 3),
+tabcox <- function(fit, columns = c("beta.se", "p"), xlabels = NULL,
+                   compress.factors = FALSE, sep.char = ", ",
+                   format.xtable = FALSE, decimals = 2, p.decimals = c(2, 3),
                    p.cuts = 0.01, p.lowerbound = 0.001, p.leading0 = TRUE,
                    p.avoid1 = FALSE, bold.colnames = TRUE,
                    variable.colname = "Variable", print.html = FALSE,
@@ -83,47 +63,30 @@ tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
   summary.fit <- summary(fit)
   coefmat <- summary.fit$coefficients
   rownames.coefmat <- rownames(coefmat)
-  betas <- coefmat[, "Estimate"]
-  if (robust) {
-    ses <- coefmat[, "Robust S.E."]
-    zs <- coefmat[, "Robust z"]
-  } else {
-    ses <- coefmat[, "Naive S.E."]
-    zs <- coefmat[, "Naive z"]
-  }
-  ps <- pnorm(-abs(zs)) * 2
+  betas <- coefmat[, "coef"]
+  hrs <- coefmat[, "exp(coef)"]
+  ses <- coefmat[, "se(coef)"]
+  zs <- coefmat[, "z"]
+  ps <- coefmat[, "Pr(>|z|)"]
   intercept <- rownames.coefmat[1] == "(Intercept)"
-  gee.fam <- fit$family$family
-  gee.link <- fit$family$link
-
-  # Default columns to include depending on family of GEE
-  if (is.null(columns)) {
-    if (gee.fam == "binomial" & gee.link == "logit") {
-      columns <- c("beta.se", "or.orci", "p")
-    } else {
-      columns <- c("beta.se", "p")
-    }
-  }
 
   # Determine whether xlabels has to be created
   create.xlabels <- is.null(xlabels)
 
   # Determine whether there are factors, interactions, or polynomials
-  classes <- attr(fit$terms, "dataClasses")
-  x.factors <- names(classes)[classes == "factor"]
+  fit.xlevels <- fit$xlevels
+  x.factors <- names(fit.xlevels)
   factors <- length(x.factors) > 0
 
-  interactions <- length(grep(pattern = ":", x = rownames.coefmat)) > 1
+  interaction.rows <- grep(pattern = ":", x = rownames.coefmat)
+  interactions <- length(interaction.rows) > 1
 
   polynomial.rows <- grep(pattern = "poly(", x = rownames.coefmat, fixed = TRUE)
   polynomials <- length(polynomial.rows) > 0
 
   # If necessary, force compress.factors to be TRUE and notify user of reason
   if (interactions & ! compress.factors) {
-    message("The 'compress.factors' input is being switched to TRUE because the fitted GEE includes interaction terms. This limitation may be addressed in future versions of 'tabgee'.")
-    compress.factors <- TRUE
-  } else if (compress.factors & is.null(data) & create.xlabels) {
-    message("The compress.factors input is being switched to TRUE because reference group labels are not available. If you really want compress.factors = FALSE, you'll need to re-run with 'data' or 'xlabels' specified.")
+    message("The 'compress.factors' input is being switched to TRUE because the fitted GEE includes interaction terms. This limitation may be addressed in future versions of 'tabcox'.")
     compress.factors <- TRUE
   }
 
@@ -167,14 +130,21 @@ tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
 
       }
 
-      # Clean up factors (imperfect solution - could go wrong!)
-      if (factors | interactions) {
-
+      # Clean up factors
+      if (factors) {
         for (ii in 1: length(x.factors)) {
           xlabels <- unlist(lapply(xlabels, function(x)
             gsub(pattern = x.factors[ii], replacement = "", x = x)))
         }
+      }
 
+      # Clean up interactions
+      if (interactions) {
+        for (ii in 1: length(x.factors)) {
+          xlabels[interaction.rows] <-
+            unlist(lapply(xlabels[interaction.rows], function(x)
+              gsub(pattern = x.factors[ii], replacement = "", x = x)))
+        }
       }
 
     }
@@ -198,7 +168,7 @@ tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
 
         # Clean up polynomial
         varname.ii.split <-
-          unlist(strsplit(substring(varname.ii, first = 6), split = ","))
+          unlist(strsplit(substr(varname.ii, start = 6, stop = 100), split = ","))
         varname.ii <- varname.ii.split[1]
         poly.order <- as.numeric(varname.ii.split[2])
         if (create.xlabels) {
@@ -221,9 +191,7 @@ tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
       } else if (varname.ii %in% x.factors) {
 
         # Clean up factor
-        locs <- which(substr(rownames.coefmat, start = 1,
-                             stop = nchar(varname.ii)) == varname.ii)
-        levels.ii <- levels(data[[varname.ii]])
+        levels.ii <- as.character(unlist(fit$xlevels[varname.ii]))
         nlevels.ii <- length(levels.ii)
         new.entries <- (rowcount + 1): (rowcount + nlevels.ii)
         if (create.xlabels) {
@@ -269,8 +237,8 @@ tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
     } else if (column.ii == "events") {
 
       # Events
-      newcol <- matrix(c(sum(fit$model[, 1]), rep("", nrows - 1)), ncol = 1,
-                       dimnames = list(NULL, "Events"))
+      newcol <- matrix(c(fit$nevent, rep("", nrows - 1)), ncol = 1,
+                    dimnames = list(NULL, "Events"))
 
     } else if (column.ii == "beta") {
 
@@ -299,62 +267,61 @@ tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
     } else if (column.ii == "beta.betaci") {
 
       # Beta (95% CI)
+      ci.fit <- confint(fit)
       newcol <- matrix("", ncol = 1, nrow = nrows,
                        dimnames = list(NULL, "Beta (95% CI)"))
-      zcrit <- qnorm(0.975)
       newcol[entry.rows, 1] <-
         paste(sprintf(spf, betas), " (",
-              sprintf(spf, betas - zcrit * ses), sep.char,
-              sprintf(spf, betas + zcrit * ses), ")", sep = "")
+              sprintf(spf, ci.fit[, 1]), sep.char,
+              sprintf(spf, ci.fit[, 2]), ")", sep = "")
       newcol[ref.rows, 1] <- "-"
 
     } else if (column.ii == "betaci") {
 
       # 95% CI for Beta
+      ci.fit <- confint(fit)
       newcol <- matrix("", ncol = 1, nrow = nrows,
                        dimnames = list(NULL, "95% CI for Beta"))
-      zcrit <- qnorm(0.975)
-      newcol[entry.rows, 1] <-
-        paste(sprintf(spf, betas - zcrit * ses), sep.char,
-              sprintf(spf, betas + zcrit * ses), ")", sep = "")
+      newcol[entry.rows, 1] <- paste(sprintf(spf, ci.fit[, 1]), sep.char,
+                                     sprintf(spf, ci.fit[, 2]), sep = "")
       newcol[ref.rows, 1] <- "-"
 
-    } else if (column.ii == "or") {
+    } else if (column.ii == "hr") {
 
-      # OR
-      newcol <- matrix("", ncol = 1, nrow = nrows, dimnames = list(NULL, "OR"))
-      newcol[entry.rows, 1] <- sprintf(spf, exp(betas))
+      # HR
+      newcol <- matrix("", ncol = 1, nrow = nrows, dimnames = list(NULL, "HR"))
+      newcol[entry.rows, 1] <- sprintf(spf, hrs)
       if (intercept) {
         newcol[1, 1] <- "-"
       }
       newcol[ref.rows, 1] <- "-"
 
-    } else if (column.ii == "or.orci") {
+    } else if (column.ii == "hr.hrci") {
 
-      # OR (95% CI)
+      # HR (95% CI)
+      ci.fit <- summary.fit$conf.int
       newcol <- matrix("-", ncol = 1, nrow = nrows,
                        dimnames = list(NULL, "OR (95% CI)"))
-      zcrit <- pnorm(0.975)
       newcol[entry.rows, 1] <-
-        paste(sprintf(spf, exp(betas)), " (",
-              sprintf(spf, exp(betas - zcrit * ses)), sep.char,
-              sprintf(spf, exp(betas + zcrit * ses)), ")", sep = "")
+        paste(sprintf(spf, hrs), " (",
+              sprintf(spf, ci.fit[, "lower .95"]), sep.char,
+              sprintf(spf, ci.fit[, "upper .95"]), ")", sep = "")
       if (intercept) {
         newcol[1, 1] <- "-"
       }
       newcol[ref.rows, 1] <- "-"
 
-    } else if (column.ii == "orci") {
+    } else if (column.ii == "hrci") {
 
-      # 95% CI for OR
+      # 95% CI for HR
+      ci.fit <- summary.fit$conf.int
       newcol <- matrix("-", ncol = 1, nrow = nrows,
                        dimnames = list(NULL, "95% CI for OR"))
-      zcrit <- pnorm(0.975)
       newcol[entry.rows, 1] <-
-        paste(sprintf(spf, exp(betas - zcrit * ses)), sep.char,
-              sprintf(spf, exp(betas + zcrit * ses)), sep = "")
+        paste(sprintf(spf, ci.fit[, "lower .95"]), sep.char,
+              sprintf(spf, ci.fit[, "upper .95"]), sep = "")
       if (intercept) {
-        newcol[1, 1] < -"-"
+        newcol[1, 1] <- "-"
       }
       newcol[ref.rows, 1] <- "-"
 
@@ -383,7 +350,7 @@ tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
   }
 
   # Reformat for xtable if necessary
-  if (format.latex) {
+  if (format.xtable) {
     tbl[, 1] <- gsub(pattern = "  ", replacement = "$\\hskip .4cm$",
                      x = tbl[, 1], fixed = TRUE)
     if (bold.colnames) {
@@ -399,14 +366,13 @@ tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
                                 paste(rep("r", ncol(tbl) - 1), collapse = ""),
                                 sep = "", collapse = ""))
     print(tbl.xtable, include.rownames = FALSE, type = "html",
-          file = html.filename,
-          sanitize.text.function = function(x) {
+          file = html.filename, sanitize.text.function = function(x) {
             ifelse(substr(x, 1, 1) == " ", paste("&nbsp &nbsp", x), x)
           })
 
   }
 
-  # Return tbl
+  # Return table
   return(tbl)
 
 }

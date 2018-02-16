@@ -80,7 +80,7 @@ tabfreq <- function(x = NULL, y, columns = c("xgroups", "p"),
                     ylevels = NULL, compress.binary = FALSE,
                     yname.row = ! compress.binary, text.label = NULL,
                     quantiles = NULL, quantile.vals = FALSE,
-                    format.latex = FALSE, decimals = 1, p.decimals = c(2, 3),
+                    format.xtable = FALSE, decimals = 1, p.decimals = c(2, 3),
                     p.cuts = 0.01, p.lowerbound = 0.001, p.leading0 = TRUE,
                     p.avoid1 = FALSE, n.headings = FALSE, bold.colnames = TRUE,
                     variable.colname = "Variable", print.html = FALSE,
@@ -325,7 +325,7 @@ tabfreq <- function(x = NULL, y, columns = c("xgroups", "p"),
   # Add yname row and indent ylevels if requested
   if (yname.row) {
     row1 <- tbl[1, , drop = FALSE]
-    tbl[, 1] <- paste(ifelse(format.latex, "$\\hskip .4cm$", "  "),
+    tbl[, 1] <- paste(ifelse(format.xtable, "$\\hskip .4cm$", "  "),
                       tbl[, 1], sep = "")
     tbl <- rbind(c(yname, rep("", ncol(tbl) - 1)), tbl)
     summary.cols <- which(colnames(tbl) %in% c("N", "Chi-sq", "P"))
@@ -364,7 +364,7 @@ tabfreq <- function(x = NULL, y, columns = c("xgroups", "p"),
   }
 
   # Make column names bold if requested
-  if (format.latex & bold.colnames) {
+  if (format.xtable & bold.colnames) {
     colnames(tbl) <- paste("$\\textbf{", colnames(tbl), "}$", sep = "")
   }
 

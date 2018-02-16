@@ -4,13 +4,12 @@
 \alias{tabmedians}
 \title{Generate Summary Table Comparing Group Medians}
 \usage{
-tabmedians(x, y, latex = FALSE, xname = NULL, xlevels = NULL,
-  yname = NULL, quantiles = NULL, quantile.vals = FALSE,
-  parenth = "iqr", text.label = NULL, parenth.sep = "-",
-  decimals = NULL, p.include = TRUE, p.decimals = c(2, 3),
+tabmedians(x, y, columns = c("xgroups", "p"), parenth = "iqr",
+  sep.char = ", ", xname = NULL, xlevels = NULL, yname = NULL,
+  text.label = NULL, quantiles = NULL, quantile.vals = FALSE,
+  format.latex = FALSE, decimals = NULL, p.decimals = c(2, 3),
   p.cuts = 0.01, p.lowerbound = 0.001, p.leading0 = TRUE,
-  p.avoid1 = FALSE, overall.column = TRUE, n.column = FALSE,
-  n.headings = TRUE, bold.colnames = TRUE, bold.varnames = FALSE,
+  p.avoid1 = FALSE, n.headings = TRUE, bold.colnames = TRUE,
   variable.colname = "Variable", fig = FALSE, print.html = FALSE,
   html.filename = "table1.html", ...)
 }
@@ -19,40 +18,43 @@ tabmedians(x, y, latex = FALSE, xname = NULL, xlevels = NULL,
 
 \item{y}{Vector of values for the continuous \code{y} variable.}
 
-\item{xname}{Character string with a label for the \code{x} variable.}
-
-\item{xlevels}{Character vector with labels for each level of \code{x}, for
-column headings.}
-
-\item{yname}{Character string with a label for the \code{y} variable.}
-
-\item{quantiles}{Numeric value. If specified, table compares median \code{y}
-across quantiles of \code{x}. For example, if \code{x} contains BMI values
-and \code{y} HDL levels, setting \code{quantiles = 3} compares median HDL
-across BMI tertiles.}
-
-\item{quantile.vals}{Logical value for whether labels for \code{x} should
-show quantile number and corresponding range, e.g. Q1 [0.00, 0.25), rather
-than just the quantile number.}
+\item{columns}{Character vector specifying what columns to include. Choices
+for each element are \code{"n"} for total sample size, \code{"overall"} for
+overall median, \code{"xgroups"} for \code{x} group medians, \code{"diff"}
+for difference in \code{x} group medians (only available for binary
+\code{x}), \code{"test"} for test statistic, and \code{"p"} for p-value.}
 
 \item{parenth}{Character string specifying what values are shown in
 parentheses after the medians in each cell. Choices are \code{"none"},
-\code{"iqr"}, \code{"range"}, \code{"minmax"}, \code{"q1q3"} for first and
-third quartiles, and \code{"ci"} for 95\% confidence interval for the medians
-(based on binomial probabilities if one or more groups have n less than 10,
-otherwise based on normal approximation to binomial).}
+\code{"iqr"}, \code{"q1q3"} for first and third quartiles, \code{"range"},
+\code{"minmax"}, and \code{"ci"} for 95\% confidence interval for the medians
+based on normal approximation to binomial.}
+
+\item{sep.char}{Character string with separator to place between lower and
+upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.}
+
+\item{xname}{Character string with a label for the \code{x} variable.}
+
+\item{xlevels}{Character vector with labels for the levels of \code{x}, used
+in column headings.}
+
+\item{yname}{Character string with a label for the \code{y} variable.}
 
 \item{text.label}{Character string with text to put after the \code{y}
 variable name, identifying what cell values and parentheses represent.}
 
-\item{parenth.sep}{Character string with separator to place between first and
-second numbers in parentheses, if applicable. Typically \code{"-"} or
-\code{", "}.}
+\item{quantiles}{Numeric value. If specified, table compares \code{y} across
+quantiles of \code{x} created on the fly.}
+
+\item{quantile.vals}{Logical value for whether labels for \code{x} quantiles
+should show quantile number and corresponding range, e.g. Q1 [0.00, 0.25),
+rather than just the quantile number.}
+
+\item{format.latex}{Logical value for whether to format table so it is
+ready to be passed to \code{\link[xtable]{xtable}} for printing in LaTeX.}
 
 \item{decimals}{Numeric value specifying number of decimal places for numbers
 other than p-values.}
-
-\item{p.include}{Logical value for whether to include a p-value column.}
 
 \item{p.decimals}{Numeric value specifying number of decimal places for
 p-values. Can be a vector if you want the number of decimals to depend on
@@ -74,20 +76,11 @@ leading 0's before the decimal point.}
 appear as \code{>0.99} (or similarly depending on \code{p.decimals} and
 \code{p.cuts}) rather than 1.}
 
-\item{overall.column}{Logical value for whether to include a column with the
-overall median of \code{y}.}
-
-\item{n.column}{Logical value for whether to include a column with the
-overall sample size.}
-
-\item{n.headings}{Logical value for whether to include sample sizes in
+\item{n.headings}{Logical value for whether to display group sample sizes in
 parentheses in column headings.}
 
 \item{bold.colnames}{Logical value for whether to use bold font for column
 headings. Only used if \code{xtable = TRUE}.}
-
-\item{bold.varnames}{Logic value for whether to use bold font for the
-\code{y} variable name in the first column. Only used if \code{xtable = TRUE}.}
 
 \item{variable.colname}{Character string with desired heading for first
 column of table, in case you prefer something other than \code{"Variable"}.}
@@ -105,8 +98,7 @@ that gets written if \code{print.html = TRUE}.}
 used if \code{fig = TRUE}.}
 }
 \value{
-Character matrix with table comparing median \code{y} across levels
-of \code{x}.
+Character matrix comparing median \code{y} across levels of \code{x}.
 }
 \description{
 Creates table (or figure) comparing the median of \code{y} across levels of
@@ -141,7 +133,7 @@ your document. You can control the name of this file with
 }
 
 If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-\code{format.xtable = TRUE}. You may have to set
+\code{format.latex = TRUE}. You may have to set
 \code{sanitize.text.function = identity} when calling
 \code{\link[xtable]{print.xtable}}.
 }
@@ -151,36 +143,20 @@ If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
 data(d)
 d <- d[complete.cases(d), ]
 
-# Create labels for group and race
-groups <- c("Control", "Treatment")
-races <- c("White", "Black", "Mexican American", "Other")
-
 # Compare median BMI in control group vs. treatment group
-medtable1 <- tabmedians(x = d$Group, y = d$BMI)
-
-# Repeat, but show first and third quartile rather than IQR in parentheses
-medtable2 <- tabmedians(x = d$Group, y = d$BMI, parenth = "q1q3")
-
-# Compare median BMI by race, suppressing overall column and (n = ) part of
-# headings
-medtable3 <- tabmedians(x = d$Race, y = d$BMI, overall.column = FALSE,
-                        n.headings = FALSE)
+(medtable1 <- tabmedians(x = d$Group, y = d$BMI))
 
 # Compare median BMI by quartile of age
-medtable4 <- tabmedians(x = d$Age, y = d$BMI, quantiles = 4)
+(medtable2 <- tabmedians(x = d$Age, y = d$BMI, quantiles = 4))
 
 # Create single table comparing median BMI and median age in control vs.
 # treatment group
-medtable5 <- rbind(tabmedians(x = d$Group, y = d$BMI),
-                   tabmedians(x = d$Group, y = d$Age))
+(medtable3 <- rbind(tabmedians(x = d$Group, y = d$BMI),
+                    tabmedians(x = d$Group, y = d$Age)))
 
-# A (usually) faster way to make the above table is to call the tabmulti
-# function
-medtable6 <- tabmulti(dataset = d, xvarname = "Group",
+# An easier way to make this table is to use tabmulti
+medtable4 <- tabmulti(data = d, xvarname = "Group",
                       yvarnames = c("BMI", "Age"), ymeasures = "median")
-
-# medtable5 and medtable6 are equivalent
-all(medtable5 == medtable6)
 
 
 }

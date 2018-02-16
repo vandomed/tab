@@ -4,62 +4,60 @@
 \alias{tabmeans}
 \title{Generate Summary Table Comparing Group Means}
 \usage{
-tabmeans(x, y, format.xtable = FALSE, variance = "unequal", xname = NULL,
-  xlevels = NULL, yname = NULL, quantiles = NULL, quantile.vals = FALSE,
-  parenth = "sd", text.label = NULL, parenth.sep = "-", decimals = NULL,
-  p.include = TRUE, p.decimals = c(2, 3), p.cuts = 0.01,
-  p.lowerbound = 0.001, p.leading0 = TRUE, p.avoid1 = FALSE,
-  overall.column = TRUE, n.column = FALSE, n.headings = TRUE,
-  bold.colnames = TRUE, bold.varnames = FALSE,
-  variable.colname = "Variable", fig = FALSE, print.html = FALSE,
-  html.filename = "table1.html", ...)
+tabmeans(x, y, columns = c("xgroups", "p"), parenth = "sd",
+  sep.char = ", ", variance = "unequal", xname = NULL, xlevels = NULL,
+  yname = NULL, text.label = NULL, quantiles = NULL,
+  quantile.vals = FALSE, format.latex = FALSE, decimals = NULL,
+  p.decimals = c(2, 3), p.cuts = 0.01, p.lowerbound = 0.001,
+  p.leading0 = TRUE, p.avoid1 = FALSE, n.headings = TRUE,
+  bold.colnames = TRUE, variable.colname = "Variable", fig = FALSE,
+  print.html = FALSE, html.filename = "table1.html", ...)
 }
 \arguments{
 \item{x}{Vector of values for the categorical \code{x} variable.}
 
 \item{y}{Vector of values for the continuous \code{y} variable.}
 
-\item{format.xtable}{Logical value for whether to format table for
-converting to \code{\link[xtable]{xtable}} object and printing in LaTeX.}
+\item{columns}{Character vector specifying what columns to include. Choices
+for each element are \code{"n"} for total sample size, \code{"overall"} for
+overall mean, \code{"xgroups"} for \code{x} group means, \code{"diff"} for
+difference in \code{x} group means (only available for binary \code{x}),
+\code{"test"} for test statistic, and \code{"p"} for p-value.}
+
+\item{parenth}{Character string specifying what statistic to display in
+parentheses after the means. Choices are \code{"none"}, \code{"sd"},
+\code{"se"},  \code{"t.ci"}, and \code{"z.ci"}.}
+
+\item{sep.char}{Character string with separator to place between lower and
+upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.}
 
 \item{variance}{Character string specifying which version of the two-sample
-t-test to use, supposing \code{x} has two levels. Choices are \code{"equal"}
-for equal variance t-test, \code{"unequal"} for unequal variance t-test, and
-\code{"ftest"} for F test to determine which to use.}
+t-test to use if \code{x} has 2 levels. Choices are \code{"equal"} for equal
+variance t-test, \code{"unequal"} for unequal variance t-test, and \code{"f"}
+for F test to determine which to use.}
 
 \item{xname}{Character string with a label for the \code{x} variable.}
 
-\item{xlevels}{Character vector with labels for each level of \code{x}, for
-column headings.}
+\item{xlevels}{Character vector with labels for the levels of \code{x}, used
+in column headings.}
 
 \item{yname}{Character string with a label for the \code{y} variable.}
-
-\item{quantiles}{Numeric value. If specified, table compares mean \code{y}
-across quantiles of \code{x}. For example, if \code{x} contains BMI values
-and \code{y} HDL levels, setting \code{quantiles = 3} compares mean HDL
-across BMI tertiles.}
-
-\item{quantile.vals}{Logical value for whether labels for \code{x} should
-show quantile number and corresponding range, e.g. Q1 [0.00, 0.25), rather
-than just the quantile number.}
-
-\item{parenth}{Character string specifying what statistic should appear in
-parentheses after the means in each cell. Choices are \code{"none"},
-\code{"sd"} for standard deviation, \code{"se"} for standard error,
-\code{"t.ci"} for 95\% confidence interval based on t distribution, and
-\code{"z.ci"} for 95\% confidence interval based on z distribution.}
 
 \item{text.label}{Character string with text to put after the \code{y}
 variable name, identifying what cell values and parentheses represent.}
 
-\item{parenth.sep}{Character string with separator to place between first and
-second numbers in parentheses, if applicable. Typically \code{"-"} or
-\code{", "}.}
+\item{quantiles}{Numeric value. If specified, table compares \code{y} across
+quantiles of \code{x} created on the fly.}
+
+\item{quantile.vals}{Logical value for whether labels for \code{x} quantiles
+should show quantile number and corresponding range, e.g. Q1 [0.00, 0.25),
+rather than just the quantile number.}
+
+\item{format.latex}{Logical value for whether to format table so it is
+ready to be passed to \code{\link[xtable]{xtable}} for printing in LaTeX.}
 
 \item{decimals}{Numeric value specifying number of decimal places for numbers
 other than p-values.}
-
-\item{p.include}{Logical value for whether to include a p-value column.}
 
 \item{p.decimals}{Numeric value specifying number of decimal places for
 p-values. Can be a vector if you want the number of decimals to depend on
@@ -81,20 +79,11 @@ leading 0's before the decimal point.}
 appear as \code{>0.99} (or similarly depending on \code{p.decimals} and
 \code{p.cuts}) rather than 1.}
 
-\item{overall.column}{Logical value for whether to include a column with the
-overall mean of \code{y}.}
-
-\item{n.column}{Logical value for whether to include a column with the
-overall sample size.}
-
-\item{n.headings}{Logical value for whether to include sample sizes in
+\item{n.headings}{Logical value for whether to display group sample sizes in
 parentheses in column headings.}
 
 \item{bold.colnames}{Logical value for whether to use bold font for column
 headings. Only used if \code{xtable = TRUE}.}
-
-\item{bold.varnames}{Logic value for whether to use bold font for the
-\code{y} variable name in the first column. Only used if \code{xtable = TRUE}.}
 
 \item{variable.colname}{Character string with desired heading for first
 column of table, in case you prefer something other than \code{"Variable"}.}
@@ -112,8 +101,7 @@ that gets written if \code{print.html = TRUE}.}
 used if \code{fig = TRUE}.}
 }
 \value{
-Character matrix with table comparing mean \code{y} across levels of
-\code{x}.
+Character matrix comparing mean \code{y} across levels of \code{x}.
 }
 \description{
 Creates table (or figure) comparing the mean of \code{y} across levels of
@@ -145,7 +133,7 @@ your document. You can control the name of this file with
 }
 
 If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-\code{format.xtable = TRUE}. You may have to set
+\code{format.latex = TRUE}. You may have to set
 \code{sanitize.text.function = identity} when calling
 \code{\link[xtable]{print.xtable}}.
 }
@@ -156,30 +144,23 @@ data(d)
 d <- d[complete.cases(d), ]
 
 # Compare mean BMI in control group vs. treatment group - table and figure
-meanstable1 <- tabmeans(x = d$Group, y = d$BMI)
+(meanstable1 <- tabmeans(x = d$Group, y = d$BMI))
 meansfig1 <- tabmeans(x = d$Group, y = d$BMI, fig = TRUE)
 
-# Compare mean BMI by race - table and figure
-meanstable2 <- tabmeans(x = d$Race, y = d$BMI)
-meansfig2 <- tabmeans(x = d$Race, y = d$BMI, fig = TRUE)
-
 # Compare mean baseline systolic BP across tertiles of BMI - table and figure
-meanstable3 <- tabmeans(x = d$BMI, y = d$bp.1, yname = "Systolic BP",
-                        quantiles = 3)
-meansfig3 <- tabmeans(x = d$BMI, y = d$bp.1, quantiles = 3, fig = TRUE,
+(meanstable2 <- tabmeans(x = d$BMI, y = d$bp.1, yname = "Systolic BP",
+                         quantiles = 3))
+meansfig2 <- tabmeans(x = d$BMI, y = d$bp.1, quantiles = 3, fig = TRUE,
                       yname = "Systolic BP", xname = "BMI Tertile")
 
 # Create single table comparing mean BMI and mean age in control vs.
 # treatment group
-meanstable4 <- rbind(tabmeans(x = d$Group, y = d$BMI),
-                     tabmeans(x = d$Group, y = d$Age))
+(meanstable3 <- rbind(tabmeans(x = d$Group, y = d$BMI),
+                      tabmeans(x = d$Group, y = d$Age)))
 
-# An easier way to make the above table is to call the tabmulti function
-meanstable5 <- tabmulti(dataset = d, xvarname = "Group",
-                        yvarnames = c("BMI", "Age"))
-
-# meanstable4 and meanstable5 are equivalent
-all(meanstable4 == meanstable5)
+# An easier way to make this table is to use tabmulti
+(meanstable4 <- tabmulti(data = d, xvarname = "Group",
+                         yvarnames = c("BMI", "Age")))
 
 
 }

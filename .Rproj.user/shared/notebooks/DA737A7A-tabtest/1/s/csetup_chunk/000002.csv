@@ -3,4 +3,5 @@
 "0","library(""xtable"")"
 "0","# Set xtable options"
 "0","options(""xtable.caption.placement"" = ""top"", "
-"0","        ""xtable.include.rownames"" = FALSE)"
+"0","        ""xtable.include.rownames"" = FALSE, "
+"0","        ""xtable.comment"" = FALSE)"

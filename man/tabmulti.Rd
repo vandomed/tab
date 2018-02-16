@@ -2,52 +2,57 @@
 % Please edit documentation in R/tabmulti.R
 \name{tabmulti}
 \alias{tabmulti}
-\title{Generate Multi-row Table Comparing Multiple Variables Across Levels of One
+\title{Generate Summary Table Comparing Multiple Variables Across Levels of One
 Categorical Variable}
 \usage{
-tabmulti(dataset, xvarname, yvarnames, ymeasures = NULL,
-  listwise.deletion = TRUE, latex = FALSE, xlevels = NULL,
+tabmulti(data, xvarname, yvarnames, ymeasures = NULL, columns = c("xgroups",
+  "p"), listwise.deletion = FALSE, sep.char = ", ", xlevels = NULL,
   ynames = yvarnames, ylevels = NULL, quantiles = NULL,
-  quantile.vals = FALSE, parenth.sep = "-", cell = "n",
-  freq.parenth = NULL, freq.text.label = NULL, freq.tests = "chi",
-  means.parenth = "sd", means.text.label = NULL, variance = "unequal",
-  medians.parenth = "iqr", medians.text.label = NULL, decimals = NULL,
-  p.include = TRUE, p.decimals = c(2, 3), p.cuts = 0.01,
-  p.lowerbound = 0.001, p.leading0 = TRUE, p.avoid1 = FALSE,
-  overall.column = TRUE, n.column = FALSE, n.headings = TRUE,
-  compress = FALSE, bold.colnames = TRUE, bold.varnames = FALSE,
-  bold.varlevels = FALSE, variable.colname = "Variable",
-  print.html = FALSE, html.filename = "table1.html")
+  quantile.vals = NULL, format.latex = FALSE, decimals = NULL,
+  p.decimals = c(2, 3), p.cuts = 0.01, p.lowerbound = 0.001,
+  p.leading0 = TRUE, p.avoid1 = FALSE, n.headings = FALSE,
+  bold.colnames = TRUE, variable.colname = "Variable", print.html = FALSE,
+  html.filename = "table1.html", means.list = NULL, medians.list = NULL,
+  freq.list = NULL)
 }
 \arguments{
-\item{dataset}{Data frame.}
+\item{data}{Data frame.}
 
 \item{xvarname}{Character string with name of column variable. Should be one
-of \code{names(dataset)}.}
+of \code{names(data)}.}
 
 \item{yvarnames}{Character vector with names of row variables. Each element
-should be one of \code{names(dataset)}.}
+should be one of \code{names(data)}.}
 
 \item{ymeasures}{Character vector specifying whether each \code{y} variable
 should be summarized by mean, median, or frequency. For example, if
-\code{yvarnames} has length 3 and you wish to display frequencies for the
+\code{yvarnames} has length 3 and you want to display frequencies for the
 first variable, means for the second, and medians for the third, you would
 set \code{ymeasures = c("freq", "mean", "median")}. If unspecified, function
-displays frequencies for any factor variable or numeric variable with 5 or
+displays frequencies for factor variables and numeric variable with 5 or
 fewer unique values, and means for numeric variables with more than five
 levels.}
+
+\item{columns}{Character vector specifying what columns to include. Choices
+for each element are \code{"n"} for total sample size, \code{"overall"} for
+overall statistics, \code{"xgroups"} for \code{x} group statistics,
+\code{"test"} for test statistic, and \code{"p"} for p-value.}
 
 \item{listwise.deletion}{Logical value for whether observations with missing
 values for any \code{y} variable should be excluded entirely (as opposed to
 using all available data for each comparison).}
 
-\item{xlevels}{Character vector with labels for each level of \code{x}, for
-column headings.}
+\item{sep.char}{Character string with separator to place between lower and
+upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.}
+
+\item{xlevels}{Character vector with labels for the levels of \code{x}, used
+in column headings.}
 
 \item{ynames}{Character vector with labels for the \code{y} variables.}
 
-\item{ylevels}{Character vector or list of character vectors with labels for
-the levels of each categorical \code{y} variable.}
+\item{ylevels}{Character vector (if only 1 frequency comparison) or list of
+character vectors with labels for the levels of each categorical \code{y}
+variable.}
 
 \item{quantiles}{Numeric value. If specified, function compares \code{y}
 variables across quantiles of \code{x}. For example, if \code{x} contains BMI
@@ -55,74 +60,16 @@ values and \code{yvarnames} includes HDL and race, setting
 \code{quantiles = 3} compares mean BMI and distribution of race across BMI
 tertiles.}
 
-\item{quantile.vals}{Logical value for whether labels for \code{x} should
-show quantile number and corresponding range, e.g. Q1 [0.00, 0.25), rather
-than just the quantile number.}
+\item{quantile.vals}{Logical value for whether labels for \code{x} quantiles
+should show quantile number and corresponding range, e.g. Q1 [0.00, 0.25),
+rather than just the quantile number.}
 
-\item{parenth.sep}{Character string with separator to place between first and
-second numbers in parentheses, if applicable. Typically \code{"-"} or
-\code{", "}.}
+\item{format.latex}{Logical value for whether to format table so it is
+ready to be passed to \code{\link[xtable]{xtable}} for printing in LaTeX.}
 
-\item{cell}{Character string specifying what statistic should appear in cells
-of the table for frequency comparisons. Choices are \code{"n"} for counts,
-\code{"tot.percent"} for table percentage, \code{"col.percent"} for column
-percentage, \code{"row.percent"} for row percentage, \code{"tot.prop"} for
-table proportion, \code{"col.prop"} for column proportion, \code{"row.prop"}
-for row proportion, \code{"n/totn"} for count/total counts, \code{"n/coln"}
-for count/column count, and \code{"n/rown"} for count/row count.}
-
-\item{freq.parenth}{Character string specifying what statistic should appear
-in parentheses after cell values for frequency comparisons. Choices are
-\code{"none"}, \code{"se"} for standard error of requested percentage or
-proportion, \code{"ci"} for 95\% confidence interval for requested percentage
-or proportion, and \code{"tot.percent"}, \code{"col.percent"},
-\code{"row.percent"}, \code{"tot.prop"}, \code{"col.prop"}, and
-\code{"row.prop"} for various percentages and proportions.}
-
-\item{freq.text.label}{Character string with text to put after \code{y}
-variable names for frequency comparisons, identifying what cell values and
-parentheses represent.}
-
-\item{freq.tests}{Character string or vector specifying which test for
-association between \code{x} and \code{y} should be used for each frequency
-comparison. Choices are \code{"chi"} for Pearson's chi-squared test,
-\code{"fisher"} for Fisher's exact test, \code{"z"} for z test without
-continuity correction; and \code{"z.continuity"} for z test with continuity
-correction. \code{"z"} and \code{"z.continuity"} can only be used if \code{x}
-and \code{y} are binary.}
-
-\item{means.parenth}{Character string specifying what statistic should appear
-in parentheses after the means in each cell for mean comparisons. Choices are
-\code{"none"}, \code{"sd"} for standard deviation, \code{"se"} for standard
-error, \code{"t.ci"} for 95\% confidence interval based on t distribution,
-and \code{"z.ci"} for 95\% confidence interval based on z distribution.}
-
-\item{means.text.label}{Character string with text to put after \code{y}
-variable names for mean comparisons, identifying what cell values and
-parentheses represent.}
-
-\item{variance}{Character string specifying which version of the two-sample
-t-test to use for mean comparisons, supposing \code{x} has two levels.
-Choices are \code{"equal"} for equal variance t-test, \code{"unequal"} for
-unequal variance t-test, and \code{"ftest"} for F test to determine which to
-use.}
-
-\item{medians.parenth}{Character string specifying what values are shown in
-parentheses after the medians in each cell for median comparisons. Choices
-are \code{"none"}, \code{"iqr"}, \code{"range"}, \code{"minmax"},
-\code{"q1q3"} for first and third quartiles, and \code{"ci"} for 95\%
-confidence interval for the medians (based on binomial probabilities if one
-or more groups have n less than 10, otherwise based on normal approximation
-to binomial).}
-
-\item{medians.text.label}{Character string with text to put after the
-\code{y} variable name for median comparisons, identifying what cell values
-and parentheses represent.}
-
-\item{decimals}{Numeric value or vector specifying number of decimal places
-for numbers other than p-values for each \code{y} variable.}
-
-\item{p.include}{Logical value for whether to include a p-value column.}
+\item{decimals}{Numeric vector specifying number of decimal places for
+numbers other than p-values for each \code{y} variable. Can be a single value
+to use for all \code{y} variables.}
 
 \item{p.decimals}{Numeric value specifying number of decimal places for
 p-values. Can be a vector if you want the number of decimals to depend on
@@ -144,27 +91,11 @@ leading 0's before the decimal point.}
 appear as \code{>0.99} (or similarly depending on \code{p.decimals} and
 \code{p.cuts}) rather than 1.}
 
-\item{overall.column}{Logical value for whether to include a column showing
-overall means/medians/frequencies for \code{y}.}
-
-\item{n.column}{Logical value for whether to include a column with the
-overall sample size.}
-
-\item{n.headings}{Logical value for whether to include sample sizes in
+\item{n.headings}{Logical value for whether to display group sample sizes in
 parentheses in column headings.}
-
-\item{compress}{Logical value for whether binary \code{y} variables should
-be displayed as a single row rather than two.}
 
 \item{bold.colnames}{Logical value for whether to use bold font for column
 headings. Only used if \code{xtable = TRUE}.}
-
-\item{bold.varnames}{Logic value for whether to use bold font for
-\code{y} variable names in the first column. Only used if \code{latex = TRUE}.}
-
-\item{bold.varlevels}{Logical value for whether levels of categorical
-\code{y} variables should appear in bold font in the first column. Only used
-if \code{latex = TRUE}.}
 
 \item{variable.colname}{Character string with desired heading for first
 column of table, in case you prefer something other than \code{"Variable"}.}
@@ -174,16 +105,21 @@ table to the current working directory.}
 
 \item{html.filename}{Character string specifying the name of the .html file
 that gets written if \code{print.html = TRUE}.}
+
+\item{means.list}{List of arguments to pass to \code{\link{tabmeans}}.}
+
+\item{medians.list}{List of arguments to pass to \code{\link{tabmedians}}.}
+
+\item{freq.list}{List of arguments to pass to \code{\link{tabfreq}}.}
 }
 \value{
-Character matrix with table comparing means/medians/frequencies of
-\code{y} variables across levels of \code{x}.
+Character matrix comparing \code{y} variables across levels of
+\code{x}.
 }
 \description{
-Basically provides an alternative to making multiple calls to
-\code{\link{tabmeans}}, \code{\link{tabmedians}}, and \code{\link{tabfreq}},
-then using \code{\link[base]{rbind}} to combine the results into a single
-table.
+Provides an alternative to making multiple calls to \code{\link{tabmeans}},
+\code{\link{tabmedians}}, and \code{\link{tabfreq}}, and then combining
+via \code{\link[base]{rbind}}.
 }
 \section{Note}{
 
@@ -206,7 +142,7 @@ your document. You can control the name of this file with
 }
 
 If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-\code{format.xtable = TRUE}. You may have to set
+\code{format.latex = TRUE}. You may have to set
 \code{sanitize.text.function = identity} when calling
 \code{\link[xtable]{print.xtable}}.
 }
@@ -217,20 +153,19 @@ data(d)
 
 # Compare age, sex, race, and BMI in control vs. treatment group using
 # listwise deletion
-table1 <- tabmulti(dataset = d, xvarname = "Group",
-                   yvarnames = c("Age", "Sex", "Race", "BMI"))
+(table1 <- tabmulti(data = d, xvarname = "Group",
+                    yvarnames = c("Age", "Sex", "Race", "BMI")))
 
 # Repeat using pairwise deletion
-table2 <- tabmulti(dataset = d, xvarname = "Group", n.column = TRUE,
-                   n.headings = FALSE,
-                   yvarnames = c("Age", "Sex", "Race", "BMI"),
-                   listwise.deletion = FALSE)
-
+(table2 <- tabmulti(data = d, xvarname = "Group",
+                    yvarnames = c("Age", "Sex", "Race", "BMI"),
+                    columns = c("n", "xgroups", "p"),
+                    listwise.deletion = FALSE))
 
 # Same as table1, but compare medians rather than means for BMI
-table3 <- tabmulti(dataset = d, xvarname = "Group",
-                   yvarnames = c("Age", "Sex", "Race", "BMI"),
-                   ymeasures = c("mean", "freq", "freq", "median"))
+(table3 <- tabmulti(data = d, xvarname = "Group",
+                    yvarnames = c("Age", "Sex", "Race", "BMI"),
+                    ymeasures = c("mean", "freq", "freq", "median")))
 
 
 }

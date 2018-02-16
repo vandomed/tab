@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1518759436424.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "B0806B82",
+    "lastKnownWriteTime" : 1518759768,
+    "last_content_update" : 1518759768807,
+    "path" : "C:/Users/Dane/Google Drive/github/tab/R/tabmeans.R",
+    "project_path" : "R/tabmeans.R",
+    "properties" : {
+        "cursorPosition" : "24,60",
+        "scrollLine" : "10",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

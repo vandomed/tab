@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1517885158915.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "EE2D06B",
+    "lastKnownWriteTime" : 1518759388,
+    "last_content_update" : 1518759388786,
+    "path" : "C:/Users/Dane/Google Drive/github/tab/R/tab.R",
+    "project_path" : "R/tab.R",
+    "properties" : {
+        "cursorPosition" : "9,49",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

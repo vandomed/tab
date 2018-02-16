@@ -4,76 +4,76 @@
 \alias{tabfreq}
 \title{Generate Frequency Table}
 \usage{
-tabfreq(x = NULL, y, latex = FALSE, xlevels = NULL, yname = NULL,
-  ylevels = NULL, quantiles = NULL, quantile.vals = FALSE, cell = "n",
-  parenth = NULL, text.label = NULL, parenth.sep = "-", test = "chi",
-  decimals = NULL, p.include = TRUE, p.decimals = c(2, 3),
-  p.cuts = 0.01, p.lowerbound = 0.001, p.leading0 = TRUE,
-  p.avoid1 = FALSE, overall.column = TRUE, n.column = FALSE,
-  n.headings = TRUE, compress = FALSE, compress.val = NULL,
-  bold.colnames = TRUE, bold.varnames = FALSE, bold.varlevels = FALSE,
-  variable.colname = "Variable", print.html = FALSE,
+tabfreq(x = NULL, y, columns = c("xgroups", "p"), cell = "counts",
+  parenth = "col.percent", sep.char = ", ", test = "chi.fisher",
+  xlevels = NULL, yname = NULL, ylevels = NULL, compress.binary = FALSE,
+  yname.row = !compress.binary, text.label = NULL, quantiles = NULL,
+  quantile.vals = FALSE, format.latex = FALSE, decimals = 1,
+  p.decimals = c(2, 3), p.cuts = 0.01, p.lowerbound = 0.001,
+  p.leading0 = TRUE, p.avoid1 = FALSE, n.headings = FALSE,
+  bold.colnames = TRUE, variable.colname = "Variable", print.html = FALSE,
   html.filename = "table1.html")
 }
 \arguments{
-\item{x}{Vector indicating group membership for columns of IxJ table.}
+\item{x}{Vector indicating group membership for columns of I-by-J table.}
 
-\item{y}{Vector indicating group membership for rows of IxJ table.}
+\item{y}{Vector indicating group membership for rows of I-by-J table.}
 
-\item{xlevels}{Character vector with labels for each level of \code{x}, for
-column headings.}
+\item{columns}{Character vector specifying what columns to include. Choices
+for each element are \code{"n"} for total sample size, \code{"overall"} for
+overall distribution of \code{y}, \code{"xgroups"} for distributions of
+\code{y} for each \code{x} group, \code{"test"} for test statistic, and
+\code{"p"} for p-value.}
+
+\item{cell}{Character string specifying what statistic to display in cells.
+Choices are \code{"counts"}, \code{"tot.percent"}, \code{"col.percent"},
+and \code{"row.percent"}.}
+
+\item{parenth}{Character string specifying what statistic to display in
+parentheses. Choices are \code{"none"}, \code{"se"}, \code{"ci"},
+\code{"counts"}, \code{"tot.percent"}, \code{"col.percent"}, and
+\code{"row.percent"}.}
+
+\item{sep.char}{Character string with separator to place between lower and
+upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.}
+
+\item{test}{Character string specifying which test for association between
+\code{x} and \code{y} should be used. Choices are \code{"chi.fisher"} for
+Pearson's chi-squared test if its assumptions are met, otherwise Fisher's
+exact test; \code{"chi"}; \code{"fisher"}; \code{"z"} for z test without
+continuity correction; and \code{"z.continuity"} for z test with continuity
+correction. The last two only work if both \code{x} and \code{y} are binary.}
+
+\item{xlevels}{Character vector with labels for the levels of \code{x}, used
+in column headings.}
 
 \item{yname}{Character string with a label for the \code{y} variable.}
 
-\item{ylevels}{Character vector with labels for the levels of \code{y}. If
-unspecified, the values that \code{y} takes on are used. Note that levels of
-\code{y} are listed in the order that they appear when you run
+\item{ylevels}{Character vector with labels for the levels of \code{y}. Note
+that levels of \code{y} are listed in the order that they appear when you run
 \code{table(y, x)}.}
 
-\item{quantiles}{Numeric value. If specified, function compares distribution
-of \code{y} across quantiles of \code{x}. For example, if \code{x} contains
-BMI values and \code{y} is race setting \code{quantiles = 3} compares the
-distribution of race across BMI tertiles.}
+\item{compress.binary}{Logical value for whether to compress binary \code{y}
+variable to a single row, excluding the first level rather than showing both.}
 
-\item{quantile.vals}{Logical value for whether labels for \code{x} should
-show quantile number and corresponding range, e.g. Q1 [0.00, 0.25), rather
-than just the quantile number.}
-
-\item{cell}{Character string specifying what statistic should appear in cells
-of the table. Choices are \code{"n"} for counts, \code{"tot.percent"} for
-table percentage, \code{"col.percent"} for column percentage,
-\code{"row.percent"} for row percentage, \code{"tot.prop"} for table
-proportion, \code{"col.prop"} for column proportion, \code{"row.prop"} for
-row proportion, \code{"n/totn"} for count/total counts, \code{"n/coln"} for
-count/column count, and \code{"n/rown"} for count/row count.}
-
-\item{parenth}{Character string specifying what statistic should appear in
-parentheses after cell values. Choices are \code{"none"}, \code{"se"} for
-standard error of requested percentage or proportion, \code{"ci"} for 95\%
-confidence interval for requested percentage or proportion, and
-\code{"tot.percent"}, \code{"col.percent"}, \code{"row.percent"},
-\code{"tot.prop"}, \code{"col.prop"}, and \code{"row.prop"} for various
-percentages and proportions.}
+\item{yname.row}{Logical value for whether to include a row displaying the
+name of the \code{y} variable.}
 
 \item{text.label}{Character string with text to put after the \code{y}
 variable name, identifying what cell values and parentheses represent.}
 
-\item{parenth.sep}{Character string with separator to place between first and
-second numbers in parentheses, if applicable. Typically \code{"-"} or
-\code{", "}.}
+\item{quantiles}{Numeric value. If specified, table compares \code{y} across
+quantiles of \code{x} created on the fly.}
 
-\item{test}{Character string specifying which test for association between
-\code{x} and \code{y} should be used. Choices are \code{"chi"} for Pearson's
-chi-squared test, \code{"fisher"} for Fisher's exact test, \code{"z"} for z
-test without continuity correction; and \code{"z.continuity"} for z test with
-continuity correction. \code{"z"} and \code{"z.continuity"} can only be used
-if \code{x} and \code{y} are binary.}
+\item{quantile.vals}{Logical value for whether labels for \code{x} quantiles
+should show quantile number and corresponding range, e.g. Q1 [0.00, 0.25),
+rather than just the quantile number.}
+
+\item{format.latex}{Logical value for whether to format table so it is
+ready to be passed to \code{\link[xtable]{xtable}} for printing in LaTeX.}
 
 \item{decimals}{Numeric value specifying number of decimal places for numbers
-other than p-values. If unspecified, function uses 1 decimal for percentages
-and 3 decimals for proportions. No decimals are ever used for counts.}
-
-\item{p.include}{Logical value for whether to include a p-value column.}
+other than p-values.}
 
 \item{p.decimals}{Numeric value specifying number of decimal places for
 p-values. Can be a vector if you want the number of decimals to depend on
@@ -95,30 +95,11 @@ leading 0's before the decimal point.}
 appear as \code{>0.99} (or similarly depending on \code{p.decimals} and
 \code{p.cuts}) rather than 1.}
 
-\item{overall.column}{Logical value for whether to include a column showing
-the distribution of \code{y} in the full sample.}
-
-\item{n.column}{Logical value for whether to include a column with the
-overall sample size.}
-
-\item{n.headings}{Logical value for whether to include sample sizes in
+\item{n.headings}{Logical value for whether to display group sample sizes in
 parentheses in column headings.}
-
-\item{compress}{Logical value for whether binary \code{y} variables should
-be displayed as a single row rather than two. Which level gets displayed is
-controlled by \code{compress.val}.}
-
-\item{compress.val}{Value specifying which level of \code{y} gets displayed
-when \code{compress = TRUE}.}
 
 \item{bold.colnames}{Logical value for whether to use bold font for column
 headings. Only used if \code{xtable = TRUE}.}
-
-\item{bold.varnames}{Logic value for whether to use bold font for the
-\code{y} variable name in the first column. Only used if \code{xtable = TRUE}.}
-
-\item{bold.varlevels}{Logical value for whether levels of \code{y} should
-appear in bold font in the first column. Only used if \code{latex = TRUE}.}
 
 \item{variable.colname}{Character string with desired heading for first
 column of table, in case you prefer something other than \code{"Variable"}.}
@@ -130,8 +111,8 @@ table to the current working directory.}
 that gets written if \code{print.html = TRUE}.}
 }
 \value{
-Character matrix with table comparing the distribution of \code{y}
-across levels of \code{x}.
+Character matrix comparing the distribution of \code{y} across levels
+of \code{x}.
 }
 \description{
 Creates I-by-J frequency table comparing the distribution of \code{y} across
@@ -158,7 +139,7 @@ your document. You can control the name of this file with
 }
 
 If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-\code{format.xtable = TRUE}. You may have to set
+\code{format.latex = TRUE}. You may have to set
 \code{sanitize.text.function = identity} when calling
 \code{\link[xtable]{print.xtable}}.
 }
@@ -169,31 +150,21 @@ data(d)
 d <- d[complete.cases(d), ]
 
 # Compare sex distribution by group, with group as column variable
-freqtable1 <- tabfreq(x = d$Group, y = d$Sex)
+(freqtable1 <- tabfreq(x = d$Group, y = d$Sex))
 
-# Same comparison, but compress table to show Female row only, show percent
-# (SE) rather than n (percent), and suppress (n = ) from column headings
-freqtable2 <- tabfreq(x = d$Group, y = d$Sex, compress = TRUE,
-                      compress.val = "Female", cell = "col.percent",
-                      parenth = "se", n.headings = FALSE)
-
-# Compare sex distribution by race, suppressing (n = ) from column headings
-# and showing percent (95\\\% CI) rather than n (percent)
-freqtable3 <- tabfreq(x = d$Race, y = d$Sex, n.headings = FALSE,
-                      cell = "col.percent")
+# Same comparison, but compress table to show male row only and show percent
+# (SE) rather than n (percent)
+(freqtable2 <- tabfreq(x = d$Group, y = d$Sex, compress.binary = TRUE,
+                       cell = "col.percent", parenth = "se"))
 
 # Use rbind to create single table comparing sex and race in control vs.
 # treatment group
-freqtable4 <- rbind(tabfreq(x = d$Group, y = d$Sex),
-                    tabfreq(x = d$Group, y = d$Race))
+(freqtable3 <- rbind(tabfreq(x = d$Group, y = d$Sex),
+                     tabfreq(x = d$Group, y = d$Race)))
 
-# A (usually) faster way to make the above table is to call the the tabmulti
-# function
-freqtable5 <- tabmulti(dataset = d, xvarname = "Group",
-                       yvarnames = c("Sex", "Race"))
-
-# freqtable4 and freqtable5 are equivalent
-all(freqtable4 == freqtable5)
+# An easier way to make this table is to use tabmulti
+(freqtable4 <- tabmulti(data = d, xvarname = "Group",
+                        yvarnames = c("Sex", "Race")))
 
 
 }

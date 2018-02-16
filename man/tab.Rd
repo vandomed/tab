@@ -19,8 +19,8 @@ analyses in R to their reports or manuscripts.
 \tabular{ll}{
 Package: \tab tab \cr
 Type: \tab Package \cr
-Version: \tab 3.1.3 \cr
-Date: \tab 2018-02-10 \cr
+Version: \tab 4.1.1 \cr
+Date: \tab 2018-02-16 \cr
 License: \tab GPL-3 \cr
 }
 

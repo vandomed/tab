@@ -5,19 +5,19 @@
 \title{Generate Summary Table for Fitted Generalized Linear Model (GLM)}
 \usage{
 tabglm(fit, columns = NULL, xlabels = NULL, compress.factors = FALSE,
-  ci.sep = ", ", format.xtable = FALSE, decimals = 2, p.decimals = c(2,
+  sep.char = ", ", format.latex = FALSE, decimals = 2, p.decimals = c(2,
   3), p.cuts = 0.01, p.lowerbound = 0.001, p.leading0 = TRUE,
-  p.avoid1 = FALSE, greek.beta = FALSE, bold.colnames = TRUE,
-  variable.colname = "Variable", print.html = FALSE,
-  html.filename = "table1.html")
+  p.avoid1 = FALSE, bold.colnames = TRUE, variable.colname = "Variable",
+  print.html = FALSE, html.filename = "table1.html")
 }
 \arguments{
 \item{fit}{Object returned from \code{\link[stats]{glm}}.}
 
 \item{columns}{Character vector specifying what columns to include. Choices
-for each element are \code{"beta"}, \code{"se"}, \code{"beta.se"},
-\code{"beta.betaci"}, \code{"betaci"}, \code{"or"}, \code{"or.orci"},
-\code{"orci"}, \code{"test"} (for z/t test statistic), and \code{"p"}.}
+for each element are \code{"n"}, \code{"events"} (for binary outcomes),
+\code{"beta"}, \code{"se"}, \code{"beta.se"}, \code{"beta.betaci"},
+\code{"betaci"}, \code{"or"}, \code{"or.orci"}, \code{"orci"}, \code{"test"}
+(for z/t test statistic), and \code{"p"}.}
 
 \item{xlabels}{Character vector with labels for the \code{x} variables and
 their levels. Often useful to leave as \code{NULL} first, see how the table
@@ -28,11 +28,11 @@ as one row for each of the non-reference group levels, as opposed to one row
 for the variable name and one row for each of the levels including the
 reference group.}
 
-\item{ci.sep}{Character string with separator to place between lower and
+\item{sep.char}{Character string with separator to place between lower and
 upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.}
 
-\item{format.xtable}{Logical value for whether to format table for
-converting to \code{\link[xtable]{xtable}} object and printing in LaTeX.}
+\item{format.latex}{Logical value for whether to format table so it is
+ready to be passed to \code{\link[xtable]{xtable}} for printing in LaTeX.}
 
 \item{decimals}{Numeric value specifying number of decimal places for numbers
 other than p-values.}
@@ -56,9 +56,6 @@ leading 0's before the decimal point.}
 \item{p.avoid1}{Logical value for whether p-values that round to 1 should
 appear as \code{>0.99} (or similarly depending on \code{p.decimals} and
 \code{p.cuts}) rather than 1.}
-
-\item{greek.beta}{Logical value for whether to display the Greek letter beta
-rather than "Beta". Only used if \code{latex = TRUE}.}
 
 \item{bold.colnames}{Logical value for whether to use bold font for column
 headings. Only used if \code{xtable = TRUE}.}
@@ -100,7 +97,7 @@ your document. You can control the name of this file with
 }
 
 If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-\code{format.xtable = TRUE}. You may have to set
+\code{format.latex = TRUE}. You may have to set
 \code{sanitize.text.function = identity} when calling
 \code{\link[xtable]{print.xtable}}.
 }
@@ -112,7 +109,7 @@ d <- d[complete.cases(d), ]
 
 # Linear regression: BMI vs. age, sex, race, and treatment
 glmfit1 <- glm(BMI ~ Age + Sex + Race + Group, data = d)
-(lintable <- tabglm(fit = glmfit))
+(lintable <- tabglm(fit = glmfit1))
 
 # Logistic regression: 1-year mortality vs. age, sex, race, and treatment.
 # Display factors in "compressed" format
