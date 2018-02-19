@@ -57,16 +57,15 @@
 tabmedians <- function(x, y, columns = c("xgroups", "p"), parenth = "iqr",
                        sep.char = ", ", xname = NULL, xlevels = NULL,
                        yname = NULL, text.label = NULL, quantiles = NULL,
-                       quantile.vals = FALSE, format.latex = FALSE,
-                       decimals = NULL, p.decimals = c(2, 3), p.cuts = 0.01,
+                       quantile.vals = FALSE, decimals = NULL,
+                       p.decimals = c(2, 3), p.cuts = 0.01,
                        p.lowerbound = 0.001, p.leading0 = TRUE,
                        p.avoid1 = FALSE, n.headings = TRUE,
-                       bold.colnames = TRUE, variable.colname = "Variable",
-                       fig = FALSE, print.html = FALSE,
-                       html.filename = "table1.html", ...) {
+                       variable.colname = "Variable", fig = FALSE,
+                       print.html = FALSE, html.filename = "table1.html", ...) {
 
   # If xname or yname unspecified, use variable names
-  if (is.null(xname)) {
+  if (is.null(xname) & fig) {
     xname <- deparse(substitute(x))
     if (grepl("\\$", xname)) {
       xname <- strsplit(xname, "\\$")[[1]][2]
@@ -168,12 +167,14 @@ tabmedians <- function(x, y, columns = c("xgroups", "p"), parenth = "iqr",
       } else if (parenth == "range") {
         text.label <- ", Median (range)"
       } else if (parenth == "minmax") {
-        text.label <- paste(", Median (Min", sep.char, "Max)", sep = "")
+        text.label <- paste(", Median (min", sep.char, "max)", sep = "")
       } else if (parenth == "q1q3") {
         text.label <- paste(", Median (Q1", sep.char, "Q3)", sep = "")
       } else if (parenth == "ci") {
         text.label <- ", Median (95% CI)"
       }
+    } else {
+      text.label <- paste(",", text.label)
     }
 
     # Initialize table
@@ -306,11 +307,6 @@ tabmedians <- function(x, y, columns = c("xgroups", "p"), parenth = "iqr",
       colnames(tbl)[colnames(tbl) %in% xlevels] <-
         paste(xlevels, " (n = ", ns, ")", sep = "")
 
-    }
-
-    # Make column names bold if requested
-    if (format.latex & bold.colnames) {
-      colnames(tbl) <- paste("$\\textbf{", colnames(tbl), "}$", sep = "")
     }
 
     # Print html version of table if requested

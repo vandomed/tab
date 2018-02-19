@@ -5,16 +5,16 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "1859466846",
+    "hash" : "0",
     "id" : "C640BD3B",
-    "lastKnownWriteTime" : 1519016348,
-    "last_content_update" : 1519016348911,
+    "lastKnownWriteTime" : 1519055459,
+    "last_content_update" : 1519055459122,
     "path" : "C:/Users/Dane/Google Drive/github/tab/vignettes/tab-vignette.Rmd",
     "project_path" : "vignettes/tab-vignette.Rmd",
     "properties" : {
-        "cursorPosition" : "269,3",
+        "cursorPosition" : "19,3",
         "last_setup_crc32" : "",
-        "scrollLine" : "248"
+        "scrollLine" : "0"
     },
     "relative_order" : 2,
     "source_on_save" : false,

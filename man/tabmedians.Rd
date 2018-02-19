@@ -7,11 +7,10 @@
 tabmedians(x, y, columns = c("xgroups", "p"), parenth = "iqr",
   sep.char = ", ", xname = NULL, xlevels = NULL, yname = NULL,
   text.label = NULL, quantiles = NULL, quantile.vals = FALSE,
-  format.latex = FALSE, decimals = NULL, p.decimals = c(2, 3),
-  p.cuts = 0.01, p.lowerbound = 0.001, p.leading0 = TRUE,
-  p.avoid1 = FALSE, n.headings = TRUE, bold.colnames = TRUE,
-  variable.colname = "Variable", fig = FALSE, print.html = FALSE,
-  html.filename = "table1.html", ...)
+  decimals = NULL, p.decimals = c(2, 3), p.cuts = 0.01,
+  p.lowerbound = 0.001, p.leading0 = TRUE, p.avoid1 = FALSE,
+  n.headings = TRUE, variable.colname = "Variable", fig = FALSE,
+  print.html = FALSE, html.filename = "table1.html", ...)
 }
 \arguments{
 \item{x}{Vector of values for the categorical \code{x} variable.}
@@ -50,10 +49,6 @@ quantiles of \code{x} created on the fly.}
 should show quantile number and corresponding range, e.g. Q1 [0.00, 0.25),
 rather than just the quantile number.}
 
-\item{format.latex}{Logical value for whether to format table so it is
-ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
-\code{\link[knitr]{kable}}.}
-
 \item{decimals}{Numeric value specifying number of decimal places for numbers
 other than p-values.}
 
@@ -79,9 +74,6 @@ appear as \code{>0.99} (or similarly depending on \code{p.decimals} and
 
 \item{n.headings}{Logical value for whether to display group sample sizes in
 parentheses in column headings.}
-
-\item{bold.colnames}{Logical value for whether to use bold font for column
-headings. Only used if \code{xtable = TRUE}.}
 
 \item{variable.colname}{Character string with desired heading for first
 column of table, in case you prefer something other than \code{"Variable"}.}
@@ -134,7 +126,7 @@ your document. You can control the name of this file with
 }
 
 If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-\code{format.latex = TRUE}. Then, you can pass the returned object to
+\code{latex = TRUE}. Then, you can pass the returned object to
 \code{\link[xtable]{xtable}} or \code{\link[knitr]{kable}} for printing. For
 \code{\link[xtable]{xtable}}, you may have to set
 \code{sanitize.text.function = identity} when printing.

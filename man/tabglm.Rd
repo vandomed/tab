@@ -5,11 +5,11 @@
 \title{Generate Summary Table for Fitted Generalized Linear Model (GLM)}
 \usage{
 tabglm(fit, columns = NULL, xlabels = NULL, compress.factors = FALSE,
-  omit.refgroups = compress.factors, sep.char = ", ",
-  format.latex = FALSE, decimals = 2, p.decimals = c(2, 3),
-  p.cuts = 0.01, p.lowerbound = 0.001, p.leading0 = TRUE,
-  p.avoid1 = FALSE, bold.colnames = TRUE, variable.colname = "Variable",
-  print.html = FALSE, html.filename = "table1.html")
+  omit.refgroups = compress.factors, sep.char = ", ", latex = FALSE,
+  decimals = 2, p.decimals = c(2, 3), p.cuts = 0.01,
+  p.lowerbound = 0.001, p.leading0 = TRUE, p.avoid1 = FALSE,
+  variable.colname = "Variable", print.html = FALSE,
+  html.filename = "table1.html")
 }
 \arguments{
 \item{fit}{Object returned from \code{\link[stats]{glm}}.}
@@ -40,7 +40,7 @@ reference group.}
 \item{sep.char}{Character string with separator to place between lower and
 upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.}
 
-\item{format.latex}{Logical value for whether to format table so it is
+\item{latex}{Logical value for whether to format table so it is
 ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
 \code{\link[knitr]{kable}}.}
 
@@ -66,9 +66,6 @@ leading 0's before the decimal point.}
 \item{p.avoid1}{Logical value for whether p-values that round to 1 should
 appear as \code{>0.99} (or similarly depending on \code{p.decimals} and
 \code{p.cuts}) rather than 1.}
-
-\item{bold.colnames}{Logical value for whether to use bold font for column
-headings. Only used if \code{xtable = TRUE}.}
 
 \item{variable.colname}{Character string with desired heading for first
 column of table, in case you prefer something other than \code{"Variable"}.}
@@ -107,7 +104,7 @@ your document. You can control the name of this file with
 }
 
 If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-\code{format.latex = TRUE}. Then, you can pass the returned object to
+\code{latex = TRUE}. Then, you can pass the returned object to
 \code{\link[xtable]{xtable}} or \code{\link[knitr]{kable}} for printing. For
 \code{\link[xtable]{xtable}}, you may have to set
 \code{sanitize.text.function = identity} when printing.

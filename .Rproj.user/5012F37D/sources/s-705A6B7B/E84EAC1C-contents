@@ -1,83 +1,70 @@
-#' Generate Summary Table for Fitted Generalized Estimating Equation (GEE) Model
+#' Generate Summary Table for Fitted Generalized Linear Model (GLM)
+#'
+#' Creates table summarizing a GLM fit using the \code{\link[stats]{glm}}
+#' function.
 #'
 #'
-#' Creates table summarizing a GEE model fit using the \code{\link[gee]{gee}}
-#' function [1].
-#'
-#' Interaction and polynomial terms are compatible with \code{tabgee}. If
-#' interaction terms are included, the table will be formatted a little
-#' differently. Basically including an interaction is equivalent to setting
-#' \code{basic.form = TRUE}. All variable names and levels will be exactly as
-#' they appear when you run \code{summary(fit)}, where \code{fit} is the
-#' object returned from a call to \code{\link[gee]{gee}}.
-#'
-#'
+#' @inherit tabmeans references
 #' @inheritSection tabmeans Note
 #' @inheritParams tabmeans
-#' @inheritParams tabglm
 #'
 #'
-#' @param fit Object returned from \code{\link[gee]{gee}}.
+#' @param fit Object returned from \code{\link[stats]{glm}}.
 #'
 #' @param columns Character vector specifying what columns to include. Choices
-#' for each element are \code{"n"}, \code{"events"} (for binary outcomes)
+#' for each element are \code{"n"}, \code{"events"} (for binary outcomes),
 #' \code{"beta"}, \code{"se"}, \code{"beta.se"}, \code{"beta.betaci"},
-#' \code{"betaci"}, \code{"or"}, \code{"or.orci"}, \code{"orci"}, \code{"z"},
-#' and \code{"p"}.
+#' \code{"betaci"}, \code{"or"}, \code{"or.orci"}, \code{"orci"}, \code{"test"}
+#' (for z/t test statistic), and \code{"p"}.
 #'
-#' @param robust Logical value for whether 'robust' standard errors should be
-#' used for inference.
+#' @param xlabels Character vector with labels for the \code{x} variables and
+#' their levels. Often useful to leave as \code{NULL} first, see how the table
+#' looks, and then re-run with labels where they need to be.
 #'
-#' @param data Data frame containing variables passed to \code{\link[gee]{gee}}
-#' to create \code{fit}. Only needs to be specified when one or more of the
-#' predictors is a factor variable and \code{compres.factors = FALSE}.
+#' @param compress.factors Logical value for whether to display factor variables
+#' in compressed format, with variable names omitted and levels not indented.
+#' Can also be "binary" to compress binary factor variables only.
+#'
+#' @param omit.refgroups Logical value for whether to omit reference groups
+#' for factor variables. Can also be "binary" to omit reference groups for
+#' binary factor variables only.
 #'
 #'
+#' as one row for each of the non-reference group levels, as opposed to one row
+#' for the variable name and one row for each of the levels including the
+#' reference group.
 #'
 #'
-#' @return Character matrix with table summarizing the fitted GEE.
+#' @return Character matrix summarizing the fitted GLM.
 #'
 #'
 #' @examples
-#' # Load in sample dataset d and convert to long format
+#' # Load in sample dataset and drop rows with missing values
 #' data(tabdata)
-#' tabdata2 <- reshape(data = tabdata,
-#'                     varying = c("bp.1", "bp.2", "bp.3", "highbp.1",
-#'                                 "highbp.2", "highbp.3"),
-#'                     timevar = "bp.visit", direction = "long")
-#' tabdata2 <- tabdata2[order(tabdata2$id), ]
+#' tabdata <- tabdata[complete.cases(tabdata), ]
 #'
-#' # GEE: Blood pressure at 1, 2, and 3 months vs. predictors
-#' geefit1 <- gee(bp ~ Age + Sex + Race + BMI + Group, id = id, data = tabdata2,
-#'                corstr = "unstructured")
-#' (geetable1 <- tabgee(fit = geefit1, data = tabdata2))
+#' # Linear regression: BMI vs. age, sex, race, and treatment
+#' glmfit1 <- glm(BMI ~ Age + Sex + Race + Group, data = tabdata)
+#' (lintable <- tabglm(fit = glmfit1))
 #'
-#' # GEE: High blood pressure at 1, 2, and 3 months vs. predictors. Display
-#' # factors in "compressed" format
-#' geefit2 <- gee(highbp ~ Age + Sex + Race + BMI + Group, id = id,
-#'                data = tabdata2, family = binomial, corstr = "unstructured")
-#' (geetable2 <- tabgee(fit = geefit2, data = tabdata2,
-#'                      compress.factors = TRUE))
+#' # Logistic regression: 1-year mortality vs. age, sex, race, and treatment.
+#' # Display factors in "compressed" format
+#' glmfit2 <- glm(death_1yr ~ Age + Sex + Race + Group, data = tabdata,
+#'                family = binomial)
+#' (logtable1 <- tabglm(fit = glmfit2, compress.factors = TRUE))
 #'
-#'
-#' @references
-#' 1. Carey, V.J. (2015). gee: Generalized Estimation Equation Solver. R package
-#' version 4.13-19. Ported to R by Thomas Lumley and Brian Ripley.
-#' \url{https://cran.r-project.org/package=gee}.
-#'
-#' 2. Dahl, D.B. (2016). xtable: Export Tables to LaTeX or HTML. R package
-#' version 1.8-2, \url{https://cran.r-project.org/package=xtable}.
-#'
-#' 3. Ushley, K. (2013). Kmisc: Kevin Miscellaneous. R package version 0.5.0.
-#'\url{https://CRAN.R-project.org/package=Kmisc}.
+#' # Logistic regression with higher-order terms
+#' glmfit3 <- glm(death_1yr ~ poly(Age, 2, raw = TRUE) + Sex + BMI + Sex * BMI,
+#'                data = tabdata, family = "binomial")
+#' (logtable2 <- tabglm(fit = glmfit3))
 #'
 #'
-#'@export
-tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
-                   compress.factors = FALSE, data = NULL, sep.char = ", ",
-                   format.latex = FALSE, decimals = 2, p.decimals = c(2, 3),
-                   p.cuts = 0.01, p.lowerbound = 0.001, p.leading0 = TRUE,
-                   p.avoid1 = FALSE, bold.colnames = TRUE,
+#' @export
+tabglm <- function(fit, columns = NULL, xlabels = NULL,
+                   compress.factors = FALSE, omit.refgroups = compress.factors,
+                   sep.char = ", ", latex = FALSE, decimals = 2,
+                   p.decimals = c(2, 3), p.cuts = 0.01, p.lowerbound = 0.001,
+                   p.leading0 = TRUE, p.avoid1 = FALSE,
                    variable.colname = "Variable", print.html = FALSE,
                    html.filename = "table1.html") {
 
@@ -86,21 +73,16 @@ tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
   coefmat <- summary.fit$coefficients
   rownames.coefmat <- rownames(coefmat)
   betas <- coefmat[, "Estimate"]
-  if (robust) {
-    ses <- coefmat[, "Robust S.E."]
-    zs <- coefmat[, "Robust z"]
-  } else {
-    ses <- coefmat[, "Naive S.E."]
-    zs <- coefmat[, "Naive z"]
-  }
-  ps <- pnorm(-abs(zs)) * 2
+  ses <- coefmat[, "Std. Error"]
+  ps <- coefmat[, 4]
+  df <- fit$df.residual
   intercept <- rownames.coefmat[1] == "(Intercept)"
-  gee.fam <- fit$family$family
-  gee.link <- fit$family$link
+  glm.fam <- fit$family$family
+  glm.link <- fit$family$link
 
-  # Default columns to include depending on family of GEE
+  # Default columns to include depending on family of GLM
   if (is.null(columns)) {
-    if (gee.fam == "binomial" & gee.link == "logit") {
+    if (glm.fam == "binomial" & glm.link == "logit") {
       columns <- c("beta.se", "or.orci", "p")
     } else {
       columns <- c("beta.se", "p")
@@ -111,32 +93,30 @@ tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
   create.xlabels <- is.null(xlabels)
 
   # Determine whether there are factors, interactions, or polynomials
-  classes <- attr(fit$terms, "dataClasses")
-  x.factors <- names(classes)[classes == "factor"]
+  fit.xlevels <- fit$xlevels
+  x.factors <- names(fit.xlevels)
   factors <- length(x.factors) > 0
 
-  interactions <- length(grep(pattern = ":", x = rownames.coefmat)) > 1
+  interaction.rows <- grep(pattern = ":", x = rownames.coefmat)
+  interactions <- length(interaction.rows) > 1
 
   polynomial.rows <- grep(pattern = "poly(", x = rownames.coefmat, fixed = TRUE)
   polynomials <- length(polynomial.rows) > 0
 
   # If necessary, force compress.factors to be TRUE and notify user of reason
-  if (interactions & ! compress.factors) {
-    message("The 'compress.factors' input is being switched to TRUE because the fitted GEE includes interaction terms. This limitation may be addressed in future versions of 'tabgee'.")
-    compress.factors <- TRUE
-  } else if (compress.factors & is.null(data) & create.xlabels) {
-    message("The compress.factors input is being switched to TRUE because reference group labels are not available. If you really want compress.factors = FALSE, you'll need to re-run with 'data' or 'xlabels' specified.")
-    compress.factors <- TRUE
+  if (interactions & (compress.factors != FALSE | omit.refgroups != FALSE)) {
+      message("Because the fitted GLM has interaction terms, 'compress.factors' and 'omit.refgroups' are being set to TRUE. This limitation may be addressed in future versions of 'tabglm'.")
+    compress.factors <- omit.refgroups <- TRUE
   }
 
   # Determine row indices for table entries and create xlabels vector
-  if (compress.factors) {
+  if (compress.factors == TRUE & omit.refgroups == TRUE) {
 
     # Compressed factor formatting
 
     # All rows of table have entries
-    ref.rows <- c()
     entry.rows <- 1: nrow(coefmat)
+    ref.rows <- NULL
 
     # Create xlabels
     if (create.xlabels) {
@@ -169,14 +149,21 @@ tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
 
       }
 
-      # Clean up factors (imperfect solution - could go wrong!)
-      if (factors | interactions) {
-
+      # Clean up factors
+      if (factors) {
         for (ii in 1: length(x.factors)) {
           xlabels <- unlist(lapply(xlabels, function(x)
             gsub(pattern = x.factors[ii], replacement = "", x = x)))
         }
+      }
 
+      # Clean up interactions
+      if (interactions) {
+        for (ii in 1: length(x.factors)) {
+          xlabels[interaction.rows] <-
+            unlist(lapply(xlabels[interaction.rows], function(x)
+              gsub(pattern = x.factors[ii], replacement = "", x = x)))
+        }
       }
 
     }
@@ -184,9 +171,15 @@ tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
   } else {
 
     # Expanded factor formatting
+
     rowcount <- ifelse(intercept, 1, 0)
     entry.rows <- rowcount
+    factorname.rows <- c()
     ref.rows <- c()
+    bfactorname.rows <- c()
+    blevel.rows <- c()
+    bref.rows <- c()
+
     if (create.xlabels & intercept) {
       xlabels <- "Intercept"
     }
@@ -200,7 +193,7 @@ tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
 
         # Clean up polynomial
         varname.ii.split <-
-          unlist(strsplit(substring(varname.ii, first = 6), split = ","))
+          unlist(strsplit(substr(varname.ii, start = 6, stop = 100), split = ","))
         varname.ii <- varname.ii.split[1]
         poly.order <- as.numeric(varname.ii.split[2])
         if (create.xlabels) {
@@ -223,9 +216,7 @@ tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
       } else if (varname.ii %in% x.factors) {
 
         # Clean up factor
-        locs <- which(substr(rownames.coefmat, start = 1,
-                             stop = nchar(varname.ii)) == varname.ii)
-        levels.ii <- levels(data[[varname.ii]])
+        levels.ii <- as.character(unlist(fit$xlevels[varname.ii]))
         nlevels.ii <- length(levels.ii)
         new.entries <- (rowcount + 1): (rowcount + nlevels.ii)
         if (create.xlabels) {
@@ -235,8 +226,15 @@ tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
         xlabels[new.entries] <-
           paste("  ", xlabels[new.entries], sep = "")
         xlabels[rowcount + 1] <- paste(xlabels[rowcount + 1], "(ref)")
+
         entry.rows <- c(entry.rows, (rowcount + 2): (rowcount + nlevels.ii))
+        factorname.rows <- c(factorname.rows, rowcount)
         ref.rows <- c(ref.rows, rowcount + 1)
+        if (nlevels.ii == 2) {
+          bfactorname.rows <- c(bfactorname.rows, rowcount)
+          bref.rows <- c(bref.rows, rowcount + 1)
+          blevel.rows <- c(blevel.rows, rowcount + 1, rowcount + 2)
+        }
         rowcount <- rowcount + nlevels.ii
 
       } else {
@@ -265,20 +263,20 @@ tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
     if (column.ii == "n") {
 
       # N
-      newcol <- matrix(c(length(fit$residuals), rep("", nrows - 1)), ncol = 1,
-                       dimnames = list(NULL, "N"))
+      newcol <- matrix(c(length(fit$residuals), rep("", nrows - 1)),
+                       ncol = 1, dimnames = list(NULL, "N"))
 
     } else if (column.ii == "events") {
 
       # Events
-      newcol <- matrix(c(sum(fit$model[, 1]), rep("", nrows - 1)), ncol = 1,
-                       dimnames = list(NULL, "Events"))
+      newcol <- matrix(c(sum(fit$model[, 1]), rep("", nrows - 1)),
+                       ncol = 1, dimnames = list(NULL, "Events"))
 
     } else if (column.ii == "beta") {
 
       # Beta
       newcol <- matrix("", ncol = 1, nrow = nrows,
-                       dimnames = list(NULL, "Beta"))
+                        dimnames = list(NULL, "Beta"))
       newcol[entry.rows, 1] <- sprintf(spf, betas)
       newcol[ref.rows, 1] <- "-"
 
@@ -301,24 +299,23 @@ tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
     } else if (column.ii == "beta.betaci") {
 
       # Beta (95% CI)
+      ci.fit <- confint(fit)
       newcol <- matrix("", ncol = 1, nrow = nrows,
                        dimnames = list(NULL, "Beta (95% CI)"))
-      zcrit <- qnorm(0.975)
       newcol[entry.rows, 1] <-
         paste(sprintf(spf, betas), " (",
-              sprintf(spf, betas - zcrit * ses), sep.char,
-              sprintf(spf, betas + zcrit * ses), ")", sep = "")
+              sprintf(spf, ci.fit[, 1]), sep.char,
+              sprintf(spf, ci.fit[, 2]), ")", sep = "")
       newcol[ref.rows, 1] <- "-"
 
     } else if (column.ii == "betaci") {
 
       # 95% CI for Beta
+      ci.fit <- confint(fit)
       newcol <- matrix("", ncol = 1, nrow = nrows,
                        dimnames = list(NULL, "95% CI for Beta"))
-      zcrit <- qnorm(0.975)
-      newcol[entry.rows, 1] <-
-        paste(sprintf(spf, betas - zcrit * ses), sep.char,
-              sprintf(spf, betas + zcrit * ses), ")", sep = "")
+      newcol[entry.rows, 1] <- paste(sprintf(spf, ci.fit[, 1]), sep.char,
+                                     sprintf(spf, ci.fit[, 2]), sep = "")
       newcol[ref.rows, 1] <- "-"
 
     } else if (column.ii == "or") {
@@ -334,13 +331,13 @@ tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
     } else if (column.ii == "or.orci") {
 
       # OR (95% CI)
+      ci.fit <- confint(fit)
       newcol <- matrix("-", ncol = 1, nrow = nrows,
                        dimnames = list(NULL, "OR (95% CI)"))
-      zcrit <- pnorm(0.975)
       newcol[entry.rows, 1] <-
         paste(sprintf(spf, exp(betas)), " (",
-              sprintf(spf, exp(betas - zcrit * ses)), sep.char,
-              sprintf(spf, exp(betas + zcrit * ses)), ")", sep = "")
+              sprintf(spf, exp(ci.fit[, 1])), sep.char,
+              sprintf(spf, exp(ci.fit[, 2])), ")", sep = "")
       if (intercept) {
         newcol[1, 1] <- "-"
       }
@@ -349,22 +346,25 @@ tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
     } else if (column.ii == "orci") {
 
       # 95% CI for OR
+      ci.fit <- confint(fit)
       newcol <- matrix("-", ncol = 1, nrow = nrows,
                        dimnames = list(NULL, "95% CI for OR"))
-      zcrit <- pnorm(0.975)
       newcol[entry.rows, 1] <-
-        paste(sprintf(spf, exp(betas - zcrit * ses)), sep.char,
-              sprintf(spf, exp(betas + zcrit * ses)), sep = "")
+        paste(sprintf(spf, exp(ci.fit[, 1])), sep.char,
+              sprintf(spf, exp(ci.fit[, 2])), sep = "")
       if (intercept) {
-        newcol[1, 1] < -"-"
+        newcol[1, 1] <- "-"
       }
       newcol[ref.rows, 1] <- "-"
 
-    } else if (column.ii == "z") {
+    } else if (column.ii == "test") {
 
-      # z
-      newcol <- matrix("-", ncol = 1, nrow = nrows, dimnames = list(NULL, "z"))
-      newcol[entry.rows, 1] <- sprintf(spf, zs)
+      # t or z
+      newcol <-
+        matrix("-", ncol = 1, nrow = nrows,
+               dimnames = list(NULL, substr(colnames(coefmat)[3],
+                                            start = 1, stop = 1)))
+      newcol[entry.rows, 1] <- sprintf(spf, coefmat[, 3])
       newcol[ref.rows, 1] <- "-"
 
     } else if (column.ii == "p") {
@@ -384,25 +384,44 @@ tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
 
   }
 
+  # Drop rows with factor variable names and reference groups if requested
+  if ((compress.factors != FALSE | omit.refgroups != FALSE) & !
+      (compress.factors == TRUE & omit.refgroups == TRUE)) {
+    rows.remove <- c()
+    if (compress.factors == "binary") {
+      tbl[blevel.rows, 1] <- gsub(pattern = "  ", replacement = "",
+                                  x = tbl[blevel.rows, 1], fixed = TRUE)
+      rows.remove <- c(rows.remove, bfactorname.rows)
+    } else if (compress.factors == TRUE) {
+      tbl[, 1] <- gsub(pattern = "  ", replacement = "",
+                       x = tbl[, 1], fixed = TRUE)
+      rows.remove <- c(rows.remove, factorname.rows)
+    }
+    if (omit.refgroups == "binary") {
+      rows.remove <- c(rows.remove, bref.rows)
+    } else if (omit.refgroups == TRUE) {
+      rows.remove <- c(rows.remove, ref.rows)
+    }
+    tbl <- tbl[-rows.remove, , drop = FALSE]
+  }
+
   # Reformat for xtable if necessary
-  if (format.latex) {
+  if (latex) {
+    tbl[tbl == "-"] <- "--"
     tbl[, 1] <- gsub(pattern = "  ", replacement = "$\\hskip .4cm$",
                      x = tbl[, 1], fixed = TRUE)
-    if (bold.colnames) {
-      colnames(tbl) <- paste("$\\textbf{", colnames(tbl), "}$", sep = "")
-    }
   }
 
   # Print html version of table if requested
   if (print.html) {
 
+    tbl[tbl == "--"] <- "-"
     tbl.xtable <-
       xtable(tbl, align = paste("ll",
                                 paste(rep("r", ncol(tbl) - 1), collapse = ""),
                                 sep = "", collapse = ""))
     print(tbl.xtable, include.rownames = FALSE, type = "html",
-          file = html.filename,
-          sanitize.text.function = function(x) {
+          file = html.filename, sanitize.text.function = function(x) {
             ifelse(substr(x, 1, 1) == " ", paste("&nbsp &nbsp", x), x)
           })
 

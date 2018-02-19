@@ -92,10 +92,10 @@ tabmulti <- function(data, xvarname, yvarnames, ymeasures = NULL,
                      columns = c("xgroups", "p"), listwise.deletion = FALSE,
                      sep.char = ", ", xlevels = NULL, ynames = yvarnames,
                      ylevels = NULL, quantiles = NULL, quantile.vals = NULL,
-                     format.latex = FALSE, decimals = NULL,
+                     latex = FALSE, decimals = NULL,
                      p.decimals = c(2, 3), p.cuts = 0.01, p.lowerbound = 0.001,
                      p.leading0 = TRUE, p.avoid1 = FALSE, n.headings = FALSE,
-                     bold.colnames = TRUE, variable.colname = "Variable",
+                     variable.colname = "Variable",
                      print.html = FALSE, html.filename = "table1.html",
                      means.list = NULL, medians.list = NULL, freq.list = NULL) {
 
@@ -159,11 +159,10 @@ tabmulti <- function(data, xvarname, yvarnames, ymeasures = NULL,
       args1 <- list(x = x, y = data[, yvarnames[ii]], columns = columns,
                     sep.char = sep.char, xlevels = xlevels, yname = ynames[ii],
                     quantiles = quantiles, quantile.vals = quantile.vals,
-                    format.latex = format.latex, decimals = decimals[ii],
-                    p.decimals = p.decimals,
-                    p.cuts = p.cuts, p.lowerbound = p.lowerbound,
-                    p.leading0 = p.leading0, p.avoid1 = p.avoid1,
-                    n.headings = n.headings, bold.colnames = bold.colnames,
+                    latex = latex, decimals = decimals[ii],
+                    p.decimals = p.decimals, p.cuts = p.cuts,
+                    p.lowerbound = p.lowerbound, p.leading0 = p.leading0,
+                    p.avoid1 = p.avoid1, n.headings = n.headings,
                     variable.colname = variable.colname, fig = FALSE)
       current <- do.call(tabmeans, c(args1, means.list))
 
@@ -174,11 +173,10 @@ tabmulti <- function(data, xvarname, yvarnames, ymeasures = NULL,
       args1 <- list(x = x, y = data[, yvarnames[ii]], columns = columns,
                     sep.char = sep.char, xlevels = xlevels, yname = ynames[ii],
                     quantiles = quantiles, quantile.vals = quantile.vals,
-                    format.latex = format.latex, decimals = decimals[ii],
-                    p.decimals = p.decimals,
-                    p.cuts = p.cuts, p.lowerbound = p.lowerbound,
-                    p.leading0 = p.leading0, p.avoid1 = p.avoid1,
-                    n.headings = n.headings, bold.colnames = bold.colnames,
+                    latex = latex, decimals = decimals[ii],
+                    p.decimals = p.decimals, p.cuts = p.cuts,
+                    p.lowerbound = p.lowerbound, p.leading0 = p.leading0,
+                    p.avoid1 = p.avoid1, n.headings = n.headings,
                     variable.colname = variable.colname, fig = FALSE)
       current <- do.call(tabmedians, c(args1, medians.list))
 
@@ -188,13 +186,13 @@ tabmulti <- function(data, xvarname, yvarnames, ymeasures = NULL,
       freqindex <- freqindex + 1
       args1 <- list(x = x, y = data[, yvarnames[ii]], columns = columns,
                     sep.char = sep.char, xlevels = xlevels, yname = ynames[ii],
-                    ylevels = ylevels[[freqindex]],
-                    quantiles = quantiles, quantile.vals = quantile.vals,
-                    format.latex = format.latex, decimals = decimals[ii],
+                    ylevels = ylevels[[freqindex]], quantiles = quantiles,
+                    quantile.vals = quantile.vals, latex = latex,
+                    decimals = ifelse(is.null(decimals[ii]), 1, decimals[ii]),
                     p.decimals = p.decimals,
                     p.cuts = p.cuts, p.lowerbound = p.lowerbound,
                     p.leading0 = p.leading0, p.avoid1 = p.avoid1,
-                    n.headings = n.headings, bold.colnames = bold.colnames,
+                    n.headings = n.headings,
                     variable.colname = variable.colname)
       current <- do.call(tabfreq, c(args1, freq.list))
 

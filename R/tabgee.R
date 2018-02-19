@@ -75,11 +75,10 @@
 #'@export
 tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
                    compress.factors = is.null(data),
-                   omit.refgroups = compress.factors,
-                   data = NULL, sep.char = ", ",
-                   format.latex = FALSE, decimals = 2, p.decimals = c(2, 3),
-                   p.cuts = 0.01, p.lowerbound = 0.001, p.leading0 = TRUE,
-                   p.avoid1 = FALSE, bold.colnames = TRUE,
+                   omit.refgroups = compress.factors, data = NULL,
+                   sep.char = ", ", latex = FALSE, decimals = 2,
+                   p.decimals = c(2, 3), p.cuts = 0.01, p.lowerbound = 0.001,
+                   p.leading0 = TRUE, p.avoid1 = FALSE,
                    variable.colname = "Variable", print.html = FALSE,
                    html.filename = "table1.html") {
 
@@ -421,12 +420,9 @@ tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
   }
 
   # Reformat for xtable if necessary
-  if (format.latex) {
+  if (latex) {
     tbl[, 1] <- gsub(pattern = "  ", replacement = "$\\hskip .4cm$",
                      x = tbl[, 1], fixed = TRUE)
-    if (bold.colnames) {
-      colnames(tbl) <- paste("$\\textbf{", colnames(tbl), "}$", sep = "")
-    }
   }
 
   # Print html version of table if requested

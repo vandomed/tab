@@ -57,13 +57,12 @@
 tabmedians <- function(x, y, columns = c("xgroups", "p"), parenth = "iqr",
                        sep.char = ", ", xname = NULL, xlevels = NULL,
                        yname = NULL, text.label = NULL, quantiles = NULL,
-                       quantile.vals = FALSE, format.latex = FALSE,
-                       decimals = NULL, p.decimals = c(2, 3), p.cuts = 0.01,
+                       quantile.vals = FALSE, decimals = NULL,
+                       p.decimals = c(2, 3), p.cuts = 0.01,
                        p.lowerbound = 0.001, p.leading0 = TRUE,
                        p.avoid1 = FALSE, n.headings = TRUE,
-                       bold.colnames = TRUE, variable.colname = "Variable",
-                       fig = FALSE, print.html = FALSE,
-                       html.filename = "table1.html", ...) {
+                       variable.colname = "Variable", fig = FALSE,
+                       print.html = FALSE, html.filename = "table1.html", ...) {
 
   # If xname or yname unspecified, use variable names
   if (is.null(xname) & fig) {
@@ -308,11 +307,6 @@ tabmedians <- function(x, y, columns = c("xgroups", "p"), parenth = "iqr",
       colnames(tbl)[colnames(tbl) %in% xlevels] <-
         paste(xlevels, " (n = ", ns, ")", sep = "")
 
-    }
-
-    # Make column names bold if requested
-    if (format.latex & bold.colnames) {
-      colnames(tbl) <- paste("$\\textbf{", colnames(tbl), "}$", sep = "")
     }
 
     # Print html version of table if requested

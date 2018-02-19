@@ -28,7 +28,7 @@
 #'
 #' If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
 #' \code{format.latex = TRUE}. Then, you can pass the returned object to
-#' \code{\link[xtable]{xtable}} or \code{\link[kable]{kable}} for printing. For
+#' \code{\link[xtable]{xtable}} or \code{\link[knitr]{kable}} for printing. For
 #' \code{\link[xtable]{xtable}}, you may have to set
 #' \code{sanitize.text.function = identity} when printing.
 #'
@@ -45,7 +45,8 @@
 #'
 #' @param parenth Character string specifying what statistic to display in
 #' parentheses after the means. Choices are \code{"none"}, \code{"sd"},
-#' \code{"se"},  \code{"t.ci"}, and \code{"z.ci"}.
+#' \code{"se"},  \code{"t.ci"}, \code{"z.ci"}, \code{"range"}, and
+#' \code{"minmax"}.
 #'
 #' @param sep.char Character string with separator to place between lower and
 #' upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.
@@ -74,7 +75,7 @@
 #'
 #' @param format.latex Logical value for whether to format table so it is
 #' ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
-#' \code{\link[kable]{kable}}.
+#' \code{\link[knitr]{kable}}.
 #'
 #' @param decimals Numeric value specifying number of decimal places for numbers
 #' other than p-values.
@@ -103,7 +104,7 @@
 #' parentheses in column headings.
 #'
 #' @param bold.colnames Logical value for whether to use bold font for column
-#' headings. Only used if \code{xtable = TRUE}.
+#' headings. Only used if \code{format.latex = TRUE}.
 #'
 #' @param variable.colname Character string with desired heading for first
 #' column of table, in case you prefer something other than \code{"Variable"}.
@@ -125,7 +126,7 @@
 #'
 #'
 #' @examples
-#' # Load in sample dataset d and drop rows with missing values
+#' # Load in sample dataset and drop rows with missing values
 #' data(tabdata)
 #' tabdata <- tabdata[complete.cases(tabdata), ]
 #'
@@ -166,14 +167,14 @@ tabmeans <- function(x, y, columns = c("xgroups", "p"), parenth = "sd",
                      format.latex = FALSE, decimals = NULL,
                      p.decimals = c(2, 3), p.cuts = 0.01, p.lowerbound = 0.001,
                      p.leading0 = TRUE, p.avoid1 = FALSE, n.headings = TRUE,
-                     bold.colnames = TRUE, variable.colname = "Variable",
+                     bold.colnames = FALSE, variable.colname = "Variable",
                      fig = FALSE, print.html = FALSE,
                      html.filename = "table1.html", ...) {
 
   # If xname or yname unspecified, use variable names
-  if (is.null(xname)) {
+  if (is.null(xname) & fig) {
     xname <- deparse(substitute(x))
-    if (grepl("\\$", xname)) {
+    if (grepl("\\$", xname, fixed = TRUE)) {
       xname <- strsplit(xname, "\\$")[[1]][2]
     }
   }
@@ -298,7 +299,13 @@ tabmeans <- function(x, y, columns = c("xgroups", "p"), parenth = "sd",
         text.label <- ", M (SE)"
       } else if (parenth %in% c("t.ci", "z.ci")) {
         text.label <- ", M (95% CI)"
+      } else if (parenth == "range") {
+        text.label <- ", M (range)"
+      } else if (parenth == "minmax") {
+        text.label <- paste(", M (min", sep.char, "max)", sep = "")
       }
+    } else {
+      text.label <- paste(",", text.label)
     }
 
     # Initialize table
@@ -341,6 +348,15 @@ tabmeans <- function(x, y, columns = c("xgroups", "p"), parenth = "sd",
                                 sprintf(spf, mean.y - zcrit * se.y), sep.char,
                                 sprintf(spf, mean.y + zcrit * se.y), ")",
                                 sep = "")
+        } else if (parenth == "range") {
+          spf.r <- ifelse(all(round(y, 0) == y), "%0.0f", spf)
+          overall.cell <- paste(sprintf(spf, mean.y), " (",
+                                sprintf(spf.r, diff(range(y))), ")", sep = "")
+        } else if (parenth == "minmax") {
+          spf.r <- ifelse(all(round(y, 0) == y), "%0.0f", spf)
+          overall.cell <- paste(sprintf(spf, mean.y), " (",
+                                sprintf(spf.r, min(y)), sep.char,
+                                sprintf(spf.r, max(y)), ")", sep = "")
         }
         newcol <- matrix(overall.cell, dimnames = list(NULL, "Overall"))
 
@@ -367,6 +383,18 @@ tabmeans <- function(x, y, columns = c("xgroups", "p"), parenth = "sd",
                                sprintf(spf, means - zcrit * ses), sep.char,
                                sprintf(spf, means + zcrit * ses), ")",
                                sep = "")
+        } else if (parenth == "range") {
+          spf.r <- ifelse(all(round(y, 0) == y), "%0.0f", spf)
+          ranges <- tapply(X = y, INDEX = x, FUN = function(x) diff(range(x)))
+          group.cells <- paste(sprintf(spf, means), " (",
+                               sprintf(spf.r, ranges), ")", sep = "")
+        } else if (parenth == "minmax") {
+          spf.r <- ifelse(all(round(y, 0) == y), "%0.0f", spf)
+          mins <- tapply(X = y, INDEX = x, FUN = min)
+          maxes <- tapply(X = y, INDEX = x, FUN = max)
+          group.cells <- paste(sprintf(spf, means), " (",
+                               sprintf(spf.r, mins), sep.char,
+                               sprintf(spf.r, maxes), ")", sep = "")
         }
         newcol <- matrix(group.cells, nrow = 1, dimnames = list(NULL, xlevels))
 
@@ -468,6 +496,20 @@ tabmeans <- function(x, y, columns = c("xgroups", "p"), parenth = "sd",
       lowerbars <- means - zcrit * ses
       upperbars <- means + zcrit * ses
       ylabel <- paste(yname, " (Mean +/- 95% CI)", sep = "")
+
+    } else if (parenth %in% c("range", "minmax")) {
+
+      lowerbars <- tapply(X = y, INDEX = x, FUN = min)
+      upperbars <- tapply(X = y, INDEX = x, FUN = max)
+      ylabel <- paste(yname, " (Mean, range)", sep = "")
+
+    } else if (parenth == "minmax") {
+
+      mins <- tapply(X = y, INDEX = x, FUN = min)
+      maxes <- tapply(X = y, INDEX = x, FUN = max)
+      group.cells <- paste(sprintf(spf, means), " (",
+                           sprintf(spf, mins), sep.char,
+                           sprintf(spf, maxes), ")", sep = "")
 
     }
 

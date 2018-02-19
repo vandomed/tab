@@ -61,8 +61,8 @@
 #' # Same comparison, but compress table to show male row only and show percent
 #' # (SE) rather than n (percent)
 #' (freqtable2 <- tabfreq(x = tabdata$Group, y = tabdata$Sex,
-#'                        cell = "col.percent", parenth = "se")
-#'                        compress.binary = TRUE)
+#'                        cell = "col.percent", parenth = "se",
+#'                        compress.binary = TRUE))
 #'
 #' # Use rbind to create single table comparing sex and race in control vs.
 #' # treatment group
@@ -83,7 +83,7 @@ tabfreq <- function(x = NULL, y, columns = c("xgroups", "p"),
                     quantiles = NULL, quantile.vals = FALSE,
                     format.latex = FALSE, decimals = 1, p.decimals = c(2, 3),
                     p.cuts = 0.01, p.lowerbound = 0.001, p.leading0 = TRUE,
-                    p.avoid1 = FALSE, n.headings = FALSE, bold.colnames = TRUE,
+                    p.avoid1 = FALSE, n.headings = FALSE, bold.colnames = FALSE,
                     variable.colname = "Variable", print.html = FALSE,
                     html.filename = "table1.html") {
 
@@ -351,6 +351,8 @@ tabfreq <- function(x = NULL, y, columns = c("xgroups", "p"),
     } else if (parenth %in% c("tot.percent", "col.percent", "row.percent")) {
       text.label <- paste(", ", part1, " (%)", sep = "")
     }
+  } else {
+    text.label <- paste(",", text.label)
   }
   tbl[1, 1] <- paste(tbl[1, 1], text.label, sep = "")
 

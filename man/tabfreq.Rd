@@ -8,11 +8,10 @@ tabfreq(x = NULL, y, columns = c("xgroups", "p"), cell = "counts",
   parenth = "col.percent", sep.char = ", ", test = "chi.fisher",
   xlevels = NULL, yname = NULL, ylevels = NULL, compress.binary = FALSE,
   yname.row = !compress.binary, text.label = NULL, quantiles = NULL,
-  quantile.vals = FALSE, format.latex = FALSE, decimals = 1,
-  p.decimals = c(2, 3), p.cuts = 0.01, p.lowerbound = 0.001,
-  p.leading0 = TRUE, p.avoid1 = FALSE, n.headings = FALSE,
-  bold.colnames = TRUE, variable.colname = "Variable", print.html = FALSE,
-  html.filename = "table1.html")
+  quantile.vals = FALSE, latex = FALSE, decimals = 1, p.decimals = c(2,
+  3), p.cuts = 0.01, p.lowerbound = 0.001, p.leading0 = TRUE,
+  p.avoid1 = FALSE, n.headings = FALSE, variable.colname = "Variable",
+  print.html = FALSE, html.filename = "table1.html")
 }
 \arguments{
 \item{x}{Vector indicating group membership for columns of I-by-J table.}
@@ -69,7 +68,7 @@ quantiles of \code{x} created on the fly.}
 should show quantile number and corresponding range, e.g. Q1 [0.00, 0.25),
 rather than just the quantile number.}
 
-\item{format.latex}{Logical value for whether to format table so it is
+\item{latex}{Logical value for whether to format table so it is
 ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
 \code{\link[knitr]{kable}}.}
 
@@ -98,9 +97,6 @@ appear as \code{>0.99} (or similarly depending on \code{p.decimals} and
 
 \item{n.headings}{Logical value for whether to display group sample sizes in
 parentheses in column headings.}
-
-\item{bold.colnames}{Logical value for whether to use bold font for column
-headings. Only used if \code{xtable = TRUE}.}
 
 \item{variable.colname}{Character string with desired heading for first
 column of table, in case you prefer something other than \code{"Variable"}.}
@@ -140,7 +136,7 @@ your document. You can control the name of this file with
 }
 
 If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-\code{format.latex = TRUE}. Then, you can pass the returned object to
+\code{latex = TRUE}. Then, you can pass the returned object to
 \code{\link[xtable]{xtable}} or \code{\link[knitr]{kable}} for printing. For
 \code{\link[xtable]{xtable}}, you may have to set
 \code{sanitize.text.function = identity} when printing.

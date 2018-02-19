@@ -8,10 +8,10 @@ Categorical Variable}
 tabmulti(data, xvarname, yvarnames, ymeasures = NULL, columns = c("xgroups",
   "p"), listwise.deletion = FALSE, sep.char = ", ", xlevels = NULL,
   ynames = yvarnames, ylevels = NULL, quantiles = NULL,
-  quantile.vals = NULL, format.latex = FALSE, decimals = NULL,
+  quantile.vals = NULL, latex = FALSE, decimals = NULL,
   p.decimals = c(2, 3), p.cuts = 0.01, p.lowerbound = 0.001,
   p.leading0 = TRUE, p.avoid1 = FALSE, n.headings = FALSE,
-  bold.colnames = TRUE, variable.colname = "Variable", print.html = FALSE,
+  variable.colname = "Variable", print.html = FALSE,
   html.filename = "table1.html", means.list = NULL, medians.list = NULL,
   freq.list = NULL)
 }
@@ -64,7 +64,7 @@ tertiles.}
 should show quantile number and corresponding range, e.g. Q1 [0.00, 0.25),
 rather than just the quantile number.}
 
-\item{format.latex}{Logical value for whether to format table so it is
+\item{latex}{Logical value for whether to format table so it is
 ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
 \code{\link[knitr]{kable}}.}
 
@@ -94,9 +94,6 @@ appear as \code{>0.99} (or similarly depending on \code{p.decimals} and
 
 \item{n.headings}{Logical value for whether to display group sample sizes in
 parentheses in column headings.}
-
-\item{bold.colnames}{Logical value for whether to use bold font for column
-headings. Only used if \code{xtable = TRUE}.}
 
 \item{variable.colname}{Character string with desired heading for first
 column of table, in case you prefer something other than \code{"Variable"}.}
@@ -143,7 +140,7 @@ your document. You can control the name of this file with
 }
 
 If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-\code{format.latex = TRUE}. Then, you can pass the returned object to
+\code{latex = TRUE}. Then, you can pass the returned object to
 \code{\link[xtable]{xtable}} or \code{\link[knitr]{kable}} for printing. For
 \code{\link[xtable]{xtable}}, you may have to set
 \code{sanitize.text.function = identity} when printing.
