@@ -4,12 +4,12 @@
 \alias{tabcox}
 \title{Generate Summary Table for Fitted Cox Proportional Hazards (Cox PH) Model}
 \usage{
-tabcox(fit, columns = c("beta.se", "p"), xlabels = NULL,
-  compress.factors = FALSE, sep.char = ", ", format.latex = FALSE,
-  decimals = 2, p.decimals = c(2, 3), p.cuts = 0.01,
-  p.lowerbound = 0.001, p.leading0 = TRUE, p.avoid1 = FALSE,
-  bold.colnames = TRUE, variable.colname = "Variable", print.html = FALSE,
-  html.filename = "table1.html")
+tabcox(fit, columns = c("beta.se", "hr.hrci", "p"), xlabels = NULL,
+  compress.factors = FALSE, omit.refgroups = compress.factors,
+  sep.char = ", ", format.latex = FALSE, decimals = 2, p.decimals = c(2,
+  3), p.cuts = 0.01, p.lowerbound = 0.001, p.leading0 = TRUE,
+  p.avoid1 = FALSE, bold.colnames = TRUE, variable.colname = "Variable",
+  print.html = FALSE, html.filename = "table1.html")
 }
 \arguments{
 \item{fit}{Object returned from \code{\link[survival]{coxph}}.}
@@ -23,7 +23,15 @@ for each element are \code{"events"}, \code{"beta"}, \code{"se"},
 their levels. Often useful to leave as \code{NULL} first, see how the table
 looks, and then re-run with labels where they need to be.}
 
-\item{compress.factors}{Logical value for whether to display factor variables should
+\item{compress.factors}{Logical value for whether to display factor variables
+in compressed format, with variable names omitted and levels not indented.
+Can also be "binary" to compress binary factor variables only.}
+
+\item{omit.refgroups}{Logical value for whether to omit reference groups
+for factor variables. Can also be "binary" to omit reference groups for
+binary factor variables only.
+
+
 as one row for each of the non-reference group levels, as opposed to one row
 for the variable name and one row for each of the levels including the
 reference group.}
@@ -32,7 +40,8 @@ reference group.}
 upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.}
 
 \item{format.latex}{Logical value for whether to format table so it is
-ready to be passed to \code{\link[xtable]{xtable}} for printing in LaTeX.}
+ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
+\code{\link[knitr]{kable}}.}
 
 \item{decimals}{Numeric value specifying number of decimal places for numbers
 other than p-values.}
@@ -97,24 +106,26 @@ your document. You can control the name of this file with
 }
 
 If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-\code{format.latex = TRUE}. You may have to set
-\code{sanitize.text.function = identity} when calling
-\code{\link[xtable]{print.xtable}}.
+\code{format.latex = TRUE}. Then, you can pass the returned object to
+\code{\link[xtable]{xtable}} or \code{\link[knitr]{kable}} for printing. For
+\code{\link[xtable]{xtable}}, you may have to set
+\code{sanitize.text.function = identity} when printing.
 }
 
 \examples{
-# Load in sample dataset d and drop rows with missing values
-data(d)
-d <- d[complete.cases(d), ]
+# Load in sample dataset and drop rows with missing values
+data(tabdata)
+tabdata <- tabdata[complete.cases(tabdata), ]
 
 # Test whether race is associated with survival
-coxfit1 <- coxph(Surv(time = d$time, event = d$delta) ~ Race, data = d)
+coxfit1 <- coxph(Surv(time = tabdata$time, event = tabdata$delta) ~ Race,
+                 data = tabdata)
 coxtable1 <- tabcox(fit = coxfit1)
 
 # Test whether age, sex, race, and treatment group are associated with
 # survival
-coxfit2 <- coxph(Surv(time = d$time, event = d$delta) ~ Age + Sex + Race +
-                 Group, data = d)
+coxfit2 <- coxph(Surv(time = tabdata$time, event = tabdata$delta) ~
+                 Age + Sex + Race + Group, data = tabdata)
 coxtable2 <- tabcox(fit = coxfit2)
 
 

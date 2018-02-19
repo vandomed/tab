@@ -5,11 +5,12 @@
 \title{Generate Summary Table for Fitted Generalized Estimating Equation (GEE) Model}
 \usage{
 tabgee(fit, columns = NULL, robust = TRUE, xlabels = NULL,
-  compress.factors = FALSE, data = NULL, sep.char = ", ",
-  format.latex = FALSE, decimals = 2, p.decimals = c(2, 3),
-  p.cuts = 0.01, p.lowerbound = 0.001, p.leading0 = TRUE,
-  p.avoid1 = FALSE, bold.colnames = TRUE, variable.colname = "Variable",
-  print.html = FALSE, html.filename = "table1.html")
+  compress.factors = is.null(data), omit.refgroups = compress.factors,
+  data = NULL, sep.char = ", ", format.latex = FALSE, decimals = 2,
+  p.decimals = c(2, 3), p.cuts = 0.01, p.lowerbound = 0.001,
+  p.leading0 = TRUE, p.avoid1 = FALSE, bold.colnames = TRUE,
+  variable.colname = "Variable", print.html = FALSE,
+  html.filename = "table1.html")
 }
 \arguments{
 \item{fit}{Object returned from \code{\link[gee]{gee}}.}
@@ -27,7 +28,15 @@ used for inference.}
 their levels. Often useful to leave as \code{NULL} first, see how the table
 looks, and then re-run with labels where they need to be.}
 
-\item{compress.factors}{Logical value for whether to display factor variables should
+\item{compress.factors}{Logical value for whether to display factor variables
+in compressed format, with variable names omitted and levels not indented.
+Can also be "binary" to compress binary factor variables only.}
+
+\item{omit.refgroups}{Logical value for whether to omit reference groups
+for factor variables. Can also be "binary" to omit reference groups for
+binary factor variables only.
+
+
 as one row for each of the non-reference group levels, as opposed to one row
 for the variable name and one row for each of the levels including the
 reference group.}
@@ -40,7 +49,8 @@ predictors is a factor variable and \code{compres.factors = FALSE}.}
 upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.}
 
 \item{format.latex}{Logical value for whether to format table so it is
-ready to be passed to \code{\link[xtable]{xtable}} for printing in LaTeX.}
+ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
+\code{\link[knitr]{kable}}.}
 
 \item{decimals}{Numeric value specifying number of decimal places for numbers
 other than p-values.}
@@ -113,29 +123,32 @@ your document. You can control the name of this file with
 }
 
 If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-\code{format.latex = TRUE}. You may have to set
-\code{sanitize.text.function = identity} when calling
-\code{\link[xtable]{print.xtable}}.
+\code{format.latex = TRUE}. Then, you can pass the returned object to
+\code{\link[xtable]{xtable}} or \code{\link[knitr]{kable}} for printing. For
+\code{\link[xtable]{xtable}}, you may have to set
+\code{sanitize.text.function = identity} when printing.
 }
 
 \examples{
-# Load in sample dataset d and convert to long format
-data(d)
-d2 <- reshape(data = d, varying = c("bp.1", "bp.2", "bp.3", "highbp.1",
-                                    "highbp.2", "highbp.3"),
-              timevar = "bp.visit", direction = "long")
-d2 <- d2[order(d2$id), ]
+# Load in sample dataset and convert to long format
+data(tabdata)
+tabdata2 <- reshape(data = tabdata,
+                    varying = c("bp.1", "bp.2", "bp.3", "highbp.1",
+                                "highbp.2", "highbp.3"),
+                    timevar = "bp.visit", direction = "long")
+tabdata2 <- tabdata2[order(tabdata2$id), ]
 
 # GEE: Blood pressure at 1, 2, and 3 months vs. predictors
-geefit1 <- gee(bp ~ Age + Sex + Race + BMI + Group, id = id, data = d2,
+geefit1 <- gee(bp ~ Age + Sex + Race + BMI + Group, id = id, data = tabdata2,
                corstr = "unstructured")
-(geetable1 <- tabgee(fit = geefit1, data = d2))
+(geetable1 <- tabgee(fit = geefit1, data = tabdata2))
 
 # GEE: High blood pressure at 1, 2, and 3 months vs. predictors. Display
 # factors in "compressed" format
-geefit2 <- gee(highbp ~ Age + Sex + Race + BMI + Group, id = id, data = d2,
-               family = binomial, corstr = "unstructured")
-(geetable2 <- tabgee(fit = geefit2, data = d2, compress.factors = TRUE))
+geefit2 <- gee(highbp ~ Age + Sex + Race + BMI + Group, id = id,
+               data = tabdata2, family = binomial, corstr = "unstructured")
+(geetable2 <- tabgee(fit = geefit2, data = tabdata2,
+                     compress.factors = TRUE))
 
 
 }

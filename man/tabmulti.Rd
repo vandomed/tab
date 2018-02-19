@@ -65,7 +65,8 @@ should show quantile number and corresponding range, e.g. Q1 [0.00, 0.25),
 rather than just the quantile number.}
 
 \item{format.latex}{Logical value for whether to format table so it is
-ready to be passed to \code{\link[xtable]{xtable}} for printing in LaTeX.}
+ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
+\code{\link[knitr]{kable}}.}
 
 \item{decimals}{Numeric vector specifying number of decimal places for
 numbers other than p-values for each \code{y} variable. Can be a single value
@@ -142,28 +143,29 @@ your document. You can control the name of this file with
 }
 
 If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-\code{format.latex = TRUE}. You may have to set
-\code{sanitize.text.function = identity} when calling
-\code{\link[xtable]{print.xtable}}.
+\code{format.latex = TRUE}. Then, you can pass the returned object to
+\code{\link[xtable]{xtable}} or \code{\link[knitr]{kable}} for printing. For
+\code{\link[xtable]{xtable}}, you may have to set
+\code{sanitize.text.function = identity} when printing.
 }
 
 \examples{
-# Load in sample dataset d
-data(d)
+# Load in sample dataset
+data(tabdata)
 
 # Compare age, sex, race, and BMI in control vs. treatment group using
 # listwise deletion
-(table1 <- tabmulti(data = d, xvarname = "Group",
+(table1 <- tabmulti(data = tabdata, xvarname = "Group",
                     yvarnames = c("Age", "Sex", "Race", "BMI")))
 
 # Repeat using pairwise deletion
-(table2 <- tabmulti(data = d, xvarname = "Group",
+(table2 <- tabmulti(data = tabdata, xvarname = "Group",
                     yvarnames = c("Age", "Sex", "Race", "BMI"),
                     columns = c("n", "xgroups", "p"),
                     listwise.deletion = FALSE))
 
 # Same as table1, but compare medians rather than means for BMI
-(table3 <- tabmulti(data = d, xvarname = "Group",
+(table3 <- tabmulti(data = tabdata, xvarname = "Group",
                     yvarnames = c("Age", "Sex", "Race", "BMI"),
                     ymeasures = c("mean", "freq", "freq", "median")))
 

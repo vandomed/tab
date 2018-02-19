@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1518967931894.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1859466846",
+    "id" : "C640BD3B",
+    "lastKnownWriteTime" : 1519016348,
+    "last_content_update" : 1519016348911,
+    "path" : "C:/Users/Dane/Google Drive/github/tab/vignettes/tab-vignette.Rmd",
+    "project_path" : "vignettes/tab-vignette.Rmd",
+    "properties" : {
+        "cursorPosition" : "269,3",
+        "last_setup_crc32" : "",
+        "scrollLine" : "248"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

@@ -51,7 +51,8 @@ should show quantile number and corresponding range, e.g. Q1 [0.00, 0.25),
 rather than just the quantile number.}
 
 \item{format.latex}{Logical value for whether to format table so it is
-ready to be passed to \code{\link[xtable]{xtable}} for printing in LaTeX.}
+ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
+\code{\link[knitr]{kable}}.}
 
 \item{decimals}{Numeric value specifying number of decimal places for numbers
 other than p-values.}
@@ -133,29 +134,30 @@ your document. You can control the name of this file with
 }
 
 If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-\code{format.latex = TRUE}. You may have to set
-\code{sanitize.text.function = identity} when calling
-\code{\link[xtable]{print.xtable}}.
+\code{format.latex = TRUE}. Then, you can pass the returned object to
+\code{\link[xtable]{xtable}} or \code{\link[knitr]{kable}} for printing. For
+\code{\link[xtable]{xtable}}, you may have to set
+\code{sanitize.text.function = identity} when printing.
 }
 
 \examples{
-# Load in sample dataset d and drop rows with missing values
-data(d)
-d <- d[complete.cases(d), ]
+# Load in sample dataset and drop rows with missing values
+data(tabdata)
+tabdata <- tabdata[complete.cases(tabdata), ]
 
 # Compare median BMI in control group vs. treatment group
-(medtable1 <- tabmedians(x = d$Group, y = d$BMI))
+(medtable1 <- tabmedians(x = tabdata$Group, y = tabdata$BMI))
 
 # Compare median BMI by quartile of age
-(medtable2 <- tabmedians(x = d$Age, y = d$BMI, quantiles = 4))
+(medtable2 <- tabmedians(x = tabdata$Age, y = tabdata$BMI, quantiles = 4))
 
 # Create single table comparing median BMI and median age in control vs.
 # treatment group
-(medtable3 <- rbind(tabmedians(x = d$Group, y = d$BMI),
-                    tabmedians(x = d$Group, y = d$Age)))
+(medtable3 <- rbind(tabmedians(x = tabdata$Group, y = tabdata$BMI),
+                    tabmedians(x = tabdata$Group, y = tabdata$Age)))
 
 # An easier way to make this table is to use tabmulti
-medtable4 <- tabmulti(data = d, xvarname = "Group",
+medtable4 <- tabmulti(data = tabdata, xvarname = "Group",
                       yvarnames = c("BMI", "Age"), ymeasures = "median")
 
 

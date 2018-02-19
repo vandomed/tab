@@ -70,7 +70,8 @@ should show quantile number and corresponding range, e.g. Q1 [0.00, 0.25),
 rather than just the quantile number.}
 
 \item{format.latex}{Logical value for whether to format table so it is
-ready to be passed to \code{\link[xtable]{xtable}} for printing in LaTeX.}
+ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
+\code{\link[knitr]{kable}}.}
 
 \item{decimals}{Numeric value specifying number of decimal places for numbers
 other than p-values.}
@@ -139,28 +140,30 @@ your document. You can control the name of this file with
 }
 
 If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-\code{format.latex = TRUE}. You may have to set
-\code{sanitize.text.function = identity} when calling
-\code{\link[xtable]{print.xtable}}.
+\code{format.latex = TRUE}. Then, you can pass the returned object to
+\code{\link[xtable]{xtable}} or \code{\link[knitr]{kable}} for printing. For
+\code{\link[xtable]{xtable}}, you may have to set
+\code{sanitize.text.function = identity} when printing.
 }
 
 \examples{
-# Load in sample dataset d and drop rows with missing values
-data(d)
-d <- d[complete.cases(d), ]
+# Load in sample dataset and drop rows with missing values
+data(tabdata)
+tabdata <- tabdata[complete.cases(tabdata), ]
 
 # Compare sex distribution by group, with group as column variable
-(freqtable1 <- tabfreq(x = d$Group, y = d$Sex))
+(freqtable1 <- tabfreq(x = tabdata$Group, y = tabdata$Sex))
 
 # Same comparison, but compress table to show male row only and show percent
 # (SE) rather than n (percent)
-(freqtable2 <- tabfreq(x = d$Group, y = d$Sex, compress.binary = TRUE,
-                       cell = "col.percent", parenth = "se"))
+(freqtable2 <- tabfreq(x = tabdata$Group, y = tabdata$Sex,
+                       cell = "col.percent", parenth = "se",
+                       compress.binary = TRUE))
 
 # Use rbind to create single table comparing sex and race in control vs.
 # treatment group
-(freqtable3 <- rbind(tabfreq(x = d$Group, y = d$Sex),
-                     tabfreq(x = d$Group, y = d$Race)))
+(freqtable3 <- rbind(tabfreq(x = tabdata$Group, y = tabdata$Sex),
+                     tabfreq(x = tabdata$Group, y = tabdata$Race)))
 
 # An easier way to make this table is to use tabmulti
 (freqtable4 <- tabmulti(data = d, xvarname = "Group",

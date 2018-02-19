@@ -1,0 +1,230 @@
+#' Generate Summary Table Comparing Multiple Variables Across Levels of One
+#' Categorical Variable
+#'
+#' Provides an alternative to making multiple calls to \code{\link{tabmeans}},
+#' \code{\link{tabmedians}}, and \code{\link{tabfreq}}, and then combining
+#' via \code{\link[base]{rbind}}.
+#'
+#'
+#' @inherit tabmeans references
+#' @inheritSection tabmeans Note
+#' @inheritParams tabmeans
+#'
+#'
+#' @param data Data frame.
+#'
+#' @param xvarname Character string with name of column variable. Should be one
+#' of \code{names(data)}.
+#'
+#' @param yvarnames Character vector with names of row variables. Each element
+#' should be one of \code{names(data)}.
+#'
+#' @param ymeasures Character vector specifying whether each \code{y} variable
+#' should be summarized by mean, median, or frequency. For example, if
+#' \code{yvarnames} has length 3 and you want to display frequencies for the
+#' first variable, means for the second, and medians for the third, you would
+#' set \code{ymeasures = c("freq", "mean", "median")}. If unspecified, function
+#' displays frequencies for factor variables and numeric variable with 5 or
+#' fewer unique values, and means for numeric variables with more than five
+#' levels.
+#'
+#' @param columns Character vector specifying what columns to include. Choices
+#' for each element are \code{"n"} for total sample size, \code{"overall"} for
+#' overall statistics, \code{"xgroups"} for \code{x} group statistics,
+#' \code{"test"} for test statistic, and \code{"p"} for p-value.
+#'
+#' @param decimals Numeric vector specifying number of decimal places for
+#' numbers other than p-values for each \code{y} variable. Can be a single value
+#' to use for all \code{y} variables.
+#'
+#' @param listwise.deletion Logical value for whether observations with missing
+#' values for any \code{y} variable should be excluded entirely (as opposed to
+#' using all available data for each comparison).
+#'
+#' @param ynames Character vector with labels for the \code{y} variables.
+#'
+#' @param ylevels Character vector (if only 1 frequency comparison) or list of
+#' character vectors with labels for the levels of each categorical \code{y}
+#' variable.
+#'
+#' @param quantiles Numeric value. If specified, function compares \code{y}
+#' variables across quantiles of \code{x}. For example, if \code{x} contains BMI
+#' values and \code{yvarnames} includes HDL and race, setting
+#' \code{quantiles = 3} compares mean BMI and distribution of race across BMI
+#' tertiles.
+#'
+#' @param means.list List of arguments to pass to \code{\link{tabmeans}}.
+#'
+#' @param medians.list List of arguments to pass to \code{\link{tabmedians}}.
+#'
+#' @param freq.list List of arguments to pass to \code{\link{tabfreq}}.
+#'
+#'
+#' @return Character matrix comparing \code{y} variables across levels of
+#' \code{x}.
+#'
+#'
+#' @examples
+#' # Load in sample dataset
+#' data(tabdata)
+#'
+#' # Compare age, sex, race, and BMI in control vs. treatment group using
+#' # listwise deletion
+#' (table1 <- tabmulti(data = tabdata, xvarname = "Group",
+#'                     yvarnames = c("Age", "Sex", "Race", "BMI")))
+#'
+#' # Repeat using pairwise deletion
+#' (table2 <- tabmulti(data = tabdata, xvarname = "Group",
+#'                     yvarnames = c("Age", "Sex", "Race", "BMI"),
+#'                     columns = c("n", "xgroups", "p"),
+#'                     listwise.deletion = FALSE))
+#'
+#' # Same as table1, but compare medians rather than means for BMI
+#' (table3 <- tabmulti(data = tabdata, xvarname = "Group",
+#'                     yvarnames = c("Age", "Sex", "Race", "BMI"),
+#'                     ymeasures = c("mean", "freq", "freq", "median")))
+#'
+#'
+#' @export
+#'
+#'
+tabmulti <- function(data, xvarname, yvarnames, ymeasures = NULL,
+                     columns = c("xgroups", "p"), listwise.deletion = FALSE,
+                     sep.char = ", ", xlevels = NULL, ynames = yvarnames,
+                     ylevels = NULL, quantiles = NULL, quantile.vals = NULL,
+                     format.latex = FALSE, decimals = NULL,
+                     p.decimals = c(2, 3), p.cuts = 0.01, p.lowerbound = 0.001,
+                     p.leading0 = TRUE, p.avoid1 = FALSE, n.headings = FALSE,
+                     bold.colnames = TRUE, variable.colname = "Variable",
+                     print.html = FALSE, html.filename = "table1.html",
+                     means.list = NULL, medians.list = NULL, freq.list = NULL) {
+
+  # If listwise.deletion is TRUE, drop observations with missing values for
+  # column variable or any row variables
+  if (listwise.deletion){
+    data <- data[which(! is.na(data[, xvarname])), ]
+    for (ii in 1: length(yvarnames)) {
+      data <- data[which(! is.na(data[, yvarnames[ii]])), ]
+    }
+  }
+
+  # Create x vector
+  x <- data[, xvarname]
+
+  # Number of y variable
+  num.yvars <- length(yvarnames)
+
+  # If ymeasures is NULL, guess what measures are appropriate based on each
+  # variable
+  if (is.null(ymeasures)) {
+    ymeasures <- c()
+    for (ii in 1: num.yvars) {
+      if (is.factor(data[, yvarnames[ii]]) |
+          is.character(data[, yvarnames[ii]]) |
+          length(unique(data[! is.na(data[, yvarnames[ii]]),
+                                yvarnames[ii]])) <= 5) {
+        ymeasures <- c(ymeasures, "freq")
+      } else {
+        ymeasures <- c(ymeasures, "mean")
+      }
+    }
+  }
+
+  # If ymeasures is single value, create vector of repeat values
+  if (length(ymeasures) == 1) {
+    ymeasures <- rep(ymeasures, num.yvars)
+  }
+
+  # If decimals is a single value, create vector of repeat values
+  if (length(decimals) == 1) {
+    decimals <- rep(decimals, num.yvars)
+  }
+
+  # If ylevels is a vector, convert to a list
+  if (! is.null(ylevels) && ! is.list(ylevels)) {
+    ylevels <- list(ylevels)
+  }
+
+  # Call tabmeans, tabmedians, or tabfreq repeatedly
+  mediansindex <- 0
+  meansindex <- 0
+  freqindex <- 0
+  for (ii in 1: num.yvars) {
+    ymeasures.ii <- ymeasures[ii]
+
+    if (ymeasures.ii == "mean") {
+
+      # Means
+      meansindex <- meansindex + 1
+      args1 <- list(x = x, y = data[, yvarnames[ii]], columns = columns,
+                    sep.char = sep.char, xlevels = xlevels, yname = ynames[ii],
+                    quantiles = quantiles, quantile.vals = quantile.vals,
+                    format.latex = format.latex, decimals = decimals[ii],
+                    p.decimals = p.decimals,
+                    p.cuts = p.cuts, p.lowerbound = p.lowerbound,
+                    p.leading0 = p.leading0, p.avoid1 = p.avoid1,
+                    n.headings = n.headings, bold.colnames = bold.colnames,
+                    variable.colname = variable.colname, fig = FALSE)
+      current <- do.call(tabmeans, c(args1, means.list))
+
+    } else if (ymeasures.ii == "median") {
+
+      # Medians
+      mediansindex <- mediansindex + 1
+      args1 <- list(x = x, y = data[, yvarnames[ii]], columns = columns,
+                    sep.char = sep.char, xlevels = xlevels, yname = ynames[ii],
+                    quantiles = quantiles, quantile.vals = quantile.vals,
+                    format.latex = format.latex, decimals = decimals[ii],
+                    p.decimals = p.decimals,
+                    p.cuts = p.cuts, p.lowerbound = p.lowerbound,
+                    p.leading0 = p.leading0, p.avoid1 = p.avoid1,
+                    n.headings = n.headings, bold.colnames = bold.colnames,
+                    variable.colname = variable.colname, fig = FALSE)
+      current <- do.call(tabmedians, c(args1, medians.list))
+
+    } else if (ymeasures.ii == "freq") {
+
+      # Frequencies
+      freqindex <- freqindex + 1
+      args1 <- list(x = x, y = data[, yvarnames[ii]], columns = columns,
+                    sep.char = sep.char, xlevels = xlevels, yname = ynames[ii],
+                    ylevels = ylevels[[freqindex]],
+                    quantiles = quantiles, quantile.vals = quantile.vals,
+                    format.latex = format.latex, decimals = decimals[ii],
+                    p.decimals = p.decimals,
+                    p.cuts = p.cuts, p.lowerbound = p.lowerbound,
+                    p.leading0 = p.leading0, p.avoid1 = p.avoid1,
+                    n.headings = n.headings, bold.colnames = bold.colnames,
+                    variable.colname = variable.colname)
+      current <- do.call(tabfreq, c(args1, freq.list))
+
+    }
+
+    # Add to growing table
+    if (ii == 1) {
+      tbl <- current
+    } else {
+      tbl <- rbind(tbl, current)
+    }
+  }
+  rownames(tbl) <- NULL
+
+  # Print html version of table if requested
+  if (print.html) {
+
+    tbl.xtable <-
+      xtable(tbl,
+             align = paste("ll",
+                           paste(rep("r", ncol(tbl) - 1), collapse = ""),
+                           sep = "", collapse = ""))
+    print(tbl.xtable, include.rownames = FALSE, type = "html",
+          file = html.filename, sanitize.text.function = function(x) {
+            ifelse(substr(x, 1, 1) == " ", paste("&nbsp &nbsp", x), x)
+          })
+
+  }
+
+  # Return table
+  return(tbl)
+
+}

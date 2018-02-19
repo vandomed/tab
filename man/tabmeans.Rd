@@ -26,7 +26,8 @@ difference in \code{x} group means (only available for binary \code{x}),
 
 \item{parenth}{Character string specifying what statistic to display in
 parentheses after the means. Choices are \code{"none"}, \code{"sd"},
-\code{"se"},  \code{"t.ci"}, and \code{"z.ci"}.}
+\code{"se"},  \code{"t.ci"}, \code{"z.ci"}, \code{"range"}, and
+\code{"minmax"}.}
 
 \item{sep.char}{Character string with separator to place between lower and
 upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.}
@@ -54,7 +55,8 @@ should show quantile number and corresponding range, e.g. Q1 [0.00, 0.25),
 rather than just the quantile number.}
 
 \item{format.latex}{Logical value for whether to format table so it is
-ready to be passed to \code{\link[xtable]{xtable}} for printing in LaTeX.}
+ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
+\code{\link[knitr]{kable}}.}
 
 \item{decimals}{Numeric value specifying number of decimal places for numbers
 other than p-values.}
@@ -133,33 +135,35 @@ your document. You can control the name of this file with
 }
 
 If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-\code{format.latex = TRUE}. You may have to set
-\code{sanitize.text.function = identity} when calling
-\code{\link[xtable]{print.xtable}}.
+\code{format.latex = TRUE}. Then, you can pass the returned object to
+\code{\link[xtable]{xtable}} or \code{\link[knitr]{kable}} for printing. For
+\code{\link[xtable]{xtable}}, you may have to set
+\code{sanitize.text.function = identity} when printing.
 }
 
 \examples{
-# Load in sample dataset d and drop rows with missing values
-data(d)
-d <- d[complete.cases(d), ]
+# Load in sample dataset and drop rows with missing values
+data(tabdata)
+tabdata <- tabdata[complete.cases(tabdata), ]
 
 # Compare mean BMI in control group vs. treatment group - table and figure
-(meanstable1 <- tabmeans(x = d$Group, y = d$BMI))
-meansfig1 <- tabmeans(x = d$Group, y = d$BMI, fig = TRUE)
+(meanstable1 <- tabmeans(x = tabdata$Group, y = tabdata$BMI))
+meansfig1 <- tabmeans(x = tabdata$Group, y = tabdata$BMI, fig = TRUE)
 
 # Compare mean baseline systolic BP across tertiles of BMI - table and figure
-(meanstable2 <- tabmeans(x = d$BMI, y = d$bp.1, yname = "Systolic BP",
-                         quantiles = 3))
-meansfig2 <- tabmeans(x = d$BMI, y = d$bp.1, quantiles = 3, fig = TRUE,
-                      yname = "Systolic BP", xname = "BMI Tertile")
+(meanstable2 <- tabmeans(x = tabdata$BMI, y = tabdata$bp.1,
+                         yname = "Systolic BP", quantiles = 3))
+meansfig2 <- tabmeans(x = tabdata$BMI, y = tabdata$bp.1, quantiles = 3,
+                      fig = TRUE, yname = "Systolic BP",
+                      xname = "BMI Tertile")
 
 # Create single table comparing mean BMI and mean age in control vs.
 # treatment group
-(meanstable3 <- rbind(tabmeans(x = d$Group, y = d$BMI),
-                      tabmeans(x = d$Group, y = d$Age)))
+(meanstable3 <- rbind(tabmeans(x = tabdata$Group, y = tabdata$BMI),
+                      tabmeans(x = tabdata$Group, y = tabdata$Age)))
 
 # An easier way to make this table is to use tabmulti
-(meanstable4 <- tabmulti(data = d, xvarname = "Group",
+(meanstable4 <- tabmulti(data = tabdata, xvarname = "Group",
                          yvarnames = c("BMI", "Age")))
 
 

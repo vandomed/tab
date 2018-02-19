@@ -5,8 +5,9 @@
 \title{Generate Summary Table for Fitted Generalized Linear Model (GLM)}
 \usage{
 tabglm(fit, columns = NULL, xlabels = NULL, compress.factors = FALSE,
-  sep.char = ", ", format.latex = FALSE, decimals = 2, p.decimals = c(2,
-  3), p.cuts = 0.01, p.lowerbound = 0.001, p.leading0 = TRUE,
+  omit.refgroups = compress.factors, sep.char = ", ",
+  format.latex = FALSE, decimals = 2, p.decimals = c(2, 3),
+  p.cuts = 0.01, p.lowerbound = 0.001, p.leading0 = TRUE,
   p.avoid1 = FALSE, bold.colnames = TRUE, variable.colname = "Variable",
   print.html = FALSE, html.filename = "table1.html")
 }
@@ -23,7 +24,15 @@ for each element are \code{"n"}, \code{"events"} (for binary outcomes),
 their levels. Often useful to leave as \code{NULL} first, see how the table
 looks, and then re-run with labels where they need to be.}
 
-\item{compress.factors}{Logical value for whether to display factor variables should
+\item{compress.factors}{Logical value for whether to display factor variables
+in compressed format, with variable names omitted and levels not indented.
+Can also be "binary" to compress binary factor variables only.}
+
+\item{omit.refgroups}{Logical value for whether to omit reference groups
+for factor variables. Can also be "binary" to omit reference groups for
+binary factor variables only.
+
+
 as one row for each of the non-reference group levels, as opposed to one row
 for the variable name and one row for each of the levels including the
 reference group.}
@@ -32,7 +41,8 @@ reference group.}
 upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.}
 
 \item{format.latex}{Logical value for whether to format table so it is
-ready to be passed to \code{\link[xtable]{xtable}} for printing in LaTeX.}
+ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
+\code{\link[knitr]{kable}}.}
 
 \item{decimals}{Numeric value specifying number of decimal places for numbers
 other than p-values.}
@@ -97,29 +107,30 @@ your document. You can control the name of this file with
 }
 
 If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-\code{format.latex = TRUE}. You may have to set
-\code{sanitize.text.function = identity} when calling
-\code{\link[xtable]{print.xtable}}.
+\code{format.latex = TRUE}. Then, you can pass the returned object to
+\code{\link[xtable]{xtable}} or \code{\link[knitr]{kable}} for printing. For
+\code{\link[xtable]{xtable}}, you may have to set
+\code{sanitize.text.function = identity} when printing.
 }
 
 \examples{
-# Load in sample dataset d and drop rows with missing values
-data(d)
-d <- d[complete.cases(d), ]
+# Load in sample dataset and drop rows with missing values
+data(tabdata)
+tabdata <- tabdata[complete.cases(tabdata), ]
 
 # Linear regression: BMI vs. age, sex, race, and treatment
-glmfit1 <- glm(BMI ~ Age + Sex + Race + Group, data = d)
+glmfit1 <- glm(BMI ~ Age + Sex + Race + Group, data = tabdata)
 (lintable <- tabglm(fit = glmfit1))
 
 # Logistic regression: 1-year mortality vs. age, sex, race, and treatment.
 # Display factors in "compressed" format
-glmfit2 <- glm(death_1yr ~ Age + Sex + Race + Group, data = d,
+glmfit2 <- glm(death_1yr ~ Age + Sex + Race + Group, data = tabdata,
                family = binomial)
 (logtable1 <- tabglm(fit = glmfit2, compress.factors = TRUE))
 
 # Logistic regression with higher-order terms
 glmfit3 <- glm(death_1yr ~ poly(Age, 2, raw = TRUE) + Sex + BMI + Sex * BMI,
-               data = d, family = "binomial")
+               data = tabdata, family = "binomial")
 (logtable2 <- tabglm(fit = glmfit3))
 
 
