@@ -7,14 +7,14 @@
     "folds" : "",
     "hash" : "0",
     "id" : "C640BD3B",
-    "lastKnownWriteTime" : 1519055459,
-    "last_content_update" : 1519055459122,
-    "path" : "C:/Users/Dane/Google Drive/github/tab/vignettes/tab-vignette.Rmd",
-    "project_path" : "vignettes/tab-vignette.Rmd",
+    "lastKnownWriteTime" : 1519056955,
+    "last_content_update" : 1519056955301,
+    "path" : "C:/Users/Dane/Google Drive/github/tab/vignettes/tab.Rmd",
+    "project_path" : "vignettes/tab.Rmd",
     "properties" : {
-        "cursorPosition" : "19,3",
+        "cursorPosition" : "16,51",
         "last_setup_crc32" : "",
-        "scrollLine" : "0"
+        "scrollLine" : "10"
     },
     "relative_order" : 2,
     "source_on_save" : false,

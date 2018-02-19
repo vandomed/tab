@@ -1,5 +1,5 @@
 ---
-title: "Summary Tables with 'tab' Package"
+title: "Summary Tables with 'tab'"
 author: "Dane Van Domelen"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -7,6 +7,8 @@ bibliography: bibliography.bib
 nocite: | 
   @Kmisc, 
   @knitr1,
+  @knitr2,
+  @knitr3,
   @pander,
   @printr,
   @survival-package, 
@@ -14,7 +16,7 @@ nocite: |
   @xtable
 #csl: american-medical-association-alphabetical.csl
 vignette: >
-  %\VignetteIndexEntry{Summary Tables with 'tab' Package}
+  %\VignetteIndexEntry{Summary Tables with 'tab'}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

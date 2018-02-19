@@ -14,5 +14,6 @@ Imports: graphics, grDevices, Kmisc, MASS, stats, survey, xtable
 RoxygenNote: 6.0.1
 Suggests: knitr,
     rmarkdown,
-    pander
+    pander,
+    printr
 VignetteBuilder: knitr
