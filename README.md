@@ -411,6 +411,8 @@ Race, n (%)
 </td>
 </tr>
 </table>
+<br>
+
 ### pander's *pandoc.table* function
 
 And finally the *pandoc.table* function in **pander** (also requires `results = "asis"`):

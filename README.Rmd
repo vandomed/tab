@@ -131,8 +131,8 @@ print(xtable(table1,
              align = 'llrrr'), 
       type = "html", 
       include.rownames = FALSE)
-
 ```
+<br>
 
 ### pander's *pandoc.table* function
 
