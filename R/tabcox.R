@@ -386,7 +386,7 @@ tabcox <- function(fit, columns = c("beta.se", "hr.hrci", "p"), xlabels = NULL,
 
   # Reformat for xtable if necessary
   if (latex) {
-    tbl[, 1] <- gsub(pattern = "  ", replacement = "$\\hskip .4cm$",
+    tbl[, 1] <- gsub(pattern = "  ", replacement = "\\ \\ \\ \\ ",
                      x = tbl[, 1], fixed = TRUE)
   }
 

@@ -86,17 +86,17 @@ library("printr")
                     latex = TRUE))
 ```
 
-| Variable                       | Control    | Treatment  | P         |
-|:-------------------------------|:-----------|:-----------|:----------|
-| Age, M (SD)                    | 70.5 (5.3) | 69.5 (5.9) | 0.15      |
-| Sex, n (%)                     |            |            | &lt;0.001 |
-| $\\hskip .4cm$Female           | 93 (68.4)  | 62 (38.5)  |           |
-| $\\hskip .4cm$Male             | 43 (31.6)  | 99 (61.5)  |           |
-| Race, n (%)                    |            |            | 0.29      |
-| $\\hskip .4cm$White            | 46 (34.1)  | 65 (39.6)  |           |
-| $\\hskip .4cm$Black            | 36 (26.7)  | 52 (31.7)  |           |
-| $\\hskip .4cm$Mexican American | 21 (15.6)  | 19 (11.6)  |           |
-| $\\hskip .4cm$Other            | 32 (23.7)  | 28 (17.1)  |           |
+| Variable             | Control    | Treatment  | P         |
+|:---------------------|:-----------|:-----------|:----------|
+| Age, M (SD)          | 70.5 (5.3) | 69.5 (5.9) | 0.15      |
+| Sex, n (%)           |            |            | &lt;0.001 |
+|     Female           | 93 (68.4)  | 62 (38.5)  |           |
+|     Male             | 43 (31.6)  | 99 (61.5)  |           |
+| Race, n (%)          |            |            | 0.29      |
+|     White            | 46 (34.1)  | 65 (39.6)  |           |
+|     Black            | 36 (26.7)  | 52 (31.7)  |           |
+|     Mexican American | 21 (15.6)  | 19 (11.6)  |           |
+|     Other            | 32 (23.7)  | 28 (17.1)  |           |
 
 ``` r
 detach("package:printr", unload = TRUE)
@@ -115,17 +115,17 @@ kable(table1,
       align = 'lrrr')
 ```
 
-| Variable                       |     Control|   Treatment|          P|
-|:-------------------------------|-----------:|-----------:|----------:|
-| Age, M (SD)                    |  70.5 (5.3)|  69.5 (5.9)|       0.15|
-| Sex, n (%)                     |            |            |  &lt;0.001|
-| $\\hskip .4cm$Female           |   93 (68.4)|   62 (38.5)|           |
-| $\\hskip .4cm$Male             |   43 (31.6)|   99 (61.5)|           |
-| Race, n (%)                    |            |            |       0.29|
-| $\\hskip .4cm$White            |   46 (34.1)|   65 (39.6)|           |
-| $\\hskip .4cm$Black            |   36 (26.7)|   52 (31.7)|           |
-| $\\hskip .4cm$Mexican American |   21 (15.6)|   19 (11.6)|           |
-| $\\hskip .4cm$Other            |   32 (23.7)|   28 (17.1)|           |
+| Variable             |     Control|   Treatment|          P|
+|:---------------------|-----------:|-----------:|----------:|
+| Age, M (SD)          |  70.5 (5.3)|  69.5 (5.9)|       0.15|
+| Sex, n (%)           |            |            |  &lt;0.001|
+|     Female           |   93 (68.4)|   62 (38.5)|           |
+|     Male             |   43 (31.6)|   99 (61.5)|           |
+| Race, n (%)          |            |            |       0.29|
+|     White            |   46 (34.1)|   65 (39.6)|           |
+|     Black            |   36 (26.7)|   52 (31.7)|           |
+|     Mexican American |   21 (15.6)|   19 (11.6)|           |
+|     Other            |   32 (23.7)|   28 (17.1)|           |
 
 ### Printing in R (3): **xtable**'s 'xtable' function
 
@@ -186,7 +186,7 @@ Sex, n (%)
 </tr>
 <tr>
 <td>
-$\\hskip .4cm$Female
+    Female
 </td>
 <td align="right">
 93 (68.4)
@@ -199,7 +199,7 @@ $\\hskip .4cm$Female
 </tr>
 <tr>
 <td>
-$\\hskip .4cm$Male
+    Male
 </td>
 <td align="right">
 43 (31.6)
@@ -224,7 +224,7 @@ Race, n (%)
 </tr>
 <tr>
 <td>
-$\\hskip .4cm$White
+    White
 </td>
 <td align="right">
 46 (34.1)
@@ -237,7 +237,7 @@ $\\hskip .4cm$White
 </tr>
 <tr>
 <td>
-$\\hskip .4cm$Black
+    Black
 </td>
 <td align="right">
 36 (26.7)
@@ -250,7 +250,7 @@ $\\hskip .4cm$Black
 </tr>
 <tr>
 <td>
-$\\hskip .4cm$Mexican American
+    Mexican American
 </td>
 <td align="right">
 21 (15.6)
@@ -263,7 +263,7 @@ $\\hskip .4cm$Mexican American
 </tr>
 <tr>
 <td>
-$\\hskip .4cm$Other
+    Other
 </td>
 <td align="right">
 32 (23.7)
@@ -288,17 +288,17 @@ pandoc.table(table1,
              split.tables = Inf)
 ```
 
-| Variable                       |     Control|   Treatment|          P|
-|:-------------------------------|-----------:|-----------:|----------:|
-| Age, M (SD)                    |  70.5 (5.3)|  69.5 (5.9)|       0.15|
-| Sex, n (%)                     |            |            |  &lt;0.001|
-| $\\hskip .4cm$Female           |   93 (68.4)|   62 (38.5)|           |
-| $\\hskip .4cm$Male             |   43 (31.6)|   99 (61.5)|           |
-| Race, n (%)                    |            |            |       0.29|
-| $\\hskip .4cm$White            |   46 (34.1)|   65 (39.6)|           |
-| $\\hskip .4cm$Black            |   36 (26.7)|   52 (31.7)|           |
-| $\\hskip .4cm$Mexican American |   21 (15.6)|   19 (11.6)|           |
-| $\\hskip .4cm$Other            |   32 (23.7)|   28 (17.1)|           |
+| Variable             |     Control|   Treatment|          P|
+|:---------------------|-----------:|-----------:|----------:|
+| Age, M (SD)          |  70.5 (5.3)|  69.5 (5.9)|       0.15|
+| Sex, n (%)           |            |            |  &lt;0.001|
+|     Female           |   93 (68.4)|   62 (38.5)|           |
+|     Male             |   43 (31.6)|   99 (61.5)|           |
+| Race, n (%)          |            |            |       0.29|
+|     White            |   46 (34.1)|   65 (39.6)|           |
+|     Black            |   36 (26.7)|   52 (31.7)|           |
+|     Mexican American |   21 (15.6)|   19 (11.6)|           |
+|     Other            |   32 (23.7)|   28 (17.1)|           |
 
 More on 'tabmulti'
 ------------------
@@ -337,17 +337,17 @@ kable(table1,
       align = 'lrrrrr')
 ```
 
-| Variable                       |    N|     Overall|     Control|   Treatment|          P|
-|:-------------------------------|----:|-----------:|-----------:|-----------:|----------:|
-| Age, M (SD)                    |  296|  69.9 (5.7)|  70.5 (5.3)|  69.5 (5.9)|       0.15|
-| Sex, n (%)                     |  297|            |            |            |  &lt;0.001|
-| $\\hskip .4cm$Female           |     |  155 (52.2)|   93 (68.4)|   62 (38.5)|           |
-| $\\hskip .4cm$Male             |     |  142 (47.8)|   43 (31.6)|   99 (61.5)|           |
-| Race, n (%)                    |  299|            |            |            |       0.29|
-| $\\hskip .4cm$White            |     |  111 (37.1)|   46 (34.1)|   65 (39.6)|           |
-| $\\hskip .4cm$Black            |     |   88 (29.4)|   36 (26.7)|   52 (31.7)|           |
-| $\\hskip .4cm$Mexican American |     |   40 (13.4)|   21 (15.6)|   19 (11.6)|           |
-| $\\hskip .4cm$Other            |     |   60 (20.1)|   32 (23.7)|   28 (17.1)|           |
+| Variable             |    N|     Overall|     Control|   Treatment|          P|
+|:---------------------|----:|-----------:|-----------:|-----------:|----------:|
+| Age, M (SD)          |  296|  69.9 (5.7)|  70.5 (5.3)|  69.5 (5.9)|       0.15|
+| Sex, n (%)           |  297|            |            |            |  &lt;0.001|
+|     Female           |     |  155 (52.2)|   93 (68.4)|   62 (38.5)|           |
+|     Male             |     |  142 (47.8)|   43 (31.6)|   99 (61.5)|           |
+| Race, n (%)          |  299|            |            |            |       0.29|
+|     White            |     |  111 (37.1)|   46 (34.1)|   65 (39.6)|           |
+|     Black            |     |   88 (29.4)|   36 (26.7)|   52 (31.7)|           |
+|     Mexican American |     |   40 (13.4)|   21 (15.6)|   19 (11.6)|           |
+|     Other            |     |   60 (20.1)|   32 (23.7)|   28 (17.1)|           |
 
 For age, often the range is more informative than the SD. We can display M (min-max) rather than M (SD) but setting the `tabmeans` input `parenth = "sd"`. To pass this argument through `tabmulti`, we use the `means.list` argument:
 
@@ -363,17 +363,17 @@ kable(table1,
       align = 'lrrrrr')
 ```
 
-| Variable                       |    N|        Overall|        Control|      Treatment|          P|
-|:-------------------------------|----:|--------------:|--------------:|--------------:|----------:|
-| Age, M (min, max)              |  296|  69.9 (60, 80)|  70.5 (60, 79)|  69.5 (60, 80)|       0.15|
-| Sex, n (%)                     |  297|               |               |               |  &lt;0.001|
-| $\\hskip .4cm$Female           |     |     155 (52.2)|      93 (68.4)|      62 (38.5)|           |
-| $\\hskip .4cm$Male             |     |     142 (47.8)|      43 (31.6)|      99 (61.5)|           |
-| Race, n (%)                    |  299|               |               |               |       0.29|
-| $\\hskip .4cm$White            |     |     111 (37.1)|      46 (34.1)|      65 (39.6)|           |
-| $\\hskip .4cm$Black            |     |      88 (29.4)|      36 (26.7)|      52 (31.7)|           |
-| $\\hskip .4cm$Mexican American |     |      40 (13.4)|      21 (15.6)|      19 (11.6)|           |
-| $\\hskip .4cm$Other            |     |      60 (20.1)|      32 (23.7)|      28 (17.1)|           |
+| Variable             |    N|        Overall|        Control|      Treatment|          P|
+|:---------------------|----:|--------------:|--------------:|--------------:|----------:|
+| Age, M (min, max)    |  296|  69.9 (60, 80)|  70.5 (60, 79)|  69.5 (60, 80)|       0.15|
+| Sex, n (%)           |  297|               |               |               |  &lt;0.001|
+|     Female           |     |     155 (52.2)|      93 (68.4)|      62 (38.5)|           |
+|     Male             |     |     142 (47.8)|      43 (31.6)|      99 (61.5)|           |
+| Race, n (%)          |  299|               |               |               |       0.29|
+|     White            |     |     111 (37.1)|      46 (34.1)|      65 (39.6)|           |
+|     Black            |     |      88 (29.4)|      36 (26.7)|      52 (31.7)|           |
+|     Mexican American |     |      40 (13.4)|      21 (15.6)|      19 (11.6)|           |
+|     Other            |     |      60 (20.1)|      32 (23.7)|      28 (17.1)|           |
 
 Technically the range is the difference between the min and the max, not the min and the max, but if you prefer the label `"M (range)"`, you could specify the `text.label` input: `means.list = list(parenth = "minmax", text.label = "M (range)")`.
 
@@ -593,7 +593,6 @@ table2 <- tabglm(fit = fit,
                  columns = c("beta.se", "betaci"),
                  compress.factors = TRUE,
                  latex = TRUE)
-#> Waiting for profiling to be done...
 kable(table2, 
       caption = "Table 2d. Linear regression fit (created by `tabglm` and `kable`).", 
       align = 'lrr')
@@ -619,7 +618,6 @@ fit <- glm(death_1yr ~ poly(Age, 2, raw = TRUE) + Sex + Race + Group,
 table3 <- tabglm(fit = fit, 
                  compress.factors = "binary", 
                  latex = TRUE)
-#> Waiting for profiling to be done...
 kable(table3, 
       caption = "Table 3. Logistic regression fit (created by `tabglm` and `kable`).", 
       align = 'lrrr')

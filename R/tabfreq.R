@@ -326,7 +326,7 @@ tabfreq <- function(x = NULL, y, columns = c("xgroups", "p"),
   # Add yname row and indent ylevels if requested
   if (yname.row) {
     row1 <- tbl[1, , drop = FALSE]
-    tbl[, 1] <- paste(ifelse(latex, "$\\hskip .4cm$", "  "), tbl[, 1], sep = "")
+    tbl[, 1] <- paste(ifelse(latex, "\\ \\ \\ \\ ", "  "), tbl[, 1], sep = "")
     tbl <- rbind(c(yname, rep("", ncol(tbl) - 1)), tbl)
     summary.cols <- which(colnames(tbl) %in% c("N", "Chi-sq", "P"))
     tbl[1, summary.cols] <- row1[1, summary.cols]
