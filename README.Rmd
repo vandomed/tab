@@ -70,7 +70,6 @@ Here is how you can use *tabmulti* to generate a Table 1 comparing characteristi
 
 *tabmulti* created a character matrix, but it doesn't look like a table yet. 
 
-
 ## Exporting to Word 
 
 If you want to get the table into Microsoft Word, here are two approaches:
@@ -80,7 +79,6 @@ If you want to get the table into Microsoft Word, here are two approaches:
 2. Add `print.html = TRUE` to the above *tabmulti* function call. That will result in a .html file being written to your working directory. It should appear as a neat table when you open it (e.g. in Google Chrome), and you can copy/paste it into Word. 
 
 If you want it to display it in a **knitr** document, you can add `latex = TRUE` and then use various approaches...
-
 
 ## Printing in R
 
@@ -108,7 +106,7 @@ kable(table1, align = "lrrr", caption = "Table 1.", format = "html")
 detach("package:printr", unload = TRUE)
 ```
 
-### knitr's *kable* function
+### knitr's kable function
 
 ```{r table1d}
 library("knitr")
@@ -117,6 +115,8 @@ kable(table1,
       align = 'lrrr', 
       format = "html")
 ```
+
+
 
 ### xtable's *xtable* function
 

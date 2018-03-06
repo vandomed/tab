@@ -110,7 +110,7 @@ detach("package:printr", unload = TRUE)
 
 If you want to add table options, e.g. a caption or non-default column alignment, you can use `kable` from the **knitr** package (e.g. try `kable(table1, align = "lrrr", caption = "Table 1.", format = "html")`.
 
-### knitr's *kable* function
+### knitr's kable function
 
 ``` r
 library("knitr")
