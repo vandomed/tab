@@ -117,7 +117,6 @@ kable(table1,
       align = 'lrrr', 
       format = "html")
 ```
-<br>
 
 **xtable's xtable function**
 
@@ -132,7 +131,7 @@ print(xtable(table1,
       include.rownames = FALSE)
 ```
 
-**pander's *pandoc.table* function**
+**pander's pandoc.table function**
 
 And finally the *pandoc.table* function in **pander** (also requires `results = "asis"`):
 

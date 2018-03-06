@@ -261,8 +261,6 @@ Race, n (%)
 </tr>
 </tbody>
 </table>
-<br>
-
 **xtable's xtable function**
 
 Another option is the **xtable** package/function (requires adding `results = "asis"` as a chunk option!):
@@ -411,7 +409,7 @@ Race, n (%)
 </td>
 </tr>
 </table>
-**pander's *pandoc.table* function**
+**pander's pandoc.table function**
 
 And finally the *pandoc.table* function in **pander** (also requires `results = "asis"`):
 
