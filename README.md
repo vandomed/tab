@@ -112,6 +112,8 @@ If you want to add table options, e.g. a caption or non-default column alignment
 
 ### knitr's *kable* function
 
+Another approach:
+
 ``` r
 library("knitr")
 kable(table1,
