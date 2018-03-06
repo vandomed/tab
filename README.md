@@ -64,7 +64,8 @@ Here is how you can use `tabmulti` to generate a Table 1 comparing characteristi
 
 `tabmulti` created a character matrix, but it doesn't look like a table yet.
 
-### Exporting to Word
+Exporting to Word
+-----------------
 
 If you want to get the table into Microsoft Word, here are two approaches:
 
@@ -74,7 +75,10 @@ If you want to get the table into Microsoft Word, here are two approaches:
 
 If you want it to display it in a **knitr** document, you can add `latex = TRUE` and then use various approaches...
 
-### Printing in R (1): 'printr' with 'kable' for options
+Printing in R
+-------------
+
+### 'printr' with 'kable' for options
 
 I think the easiest approach is to simply load the **printr** package. Loading it results in R output printing more neatly, which includes character matrices showing up as neat tables.
 
@@ -104,45 +108,173 @@ detach("package:printr", unload = TRUE)
 
 (I detached **printr** so R reverts to its usual output display format for the rest of the vignette.)
 
-If you want to add table options, e.g. a caption or non-default column alignment, you can use `kable` from the **knitr** package (e.g. try `kable(table1, align = "lrrr", caption = "Table 1.")`.
+If you want to add table options, e.g. a caption or non-default column alignment, you can use `kable` from the **knitr** package (e.g. try `kable(table1, align = "lrrr", caption = "Table 1.", format = "html")`.
 
-### Printing in R (2): **knitr**'s `kable` function
+### **knitr**'s `kable` function
 
 ``` r
 library("knitr")
 kable(table1,
-      caption = "Table 1a. Characteristics (created by `tabmulti`/`kable`).", 
-      align = 'lrrr')
+      caption = "Table 1a. Characteristics (created by tabmulti/kable).", 
+      align = 'lrrr', 
+      format = "html")
 ```
 
-| Variable             |     Control|   Treatment|          P|
-|:---------------------|-----------:|-----------:|----------:|
-| Age, M (SD)          |  70.5 (5.3)|  69.5 (5.9)|       0.15|
-| Sex, n (%)           |            |            |  &lt;0.001|
-|     Female           |   93 (68.4)|   62 (38.5)|           |
-|     Male             |   43 (31.6)|   99 (61.5)|           |
-| Race, n (%)          |            |            |       0.29|
-|     White            |   46 (34.1)|   65 (39.6)|           |
-|     Black            |   36 (26.7)|   52 (31.7)|           |
-|     Mexican American |   21 (15.6)|   19 (11.6)|           |
-|     Other            |   32 (23.7)|   28 (17.1)|           |
-
-### Printing in R (3): **xtable**'s 'xtable' function
+<table>
+<caption>
+Table 1a. Characteristics (created by tabmulti/kable).
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Variable
+</th>
+<th style="text-align:right;">
+Control
+</th>
+<th style="text-align:right;">
+Treatment
+</th>
+<th style="text-align:right;">
+P
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Age, M (SD)
+</td>
+<td style="text-align:right;">
+70.5 (5.3)
+</td>
+<td style="text-align:right;">
+69.5 (5.9)
+</td>
+<td style="text-align:right;">
+0.15
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sex, n (%)
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+&lt;0.001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Female
+</td>
+<td style="text-align:right;">
+93 (68.4)
+</td>
+<td style="text-align:right;">
+62 (38.5)
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Male
+</td>
+<td style="text-align:right;">
+43 (31.6)
+</td>
+<td style="text-align:right;">
+99 (61.5)
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Race, n (%)
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+0.29
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    White
+</td>
+<td style="text-align:right;">
+46 (34.1)
+</td>
+<td style="text-align:right;">
+65 (39.6)
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Black
+</td>
+<td style="text-align:right;">
+36 (26.7)
+</td>
+<td style="text-align:right;">
+52 (31.7)
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Mexican American
+</td>
+<td style="text-align:right;">
+21 (15.6)
+</td>
+<td style="text-align:right;">
+19 (11.6)
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Other
+</td>
+<td style="text-align:right;">
+32 (23.7)
+</td>
+<td style="text-align:right;">
+28 (17.1)
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+</tbody>
+</table>
+### **xtable**'s 'xtable' function
 
 Another option is the **xtable** package/function (requires adding `results = "asis"` as a chunk option!):
 
 ``` r
 library("xtable")
 print(xtable(table1, 
-             caption = "Table 1b. Characteristics (created by `tabmulti`/`xtable`).", 
-             align = 'llrrr',), 
+             caption = "Table 1b. Characteristics (created by tabmulti/xtable).", 
+             align = 'llrrr'), 
       type = "html", 
       include.rownames = FALSE)
 ```
 
 <table border="1">
 <caption align="top">
-Table 1b. Characteristics (created by `tabmulti`/`xtable`).
+Table 1b. Characteristics (created by tabmulti/xtable).
 </caption>
 <tr>
 <th>
@@ -275,14 +407,14 @@ Race, n (%)
 </td>
 </tr>
 </table>
-### Printing in R (4): **pander**'s 'pandoc.table' function
+### **pander**'s 'pandoc.table' function
 
 And finally the `pandoc.table` function in **pander** (also requires `results = "asis"`):
 
 ``` r
 library("pander")
 pandoc.table(table1, 
-             caption = "Table 1c. Characteristics (created by `tabmulti`/`pandoc.table`).", 
+             caption = "Characteristics (created by tabmulti/pandoc.table).", 
              style = "rmarkdown", 
              justify = 'lrrr', 
              split.tables = Inf)
@@ -334,21 +466,201 @@ table1 <- tabmulti(data = tabdata,
                    latex = TRUE)
 kable(table1, 
       caption = "Table 1d. Characteristics of sample.", 
-      align = 'lrrrrr')
+      align = 'lrrrrr', 
+      format = "html")
 ```
 
-| Variable             |    N|     Overall|     Control|   Treatment|          P|
-|:---------------------|----:|-----------:|-----------:|-----------:|----------:|
-| Age, M (SD)          |  296|  69.9 (5.7)|  70.5 (5.3)|  69.5 (5.9)|       0.15|
-| Sex, n (%)           |  297|            |            |            |  &lt;0.001|
-|     Female           |     |  155 (52.2)|   93 (68.4)|   62 (38.5)|           |
-|     Male             |     |  142 (47.8)|   43 (31.6)|   99 (61.5)|           |
-| Race, n (%)          |  299|            |            |            |       0.29|
-|     White            |     |  111 (37.1)|   46 (34.1)|   65 (39.6)|           |
-|     Black            |     |   88 (29.4)|   36 (26.7)|   52 (31.7)|           |
-|     Mexican American |     |   40 (13.4)|   21 (15.6)|   19 (11.6)|           |
-|     Other            |     |   60 (20.1)|   32 (23.7)|   28 (17.1)|           |
-
+<table>
+<caption>
+Table 1d. Characteristics of sample.
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Variable
+</th>
+<th style="text-align:right;">
+N
+</th>
+<th style="text-align:right;">
+Overall
+</th>
+<th style="text-align:right;">
+Control
+</th>
+<th style="text-align:right;">
+Treatment
+</th>
+<th style="text-align:right;">
+P
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Age, M (SD)
+</td>
+<td style="text-align:right;">
+296
+</td>
+<td style="text-align:right;">
+69.9 (5.7)
+</td>
+<td style="text-align:right;">
+70.5 (5.3)
+</td>
+<td style="text-align:right;">
+69.5 (5.9)
+</td>
+<td style="text-align:right;">
+0.15
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sex, n (%)
+</td>
+<td style="text-align:right;">
+297
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+&lt;0.001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Female
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+155 (52.2)
+</td>
+<td style="text-align:right;">
+93 (68.4)
+</td>
+<td style="text-align:right;">
+62 (38.5)
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Male
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+142 (47.8)
+</td>
+<td style="text-align:right;">
+43 (31.6)
+</td>
+<td style="text-align:right;">
+99 (61.5)
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Race, n (%)
+</td>
+<td style="text-align:right;">
+299
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+0.29
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    White
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+111 (37.1)
+</td>
+<td style="text-align:right;">
+46 (34.1)
+</td>
+<td style="text-align:right;">
+65 (39.6)
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Black
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+88 (29.4)
+</td>
+<td style="text-align:right;">
+36 (26.7)
+</td>
+<td style="text-align:right;">
+52 (31.7)
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Mexican American
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+40 (13.4)
+</td>
+<td style="text-align:right;">
+21 (15.6)
+</td>
+<td style="text-align:right;">
+19 (11.6)
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Other
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+60 (20.1)
+</td>
+<td style="text-align:right;">
+32 (23.7)
+</td>
+<td style="text-align:right;">
+28 (17.1)
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+</tbody>
+</table>
 For age, often the range is more informative than the SD. We can display M (min-max) rather than M (SD) but setting the `tabmeans` input `parenth = "sd"`. To pass this argument through `tabmulti`, we use the `means.list` argument:
 
 ``` r
@@ -360,21 +672,201 @@ table1 <- tabmulti(data = tabdata,
                    latex = TRUE)
 kable(table1, 
       caption = "Table 1e. Characteristics of sample.", 
-      align = 'lrrrrr')
+      align = 'lrrrrr', 
+      format = "html")
 ```
 
-| Variable             |    N|        Overall|        Control|      Treatment|          P|
-|:---------------------|----:|--------------:|--------------:|--------------:|----------:|
-| Age, M (min, max)    |  296|  69.9 (60, 80)|  70.5 (60, 79)|  69.5 (60, 80)|       0.15|
-| Sex, n (%)           |  297|               |               |               |  &lt;0.001|
-|     Female           |     |     155 (52.2)|      93 (68.4)|      62 (38.5)|           |
-|     Male             |     |     142 (47.8)|      43 (31.6)|      99 (61.5)|           |
-| Race, n (%)          |  299|               |               |               |       0.29|
-|     White            |     |     111 (37.1)|      46 (34.1)|      65 (39.6)|           |
-|     Black            |     |      88 (29.4)|      36 (26.7)|      52 (31.7)|           |
-|     Mexican American |     |      40 (13.4)|      21 (15.6)|      19 (11.6)|           |
-|     Other            |     |      60 (20.1)|      32 (23.7)|      28 (17.1)|           |
-
+<table>
+<caption>
+Table 1e. Characteristics of sample.
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Variable
+</th>
+<th style="text-align:right;">
+N
+</th>
+<th style="text-align:right;">
+Overall
+</th>
+<th style="text-align:right;">
+Control
+</th>
+<th style="text-align:right;">
+Treatment
+</th>
+<th style="text-align:right;">
+P
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Age, M (min, max)
+</td>
+<td style="text-align:right;">
+296
+</td>
+<td style="text-align:right;">
+69.9 (60, 80)
+</td>
+<td style="text-align:right;">
+70.5 (60, 79)
+</td>
+<td style="text-align:right;">
+69.5 (60, 80)
+</td>
+<td style="text-align:right;">
+0.15
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sex, n (%)
+</td>
+<td style="text-align:right;">
+297
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+&lt;0.001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Female
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+155 (52.2)
+</td>
+<td style="text-align:right;">
+93 (68.4)
+</td>
+<td style="text-align:right;">
+62 (38.5)
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Male
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+142 (47.8)
+</td>
+<td style="text-align:right;">
+43 (31.6)
+</td>
+<td style="text-align:right;">
+99 (61.5)
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Race, n (%)
+</td>
+<td style="text-align:right;">
+299
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+0.29
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    White
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+111 (37.1)
+</td>
+<td style="text-align:right;">
+46 (34.1)
+</td>
+<td style="text-align:right;">
+65 (39.6)
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Black
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+88 (29.4)
+</td>
+<td style="text-align:right;">
+36 (26.7)
+</td>
+<td style="text-align:right;">
+52 (31.7)
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Mexican American
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+40 (13.4)
+</td>
+<td style="text-align:right;">
+21 (15.6)
+</td>
+<td style="text-align:right;">
+19 (11.6)
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Other
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+60 (20.1)
+</td>
+<td style="text-align:right;">
+32 (23.7)
+</td>
+<td style="text-align:right;">
+28 (17.1)
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+</tbody>
+</table>
 Technically the range is the difference between the min and the max, not the min and the max, but if you prefer the label `"M (range)"`, you could specify the `text.label` input: `means.list = list(parenth = "minmax", text.label = "M (range)")`.
 
 These are some of the options you have access to with `tabmulti` and the underlying functions it calls. A complete list of options are described in the help files for `tabmulti`, `tabmeans`, `tabmedians`, and `tabfreq`. The help files also have some different examples.
@@ -389,13 +881,13 @@ Suppose we want to summarize a linear regression of BMI on age, sex, race, and t
 ``` r
 fit <- glm(BMI ~ Age + Sex + Race + Group, data = tabdata)
 print(xtable(fit, 
-             caption = "Table 2a. Linear regression fit (created by `xtable`)."), 
+             caption = "Table 2a. Linear regression fit (created by xtable)."), 
       type = "html")
 ```
 
 <table border="1">
 <caption align="top">
-Table 2a. Linear regression fit (created by `xtable`).
+Table 2a. Linear regression fit (created by xtable).
 </caption>
 <tr>
 <th>
@@ -545,26 +1037,168 @@ Let's try `tabglm`:
 table2 <- tabglm(fit = fit, 
                  latex = TRUE)
 kable(table2, 
-      caption = "Table 2b. Linear regression fit (created by `tabglm` and `kable`).", 
-      align = 'lrr')
+      caption = "Table 2b. Linear regression fit (created by tabglm/kable).", 
+      align = 'lrr', 
+      format = "html")
 ```
 
-| Variable                       |     Beta (SE)|          P|
-|:-------------------------------|-------------:|----------:|
-| Intercept                      |  22.10 (1.63)|  &lt;0.001|
-| Age                            |   0.01 (0.02)|       0.66|
-| Sex                            |              |           |
-| $\\hskip .4cm$Female (ref)     |            --|         --|
-| $\\hskip .4cm$Male             |  -0.18 (0.27)|       0.51|
-| Race                           |              |           |
-| $\\hskip .4cm$White (ref)      |            --|         --|
-| $\\hskip .4cm$Black            |   0.34 (0.32)|       0.29|
-| $\\hskip .4cm$Mexican American |   0.63 (0.42)|       0.14|
-| $\\hskip .4cm$Other            |   0.02 (0.36)|       0.95|
-| Group                          |              |           |
-| $\\hskip .4cm$Control (ref)    |            --|         --|
-| $\\hskip .4cm$Treatment        |   3.10 (0.28)|  &lt;0.001|
-
+<table>
+<caption>
+Table 2b. Linear regression fit (created by tabglm/kable).
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Variable
+</th>
+<th style="text-align:right;">
+Beta (SE)
+</th>
+<th style="text-align:right;">
+P
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Intercept
+</td>
+<td style="text-align:right;">
+22.10 (1.63)
+</td>
+<td style="text-align:right;">
+&lt;0.001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Age
+</td>
+<td style="text-align:right;">
+0.01 (0.02)
+</td>
+<td style="text-align:right;">
+0.66
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sex
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Female (ref)
+</td>
+<td style="text-align:right;">
+--
+</td>
+<td style="text-align:right;">
+--
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Male
+</td>
+<td style="text-align:right;">
+-0.18 (0.27)
+</td>
+<td style="text-align:right;">
+0.51
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Race
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    White (ref)
+</td>
+<td style="text-align:right;">
+--
+</td>
+<td style="text-align:right;">
+--
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Black
+</td>
+<td style="text-align:right;">
+0.34 (0.32)
+</td>
+<td style="text-align:right;">
+0.29
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Mexican American
+</td>
+<td style="text-align:right;">
+0.63 (0.42)
+</td>
+<td style="text-align:right;">
+0.14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Other
+</td>
+<td style="text-align:right;">
+0.02 (0.36)
+</td>
+<td style="text-align:right;">
+0.95
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Group
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Control (ref)
+</td>
+<td style="text-align:right;">
+--
+</td>
+<td style="text-align:right;">
+--
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Treatment
+</td>
+<td style="text-align:right;">
+3.10 (0.28)
+</td>
+<td style="text-align:right;">
+&lt;0.001
+</td>
+</tr>
+</tbody>
+</table>
 If you don't like all the white space, you can set `compress.factors = TRUE` to omit rows with factor variable names (and left-align factor levels). By default, the input `omit.refgroups` has the same value as `compress.factors`, and `omit.refgroups = TRUE` omits reference group rows.
 
 ``` r
@@ -572,20 +1206,108 @@ table2 <- tabglm(fit = fit,
                  compress.factors = TRUE,
                  latex = TRUE)
 kable(table2, 
-      caption = "Table 2c. Linear regression fit (created by `tabglm` and `kable`).", 
-      align = 'lrr')
+      caption = "Table 2c. Linear regression fit (created by tabglm/kable).", 
+      align = 'lrr', 
+      format = "html")
 ```
 
-| Variable         |     Beta (SE)|          P|
-|:-----------------|-------------:|----------:|
-| Intercept        |  22.10 (1.63)|  &lt;0.001|
-| Age              |   0.01 (0.02)|       0.66|
-| Male             |  -0.18 (0.27)|       0.51|
-| Black            |   0.34 (0.32)|       0.29|
-| Mexican American |   0.63 (0.42)|       0.14|
-| Other            |   0.02 (0.36)|       0.95|
-| Treatment        |   3.10 (0.28)|  &lt;0.001|
-
+<table>
+<caption>
+Table 2c. Linear regression fit (created by tabglm/kable).
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Variable
+</th>
+<th style="text-align:right;">
+Beta (SE)
+</th>
+<th style="text-align:right;">
+P
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Intercept
+</td>
+<td style="text-align:right;">
+22.10 (1.63)
+</td>
+<td style="text-align:right;">
+&lt;0.001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Age
+</td>
+<td style="text-align:right;">
+0.01 (0.02)
+</td>
+<td style="text-align:right;">
+0.66
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:right;">
+-0.18 (0.27)
+</td>
+<td style="text-align:right;">
+0.51
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Black
+</td>
+<td style="text-align:right;">
+0.34 (0.32)
+</td>
+<td style="text-align:right;">
+0.29
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mexican American
+</td>
+<td style="text-align:right;">
+0.63 (0.42)
+</td>
+<td style="text-align:right;">
+0.14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Other
+</td>
+<td style="text-align:right;">
+0.02 (0.36)
+</td>
+<td style="text-align:right;">
+0.95
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Treatment
+</td>
+<td style="text-align:right;">
+3.10 (0.28)
+</td>
+<td style="text-align:right;">
+&lt;0.001
+</td>
+</tr>
+</tbody>
+</table>
 Maybe you're submitting to one of those enlightened journals that thinks comparing confidence intervals to 0 is totally different than comparing p-values to 0.05. `tabglm` can do confidence intervals.
 
 ``` r
@@ -594,20 +1316,108 @@ table2 <- tabglm(fit = fit,
                  compress.factors = TRUE,
                  latex = TRUE)
 kable(table2, 
-      caption = "Table 2d. Linear regression fit (created by `tabglm` and `kable`).", 
-      align = 'lrr')
+      caption = "Table 2d. Linear regression fit (created by tabglm/kable).", 
+      align = 'lrr', 
+      format = "html")
 ```
 
-| Variable         |     Beta (SE)|  95% CI for Beta|
-|:-----------------|-------------:|----------------:|
-| Intercept        |  22.10 (1.63)|     18.90, 25.30|
-| Age              |   0.01 (0.02)|      -0.04, 0.06|
-| Male             |  -0.18 (0.27)|      -0.71, 0.35|
-| Black            |   0.34 (0.32)|      -0.29, 0.96|
-| Mexican American |   0.63 (0.42)|      -0.20, 1.45|
-| Other            |   0.02 (0.36)|      -0.69, 0.73|
-| Treatment        |   3.10 (0.28)|       2.56, 3.64|
-
+<table>
+<caption>
+Table 2d. Linear regression fit (created by tabglm/kable).
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Variable
+</th>
+<th style="text-align:right;">
+Beta (SE)
+</th>
+<th style="text-align:right;">
+95% CI for Beta
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Intercept
+</td>
+<td style="text-align:right;">
+22.10 (1.63)
+</td>
+<td style="text-align:right;">
+18.90, 25.30
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Age
+</td>
+<td style="text-align:right;">
+0.01 (0.02)
+</td>
+<td style="text-align:right;">
+-0.04, 0.06
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:right;">
+-0.18 (0.27)
+</td>
+<td style="text-align:right;">
+-0.71, 0.35
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Black
+</td>
+<td style="text-align:right;">
+0.34 (0.32)
+</td>
+<td style="text-align:right;">
+-0.29, 0.96
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mexican American
+</td>
+<td style="text-align:right;">
+0.63 (0.42)
+</td>
+<td style="text-align:right;">
+-0.20, 1.45
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Other
+</td>
+<td style="text-align:right;">
+0.02 (0.36)
+</td>
+<td style="text-align:right;">
+-0.69, 0.73
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Treatment
+</td>
+<td style="text-align:right;">
+3.10 (0.28)
+</td>
+<td style="text-align:right;">
+2.56, 3.64
+</td>
+</tr>
+</tbody>
+</table>
 ### Logistic regression
 
 Summarizing a fitted logistic regression model with `tabglm` is very similar. For 1-year mortality vs. age, age squared, sex, race, and treatment group:
@@ -619,23 +1429,171 @@ table3 <- tabglm(fit = fit,
                  compress.factors = "binary", 
                  latex = TRUE)
 kable(table3, 
-      caption = "Table 3. Logistic regression fit (created by `tabglm` and `kable`).", 
-      align = 'lrrr')
+      caption = "Table 3. Logistic regression fit (created by tabglm/kable).", 
+      align = 'lrrr', 
+      format = "html")
 ```
 
-| Variable                       |       Beta (SE)|        OR (95% CI)|     P|
-|:-------------------------------|---------------:|------------------:|-----:|
-| Intercept                      |  -20.28 (25.57)|                 --|  0.43|
-| Age                            |     0.54 (0.73)|  1.72 (0.42, 7.43)|  0.46|
-| Age squared                    |    -0.00 (0.01)|  1.00 (0.99, 1.01)|  0.48|
-| Male                           |     0.14 (0.29)|  1.15 (0.64, 2.05)|  0.64|
-| Race                           |                |                 --|      |
-| $\\hskip .4cm$White (ref)      |              --|                 --|    --|
-| $\\hskip .4cm$Black            |    -0.92 (0.38)|  0.40 (0.19, 0.83)|  0.02|
-| $\\hskip .4cm$Mexican American |     0.16 (0.42)|  1.17 (0.50, 2.68)|  0.70|
-| $\\hskip .4cm$Other            |     0.04 (0.37)|  1.04 (0.50, 2.16)|  0.91|
-| Treatment                      |     0.04 (0.30)|  1.04 (0.58, 1.89)|  0.89|
-
+<table>
+<caption>
+Table 3. Logistic regression fit (created by tabglm/kable).
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Variable
+</th>
+<th style="text-align:right;">
+Beta (SE)
+</th>
+<th style="text-align:right;">
+OR (95% CI)
+</th>
+<th style="text-align:right;">
+P
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Intercept
+</td>
+<td style="text-align:right;">
+-20.28 (25.57)
+</td>
+<td style="text-align:right;">
+--
+</td>
+<td style="text-align:right;">
+0.43
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Age
+</td>
+<td style="text-align:right;">
+0.54 (0.73)
+</td>
+<td style="text-align:right;">
+1.72 (0.42, 7.43)
+</td>
+<td style="text-align:right;">
+0.46
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Age squared
+</td>
+<td style="text-align:right;">
+-0.00 (0.01)
+</td>
+<td style="text-align:right;">
+1.00 (0.99, 1.01)
+</td>
+<td style="text-align:right;">
+0.48
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:right;">
+0.14 (0.29)
+</td>
+<td style="text-align:right;">
+1.15 (0.64, 2.05)
+</td>
+<td style="text-align:right;">
+0.64
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Race
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    White (ref)
+</td>
+<td style="text-align:right;">
+--
+</td>
+<td style="text-align:right;">
+--
+</td>
+<td style="text-align:right;">
+--
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Black
+</td>
+<td style="text-align:right;">
+-0.92 (0.38)
+</td>
+<td style="text-align:right;">
+0.40 (0.19, 0.83)
+</td>
+<td style="text-align:right;">
+0.02
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Mexican American
+</td>
+<td style="text-align:right;">
+0.16 (0.42)
+</td>
+<td style="text-align:right;">
+1.17 (0.50, 2.68)
+</td>
+<td style="text-align:right;">
+0.70
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Other
+</td>
+<td style="text-align:right;">
+0.04 (0.37)
+</td>
+<td style="text-align:right;">
+1.04 (0.50, 2.16)
+</td>
+<td style="text-align:right;">
+0.91
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Treatment
+</td>
+<td style="text-align:right;">
+0.04 (0.30)
+</td>
+<td style="text-align:right;">
+1.04 (0.58, 1.89)
+</td>
+<td style="text-align:right;">
+0.89
+</td>
+</tr>
+</tbody>
+</table>
 Notice that the second-order term was labeled appropriately, and `tabglm` recognized `fit` as a logistic regression and thus by default added a OR (95% CI) column. Additionally, the binary Sex and Group variables was displayed as single rows, while the other factor variable, Race, was shown in a more expanded format. This was the result of setting `compress.factors = "binary"` (`compress.factors` can be `TRUE`, `FALSE`, or `"binary"`).
 
 ### GEEs
@@ -665,23 +1623,203 @@ table4 <- tabgee(fit = fit,
                  data = tabdata2, 
                  latex = TRUE)
 kable(table4, 
-      caption = "Table 4. Cox PH fit (created by `tabgee` and `kable`).", 
-      align = 'lrrr')
+      caption = "Table 4. GEE fit (created by tabgee/kable).", 
+      align = 'lrrr', 
+      format = "html")
 ```
 
-| Variable                       |    Beta|    SE|      Z| P         |
-|:-------------------------------|-------:|-----:|------:|:----------|
-| Intercept                      |  111.71|  5.45|  20.50| &lt;0.001 |
-| Age                            |    0.04|  0.07|   0.65| 0.51      |
-| Male                           |    4.16|  0.75|   5.54| &lt;0.001 |
-| Race                           |        |     -|      -|           |
-| $\\hskip .4cm$White (ref)      |       -|     -|      -| -         |
-| $\\hskip .4cm$Black            |    0.19|  0.87|   0.22| 0.83      |
-| $\\hskip .4cm$Mexican American |    1.13|  1.27|   0.89| 0.37      |
-| $\\hskip .4cm$Other            |    0.03|  1.09|   0.03| 0.98      |
-| BMI                            |    0.64|  0.16|   3.87| &lt;0.001 |
-| Treatment                      |    3.65|  0.98|   3.71| &lt;0.001 |
-
+<table>
+<caption>
+Table 4. GEE fit (created by tabgee/kable).
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Variable
+</th>
+<th style="text-align:right;">
+Beta
+</th>
+<th style="text-align:right;">
+SE
+</th>
+<th style="text-align:right;">
+Z
+</th>
+<th style="text-align:left;">
+P
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Intercept
+</td>
+<td style="text-align:right;">
+111.71
+</td>
+<td style="text-align:right;">
+5.45
+</td>
+<td style="text-align:right;">
+20.50
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Age
+</td>
+<td style="text-align:right;">
+0.04
+</td>
+<td style="text-align:right;">
+0.07
+</td>
+<td style="text-align:right;">
+0.65
+</td>
+<td style="text-align:left;">
+0.51
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:right;">
+4.16
+</td>
+<td style="text-align:right;">
+0.75
+</td>
+<td style="text-align:right;">
+5.54
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Race
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    White (ref)
+</td>
+<td style="text-align:right;">
+--
+</td>
+<td style="text-align:right;">
+--
+</td>
+<td style="text-align:right;">
+--
+</td>
+<td style="text-align:left;">
+--
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Black
+</td>
+<td style="text-align:right;">
+0.19
+</td>
+<td style="text-align:right;">
+0.87
+</td>
+<td style="text-align:right;">
+0.22
+</td>
+<td style="text-align:left;">
+0.83
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Mexican American
+</td>
+<td style="text-align:right;">
+1.13
+</td>
+<td style="text-align:right;">
+1.27
+</td>
+<td style="text-align:right;">
+0.89
+</td>
+<td style="text-align:left;">
+0.37
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Other
+</td>
+<td style="text-align:right;">
+0.03
+</td>
+<td style="text-align:right;">
+1.09
+</td>
+<td style="text-align:right;">
+0.03
+</td>
+<td style="text-align:left;">
+0.98
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BMI
+</td>
+<td style="text-align:right;">
+0.64
+</td>
+<td style="text-align:right;">
+0.16
+</td>
+<td style="text-align:right;">
+3.87
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Treatment
+</td>
+<td style="text-align:right;">
+3.65
+</td>
+<td style="text-align:right;">
+0.98
+</td>
+<td style="text-align:right;">
+3.71
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+</tr>
+</tbody>
+</table>
 ### Cox PH
 
 And finally, to summarize a fitted Cox PH model for survival vs. covariates, with default settings:
@@ -693,24 +1831,194 @@ fit <- coxph(Surv(time = tabdata$time, event = tabdata$delta) ~
              data = tabdata)
 table5 <- tabcox(fit = fit, 
                  latex = TRUE)
-kable(table5, caption = "Table 5. Cox PH fit (created by `tabcox` and `kable`).", align = 'lrrr')
+kable(table5, 
+      caption = "Table 5. Cox PH fit (created by tabcox/kable).", 
+      align = 'lrrr', 
+      format = "html")
 ```
 
-| Variable                       |     Beta (SE)|        HR (95% CI)|          P|
-|:-------------------------------|-------------:|------------------:|----------:|
-| Age                            |   0.05 (0.01)|  1.05 (1.02, 1.08)|      0.001|
-| Sex                            |              |                  -|           |
-| $\\hskip .4cm$Female (ref)     |             -|                  -|          -|
-| $\\hskip .4cm$Male             |   0.11 (0.18)|  1.12 (0.79, 1.58)|       0.54|
-| Race                           |              |                  -|           |
-| $\\hskip .4cm$White (ref)      |             -|                  -|          -|
-| $\\hskip .4cm$Black            |  -0.98 (0.22)|  0.38 (0.24, 0.58)|  &lt;0.001|
-| $\\hskip .4cm$Mexican American |   0.07 (0.26)|  1.07 (0.64, 1.78)|       0.80|
-| $\\hskip .4cm$Other            |  -0.08 (0.22)|  0.92 (0.59, 1.43)|       0.71|
-| Group                          |              |                  -|           |
-| $\\hskip .4cm$Control (ref)    |             -|                  -|          -|
-| $\\hskip .4cm$Treatment        |   0.13 (0.18)|  1.14 (0.80, 1.61)|       0.48|
-
+<table>
+<caption>
+Table 5. Cox PH fit (created by tabcox/kable).
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Variable
+</th>
+<th style="text-align:right;">
+Beta (SE)
+</th>
+<th style="text-align:right;">
+HR (95% CI)
+</th>
+<th style="text-align:right;">
+P
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Age
+</td>
+<td style="text-align:right;">
+0.05 (0.01)
+</td>
+<td style="text-align:right;">
+1.05 (1.02, 1.08)
+</td>
+<td style="text-align:right;">
+0.001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sex
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Female (ref)
+</td>
+<td style="text-align:right;">
+--
+</td>
+<td style="text-align:right;">
+--
+</td>
+<td style="text-align:right;">
+--
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Male
+</td>
+<td style="text-align:right;">
+0.11 (0.18)
+</td>
+<td style="text-align:right;">
+1.12 (0.79, 1.58)
+</td>
+<td style="text-align:right;">
+0.54
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Race
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    White (ref)
+</td>
+<td style="text-align:right;">
+--
+</td>
+<td style="text-align:right;">
+--
+</td>
+<td style="text-align:right;">
+--
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Black
+</td>
+<td style="text-align:right;">
+-0.98 (0.22)
+</td>
+<td style="text-align:right;">
+0.38 (0.24, 0.58)
+</td>
+<td style="text-align:right;">
+&lt;0.001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Mexican American
+</td>
+<td style="text-align:right;">
+0.07 (0.26)
+</td>
+<td style="text-align:right;">
+1.07 (0.64, 1.78)
+</td>
+<td style="text-align:right;">
+0.80
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Other
+</td>
+<td style="text-align:right;">
+-0.08 (0.22)
+</td>
+<td style="text-align:right;">
+0.92 (0.59, 1.43)
+</td>
+<td style="text-align:right;">
+0.71
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Group
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Control (ref)
+</td>
+<td style="text-align:right;">
+--
+</td>
+<td style="text-align:right;">
+--
+</td>
+<td style="text-align:right;">
+--
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+    Treatment
+</td>
+<td style="text-align:right;">
+0.13 (0.18)
+</td>
+<td style="text-align:right;">
+1.14 (0.80, 1.61)
+</td>
+<td style="text-align:right;">
+0.48
+</td>
+</tr>
+</tbody>
+</table>
 Closing comments
 ----------------
 

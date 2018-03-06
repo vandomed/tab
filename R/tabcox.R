@@ -314,7 +314,7 @@ tabcox <- function(fit, columns = c("beta.se", "hr.hrci", "p"), xlabels = NULL,
 
       # HR (95% CI)
       ci.fit <- summary.fit$conf.int
-      newcol <- matrix("-", ncol = 1, nrow = nrows,
+      newcol <- matrix("", ncol = 1, nrow = nrows,
                        dimnames = list(NULL, "HR (95% CI)"))
       newcol[entry.rows, 1] <-
         paste(sprintf(spf, hrs), " (",
@@ -329,7 +329,7 @@ tabcox <- function(fit, columns = c("beta.se", "hr.hrci", "p"), xlabels = NULL,
 
       # 95% CI for HR
       ci.fit <- summary.fit$conf.int
-      newcol <- matrix("-", ncol = 1, nrow = nrows,
+      newcol <- matrix("", ncol = 1, nrow = nrows,
                        dimnames = list(NULL, "95% CI for OR"))
       newcol[entry.rows, 1] <-
         paste(sprintf(spf, ci.fit[, "lower .95"]), sep.char,
@@ -386,6 +386,7 @@ tabcox <- function(fit, columns = c("beta.se", "hr.hrci", "p"), xlabels = NULL,
 
   # Reformat for xtable if necessary
   if (latex) {
+    tbl[tbl == "-"] <- "--"
     tbl[, 1] <- gsub(pattern = "  ", replacement = "\\ \\ \\ \\ ",
                      x = tbl[, 1], fixed = TRUE)
   }

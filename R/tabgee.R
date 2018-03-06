@@ -299,7 +299,7 @@ tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
     } else if (column.ii == "se") {
 
       # SE
-      newcol <- matrix("-", ncol = 1, nrow = nrows, dimnames = list(NULL, "SE"))
+      newcol <- matrix("", ncol = 1, nrow = nrows, dimnames = list(NULL, "SE"))
       newcol[entry.rows, 1] <- sprintf(spf, ses)
       newcol[ref.rows, 1] <- "-"
 
@@ -348,7 +348,7 @@ tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
     } else if (column.ii == "or.orci") {
 
       # OR (95% CI)
-      newcol <- matrix("-", ncol = 1, nrow = nrows,
+      newcol <- matrix("", ncol = 1, nrow = nrows,
                        dimnames = list(NULL, "OR (95% CI)"))
       zcrit <- pnorm(0.975)
       newcol[entry.rows, 1] <-
@@ -363,21 +363,21 @@ tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
     } else if (column.ii == "orci") {
 
       # 95% CI for OR
-      newcol <- matrix("-", ncol = 1, nrow = nrows,
+      newcol <- matrix("", ncol = 1, nrow = nrows,
                        dimnames = list(NULL, "95% CI for OR"))
       zcrit <- pnorm(0.975)
       newcol[entry.rows, 1] <-
         paste(sprintf(spf, exp(betas - zcrit * ses)), sep.char,
               sprintf(spf, exp(betas + zcrit * ses)), sep = "")
       if (intercept) {
-        newcol[1, 1] < -"-"
+        newcol[1, 1] <- "-"
       }
       newcol[ref.rows, 1] <- "-"
 
     } else if (column.ii == "z") {
 
       # z
-      newcol <- matrix("-", ncol = 1, nrow = nrows, dimnames = list(NULL, "Z"))
+      newcol <- matrix("", ncol = 1, nrow = nrows, dimnames = list(NULL, "Z"))
       newcol[entry.rows, 1] <- sprintf(spf, zs)
       newcol[ref.rows, 1] <- "-"
 
@@ -421,6 +421,7 @@ tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
 
   # Reformat for xtable if necessary
   if (latex) {
+    tbl[tbl == "-"] <- "--"
     tbl[, 1] <- gsub(pattern = "  ", replacement = "\\ \\ \\ \\ ",
                      x = tbl[, 1], fixed = TRUE)
   }

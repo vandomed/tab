@@ -332,7 +332,7 @@ tabglm <- function(fit, columns = NULL, xlabels = NULL,
 
       # OR (95% CI)
       ci.fit <- confint(fit)
-      newcol <- matrix("-", ncol = 1, nrow = nrows,
+      newcol <- matrix("", ncol = 1, nrow = nrows,
                        dimnames = list(NULL, "OR (95% CI)"))
       newcol[entry.rows, 1] <-
         paste(sprintf(spf, exp(betas)), " (",
@@ -347,7 +347,7 @@ tabglm <- function(fit, columns = NULL, xlabels = NULL,
 
       # 95% CI for OR
       ci.fit <- confint(fit)
-      newcol <- matrix("-", ncol = 1, nrow = nrows,
+      newcol <- matrix("", ncol = 1, nrow = nrows,
                        dimnames = list(NULL, "95% CI for OR"))
       newcol[entry.rows, 1] <-
         paste(sprintf(spf, exp(ci.fit[, 1])), sep.char,
@@ -361,7 +361,7 @@ tabglm <- function(fit, columns = NULL, xlabels = NULL,
 
       # t or z
       newcol <-
-        matrix("-", ncol = 1, nrow = nrows,
+        matrix("", ncol = 1, nrow = nrows,
                dimnames = list(NULL, substr(colnames(coefmat)[3],
                                             start = 1, stop = 1)))
       newcol[entry.rows, 1] <- sprintf(spf, coefmat[, 3])

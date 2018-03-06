@@ -71,7 +71,7 @@ Here is how you can use `tabmulti` to generate a Table 1 comparing characteristi
 
 `tabmulti` created a character matrix, but it doesn't look like a table yet. 
 
-### Exporting to Word 
+## Exporting to Word 
 
 If you want to get the table into Microsoft Word, here are two approaches:
 
@@ -81,7 +81,9 @@ If you want to get the table into Microsoft Word, here are two approaches:
 
 If you want it to display it in a **knitr** document, you can add `latex = TRUE` and then use various approaches...
 
-### Printing in R (1): 'printr' with 'kable' for options
+## Printing in R
+
+### 'printr' with 'kable' for options
 
 I think the easiest approach is to simply load the **printr** package. Loading it results in R output printing more neatly, which includes character matrices showing up as neat tables.
 
@@ -96,48 +98,49 @@ detach("package:printr", unload = TRUE)
 
 (I detached **printr** so R reverts to its usual output display format for the rest of the vignette.)
 
-If you want to add table options, e.g. a caption or non-default column alignment, you can use `kable` from the **knitr** package (e.g. try `kable(table1, align = "lrrr", caption = "Table 1.")`. 
+If you want to add table options, e.g. a caption or non-default column alignment, you can use `kable` from the **knitr** package (e.g. try `kable(table1, align = "lrrr", caption = "Table 1.", format = "html")`. 
 
 ```{r table1c, eval = FALSE, echo = FALSE}
 library("printr")
 library("knitr")
-kable(table1, align = "lrrr", caption = "Table 1.")
+kable(table1, align = "lrrr", caption = "Table 1.", format = "html")
 detach("package:printr", unload = TRUE)
 ```
 
 
-### Printing in R (2): **knitr**'s `kable` function
+### **knitr**'s `kable` function
 
 ```{r table1d}
 library("knitr")
 kable(table1,
-      caption = "Table 1a. Characteristics (created by `tabmulti`/`kable`).", 
-      align = 'lrrr')
+      caption = "Table 1a. Characteristics (created by tabmulti/kable).", 
+      align = 'lrrr', 
+      format = "html")
 ```
 
 
-### Printing in R (3): **xtable**'s 'xtable' function
+### **xtable**'s 'xtable' function
 
 Another option is the **xtable** package/function (requires adding `results = "asis"` as a chunk option!):
 
 ```{r table1e, results = "asis"}
 library("xtable")
 print(xtable(table1, 
-             caption = "Table 1b. Characteristics (created by `tabmulti`/`xtable`).", 
-             align = 'llrrr',), 
+             caption = "Table 1b. Characteristics (created by tabmulti/xtable).", 
+             align = 'llrrr'), 
       type = "html", 
       include.rownames = FALSE)
 ```
 
 
-### Printing in R (4): **pander**'s 'pandoc.table' function
+### **pander**'s 'pandoc.table' function
 
 And finally the `pandoc.table` function in **pander** (also requires `results = "asis"`):
 
 ```{r table1f, results = "asis"}
 library("pander")
 pandoc.table(table1, 
-             caption = "Table 1c. Characteristics (created by `tabmulti`/`pandoc.table`).", 
+             caption = "Table 1c. Characteristics (created by tabmulti/pandoc.table).", 
              style = "rmarkdown", 
              justify = 'lrrr', 
              split.tables = Inf)
@@ -176,7 +179,8 @@ table1 <- tabmulti(data = tabdata,
                    latex = TRUE)
 kable(table1, 
       caption = "Table 1d. Characteristics of sample.", 
-      align = 'lrrrrr')
+      align = 'lrrrrr', 
+      format = "html")
 ```
 
 For age, often the range is more informative than the SD. We can display M (min-max) rather than M (SD) but setting the `tabmeans` input `parenth = "sd"`. To pass this argument through `tabmulti`, we use the `means.list` argument:
@@ -190,7 +194,8 @@ table1 <- tabmulti(data = tabdata,
                    latex = TRUE)
 kable(table1, 
       caption = "Table 1e. Characteristics of sample.", 
-      align = 'lrrrrr')
+      align = 'lrrrrr', 
+      format = "html")
 ```
 
 Technically the range is the difference between the min and the max, not the min and the max, but if you prefer the label `"M (range)"`, you could specify the `text.label` input: `means.list = list(parenth = "minmax", text.label = "M (range)")`.
@@ -207,7 +212,7 @@ Suppose we want to summarize a linear regression of BMI on age, sex, race, and t
 ```{r linreg1, results = "asis"}
 fit <- glm(BMI ~ Age + Sex + Race + Group, data = tabdata)
 print(xtable(fit, 
-             caption = "Table 2a. Linear regression fit (created by `xtable`)."), 
+             caption = "Table 2a. Linear regression fit (created by xtable)."), 
       type = "html")
 ```
 
@@ -223,8 +228,9 @@ Let's try `tabglm`:
 table2 <- tabglm(fit = fit, 
                  latex = TRUE)
 kable(table2, 
-      caption = "Table 2b. Linear regression fit (created by `tabglm` and `kable`).", 
-      align = 'lrr')
+      caption = "Table 2b. Linear regression fit (created by tabglm/kable).", 
+      align = 'lrr', 
+      format = "html")
 ```
 
 If you don't like all the white space, you can set `compress.factors = TRUE` to omit rows with factor variable names (and left-align factor levels). By default, the input `omit.refgroups` has the same value as `compress.factors`, and `omit.refgroups = TRUE` omits reference group rows.
@@ -234,8 +240,9 @@ table2 <- tabglm(fit = fit,
                  compress.factors = TRUE,
                  latex = TRUE)
 kable(table2, 
-      caption = "Table 2c. Linear regression fit (created by `tabglm` and `kable`).", 
-      align = 'lrr')
+      caption = "Table 2c. Linear regression fit (created by tabglm/kable).", 
+      align = 'lrr', 
+      format = "html")
 ```
 
 Maybe you're submitting to one of those enlightened journals that thinks comparing confidence intervals to 0 is totally different than comparing p-values to 0.05. `tabglm` can do confidence intervals.
@@ -246,8 +253,9 @@ table2 <- tabglm(fit = fit,
                  compress.factors = TRUE,
                  latex = TRUE)
 kable(table2, 
-      caption = "Table 2d. Linear regression fit (created by `tabglm` and `kable`).", 
-      align = 'lrr')
+      caption = "Table 2d. Linear regression fit (created by tabglm/kable).", 
+      align = 'lrr', 
+      format = "html")
 ```
 
 ### Logistic regression
@@ -261,8 +269,9 @@ table3 <- tabglm(fit = fit,
                  compress.factors = "binary", 
                  latex = TRUE)
 kable(table3, 
-      caption = "Table 3. Logistic regression fit (created by `tabglm` and `kable`).", 
-      align = 'lrrr')
+      caption = "Table 3. Logistic regression fit (created by tabglm/kable).", 
+      align = 'lrrr', 
+      format = "html")
 ```
 
 Notice that the second-order term was labeled appropriately, and `tabglm` recognized `fit` as a logistic regression and thus by default added a OR (95% CI) column. Additionally, the binary Sex and Group variables was displayed as single rows, while the other factor variable, Race, was shown in a more expanded format. This was the result of setting `compress.factors = "binary"` (`compress.factors` can be `TRUE`, `FALSE`, or `"binary"`).
@@ -288,8 +297,9 @@ table4 <- tabgee(fit = fit,
                  data = tabdata2, 
                  latex = TRUE)
 kable(table4, 
-      caption = "Table 4. Cox PH fit (created by `tabgee` and `kable`).", 
-      align = 'lrrr')
+      caption = "Table 4. GEE fit (created by tabgee/kable).", 
+      align = 'lrrr', 
+      format = "html")
 ```
 
 ### Cox PH
@@ -303,7 +313,10 @@ fit <- coxph(Surv(time = tabdata$time, event = tabdata$delta) ~
              data = tabdata)
 table5 <- tabcox(fit = fit, 
                  latex = TRUE)
-kable(table5, caption = "Table 5. Cox PH fit (created by `tabcox` and `kable`).", align = 'lrrr')
+kable(table5, 
+      caption = "Table 5. Cox PH fit (created by tabcox/kable).", 
+      align = 'lrrr', 
+      format = "html")
 ```
 
 
