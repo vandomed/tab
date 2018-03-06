@@ -108,6 +108,8 @@ detach("package:printr", unload = TRUE)
 
 ### knitr's kable function
 
+Another approach:
+
 ```{r table1d}
 library("knitr")
 kable(table1,
