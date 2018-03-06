@@ -70,6 +70,7 @@ Here is how you can use *tabmulti* to generate a Table 1 comparing characteristi
 
 *tabmulti* created a character matrix, but it doesn't look like a table yet. 
 
+
 ## Exporting to Word 
 
 If you want to get the table into Microsoft Word, here are two approaches:
@@ -80,9 +81,10 @@ If you want to get the table into Microsoft Word, here are two approaches:
 
 If you want it to display it in a **knitr** document, you can add `latex = TRUE` and then use various approaches...
 
+
 ## Printing in R
 
-**printr**
+### printr
 
 I think the easiest approach is to simply load the **printr** package. Loading it results in R output printing more neatly, which includes character matrices showing up as neat tables.
 
@@ -105,10 +107,9 @@ library("knitr")
 kable(table1, align = "lrrr", caption = "Table 1.", format = "html")
 detach("package:printr", unload = TRUE)
 ```
+<br>
 
-**knitr's kable function**
-
-Another approach:
+### knitr's *kable* function
 
 ```{r table1d}
 library("knitr")
@@ -119,7 +120,7 @@ kable(table1,
 ```
 <br>
 
-**xtable's xtable function**
+### xtable's *xtable* function
 
 Another option is the **xtable** package/function (requires adding `results = "asis"` as a chunk option!):
 
@@ -130,10 +131,10 @@ print(xtable(table1,
              align = 'llrrr'), 
       type = "html", 
       include.rownames = FALSE)
-```
-<br>
 
-**pander's pandoc.table function**
+```
+
+### pander's *pandoc.table* function
 
 And finally the *pandoc.table* function in **pander** (also requires `results = "asis"`):
 
@@ -145,7 +146,7 @@ pandoc.table(table1,
              justify = 'lrrr', 
              split.tables = Inf)
 ```
-<br>
+
 
 ## More on *tabmulti*
 
@@ -257,6 +258,7 @@ kable(table2,
       align = 'lrr', 
       format = "html")
 ```
+<br>
 
 ### Logistic regression
 
@@ -301,6 +303,7 @@ kable(table4,
       align = 'lrrr', 
       format = "html")
 ```
+<br>
 
 ### Cox PH
 

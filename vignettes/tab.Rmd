@@ -108,7 +108,7 @@ library("knitr")
 kable(table1, align = "lrrr", caption = "Table 1.", format = "html")
 detach("package:printr", unload = TRUE)
 ```
-
+<br>
 
 ### knitr's *kable* function
 
@@ -119,7 +119,7 @@ kable(table1,
       align = 'lrrr', 
       format = "html")
 ```
-
+<br>
 
 ### xtable's *xtable* function
 
@@ -133,7 +133,7 @@ print(xtable(table1,
       type = "html", 
       include.rownames = FALSE)
 ```
-
+<br>
 
 ### pander's *pandoc.table* function
 
@@ -259,6 +259,7 @@ kable(table2,
       align = 'lrr', 
       format = "html")
 ```
+<br>
 
 ### Logistic regression
 
@@ -303,6 +304,7 @@ kable(table4,
       align = 'lrrr', 
       format = "html")
 ```
+<br>
 
 ### Cox PH
 
