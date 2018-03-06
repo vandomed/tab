@@ -4,23 +4,23 @@ Dane Van Domelen <br> <vandomed@gmail.com>
 2018-03-06
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-'tab' package
--------------
+Scope
+-----
 
 The purpose of **tab** is to make it easier to create tables for papers, including Table 1's showing characteristics of the sample and summary tables for fitted regression models. Currently, the following functions are included:
 
--   `tabmeans` compares means in two or more groups.
--   `tabmedians` compares medians in two or more groups.
--   `tabfreq` compares frequencies in two or more groups.
--   `tabmulti` compares multiple variables in two or more groups.
--   `tabglm` summarizes a generalized linear model (GLM) fit via `glm`.
--   `tabgee` summarizes a generalized estimating equation (GEE) fit via `gee`.
--   `tabcox` summarizes a Cox Proportional Hazards (Cox PH) model fit via `coxph` in **survival**.
+-   *tabmeans* compares means in two or more groups.
+-   *tabmedians* compares medians in two or more groups.
+-   *tabfreq* compares frequencies in two or more groups.
+-   *tabmulti* compares multiple variables in two or more groups.
+-   *tabglm* summarizes a generalized linear model (GLM) fit via *glm*.
+-   *tabgee* summarizes a generalized estimating equation (GEE) fit via *gee*.
+-   *tabcox* summarizes a Cox Proportional Hazards (Cox PH) model fit via *coxph* in **survival**.
 
 Creating a Table 1
 ------------------
 
-A toy dataset called `tabdata` is included in the **tab package**. It is a data frame with 15 variables and 300 observations. Let's take a look:
+A toy dataset called `tabdata` is included in the **tab** package. It is a data frame with 15 variables and 300 observations. Let's take a look:
 
 ``` r
 library("tab")
@@ -44,7 +44,7 @@ head(tabdata)
 #> 6 141.5        0        0        1
 ```
 
-Here is how you can use `tabmulti` to generate a Table 1 comparing characteristics of the treatment and control groups.
+Here is how you can use *tabmulti* to generate a Table 1 comparing characteristics of the treatment and control groups.
 
 ``` r
 (table1 <- tabmulti(data = tabdata, 
@@ -62,7 +62,7 @@ Here is how you can use `tabmulti` to generate a Table 1 comparing characteristi
 #>  [9,] "  Other"            "32 (23.7)"  "28 (17.1)"  ""
 ```
 
-`tabmulti` created a character matrix, but it doesn't look like a table yet.
+*tabmulti* created a character matrix, but it doesn't look like a table yet.
 
 Exporting to Word
 -----------------
@@ -71,14 +71,14 @@ If you want to get the table into Microsoft Word, here are two approaches:
 
 1.  Install/load **Kmisc** and run `write.cb(table1)` to copy the table to your clipboard. Paste the result into Word, then highlight the text and go to `Insert -> Table -> Convert Text to Table... OK`.
 
-2.  Add `print.html = TRUE` to the above `tabmulti` function call. That will result in a .html file being written to your working directory. It should appear as a neat table when you open it (e.g. in Google Chrome), and you can copy/paste it into Word.
+2.  Add `print.html = TRUE` to the above *tabmulti* function call. That will result in a .html file being written to your working directory. It should appear as a neat table when you open it (e.g. in Google Chrome), and you can copy/paste it into Word.
 
 If you want it to display it in a **knitr** document, you can add `latex = TRUE` and then use various approaches...
 
 Printing in R
 -------------
 
-### 'printr' with 'kable' for options
+### printr
 
 I think the easiest approach is to simply load the **printr** package. Loading it results in R output printing more neatly, which includes character matrices showing up as neat tables.
 
@@ -110,7 +110,7 @@ detach("package:printr", unload = TRUE)
 
 If you want to add table options, e.g. a caption or non-default column alignment, you can use `kable` from the **knitr** package (e.g. try `kable(table1, align = "lrrr", caption = "Table 1.", format = "html")`.
 
-### **knitr**'s `kable` function
+### knitr's *kable* function
 
 ``` r
 library("knitr")
@@ -259,7 +259,7 @@ Race, n (%)
 </tr>
 </tbody>
 </table>
-### **xtable**'s 'xtable' function
+### xtable's *xtable* function
 
 Another option is the **xtable** package/function (requires adding `results = "asis"` as a chunk option!):
 
@@ -407,9 +407,9 @@ Race, n (%)
 </td>
 </tr>
 </table>
-### **pander**'s 'pandoc.table' function
+### pander's *pandoc.table* function
 
-And finally the `pandoc.table` function in **pander** (also requires `results = "asis"`):
+And finally the *pandoc.table* function in **pander** (also requires `results = "asis"`):
 
 ``` r
 library("pander")
@@ -432,10 +432,10 @@ pandoc.table(table1,
 |     Mexican American |   21 (15.6)|   19 (11.6)|           |
 |     Other            |   32 (23.7)|   28 (17.1)|           |
 
-More on 'tabmulti'
+More on *tabmulti*
 ------------------
 
-Recall the `tabmulti` function call from above:
+Recall the *tabmulti* function call from above:
 
 ``` r
 table1 <- tabmulti(data = tabdata, 
@@ -444,9 +444,9 @@ table1 <- tabmulti(data = tabdata,
                    latex = TRUE)
 ```
 
-I specified the data frame, the name of the group variable, and the names of the variables I wanted to compare. By default, `tabmulti` treats each Y variable as continuous if it is numeric and takes on 5 or more unique values, and categorical otherwise. It compares means for continuous variables and frequencies for categorical variables.
+I specified the data frame, the name of the group variable, and the names of the variables I wanted to compare. By default, *tabmulti* treats each Y variable as continuous if it is numeric and takes on 5 or more unique values, and categorical otherwise. It compares means for continuous variables and frequencies for categorical variables.
 
-Internally, `tabmulti` called `tabmeans` for the first comparison and `tabfreq` for the second and third. We could have created the same table using these functions and `rbind`:
+Internally, *tabmulti* called *tabmeans* for the first comparison and *tabfreq* for the second and third. We could have created the same table using these functions and *rbind*:
 
 ``` r
 table1b <- rbind(tabmeans(x = tabdata$Group, y = tabdata$Age, latex = TRUE), 
@@ -456,7 +456,7 @@ all(table1 == table1b)
 #> [1] TRUE
 ```
 
-Let's go through some more options. The `columns` input controls what columns are shown, with the default `columns = c("xgroups", "p")` requesting a column for each `x` level and the p-value (from t-test or ANOVA). Since we have missing values and `tabmulti` uses pairwise deletion by default, let's add a sample size column, and why not also throw in a column for the overall sample statistics.
+Let's go through some more options. The `columns` input controls what columns are shown, with the default `columns = c("xgroups", "p")` requesting a column for each `x` level and the p-value (from t-test or ANOVA). Since we have missing values and *tabmulti* uses pairwise deletion by default, let's add a sample size column, and why not also throw in a column for the overall sample statistics.
 
 ``` r
 table1 <- tabmulti(data = tabdata, 
@@ -661,7 +661,7 @@ Race, n (%)
 </tr>
 </tbody>
 </table>
-For age, often the range is more informative than the SD. We can display M (min-max) rather than M (SD) but setting the `tabmeans` input `parenth = "sd"`. To pass this argument through `tabmulti`, we use the `means.list` argument:
+For age, often the range is more informative than the SD. We can display M (min-max) rather than M (SD) but setting the *tabmeans* input `parenth = "sd"`. To pass this argument through *tabmulti*, we use the `means.list` argument:
 
 ``` r
 table1 <- tabmulti(data = tabdata, 
@@ -869,14 +869,14 @@ Race, n (%)
 </table>
 Technically the range is the difference between the min and the max, not the min and the max, but if you prefer the label `"M (range)"`, you could specify the `text.label` input: `means.list = list(parenth = "minmax", text.label = "M (range)")`.
 
-These are some of the options you have access to with `tabmulti` and the underlying functions it calls. A complete list of options are described in the help files for `tabmulti`, `tabmeans`, `tabmedians`, and `tabfreq`. The help files also have some different examples.
+These are some of the options you have access to with *tabmulti* and the underlying functions it calls. A complete list of options are described in the help files for *tabmulti*, *tabmeans*, *tabmedians*, and *tabfreq*. The help files also have some different examples.
 
 Regression summaries
 --------------------
 
 ### Linear regression
 
-Suppose we want to summarize a linear regression of BMI on age, sex, race, and treatment group. You could use `kable`, `xtable`, or `pandoc.table` to print a summary table like this:
+Suppose we want to summarize a linear regression of BMI on age, sex, race, and treatment group. You could use *kable*, *xtable*, or *pandoc.table* to print a summary table like this:
 
 ``` r
 fit <- glm(BMI ~ Age + Sex + Race + Group, data = tabdata)
@@ -1031,7 +1031,7 @@ But this isn't how a regression table in a paper typically looks. A few issues:
 -   P-values should not print as 0.
 -   For factor variables, levels should be printed more cleanly.
 
-Let's try `tabglm`:
+Let's try *tabglm*:
 
 ``` r
 table2 <- tabglm(fit = fit, 
@@ -1308,7 +1308,7 @@ Treatment
 </tr>
 </tbody>
 </table>
-Maybe you're submitting to one of those enlightened journals that thinks comparing confidence intervals to 0 is totally different than comparing p-values to 0.05. `tabglm` can do confidence intervals.
+Maybe you're submitting to one of those enlightened journals that thinks comparing confidence intervals to 0 is totally different than comparing p-values to 0.05. *tabglm* can do confidence intervals:
 
 ``` r
 table2 <- tabglm(fit = fit, 
@@ -1420,7 +1420,7 @@ Treatment
 </table>
 ### Logistic regression
 
-Summarizing a fitted logistic regression model with `tabglm` is very similar. For 1-year mortality vs. age, age squared, sex, race, and treatment group:
+Summarizing a fitted logistic regression model with *tabglm* is very similar. For 1-year mortality vs. age, age squared, sex, race, and treatment group:
 
 ``` r
 fit <- glm(death_1yr ~ poly(Age, 2, raw = TRUE) + Sex + Race + Group, 
@@ -1594,11 +1594,11 @@ Treatment
 </tr>
 </tbody>
 </table>
-Notice that the second-order term was labeled appropriately, and `tabglm` recognized `fit` as a logistic regression and thus by default added a OR (95% CI) column. Additionally, the binary Sex and Group variables was displayed as single rows, while the other factor variable, Race, was shown in a more expanded format. This was the result of setting `compress.factors = "binary"` (`compress.factors` can be `TRUE`, `FALSE`, or `"binary"`).
+Notice that the second-order term was labeled appropriately, and *tabglm* recognized `fit` as a logistic regression and thus by default added a OR (95% CI) column. Additionally, the binary Sex and Group variables was displayed as single rows, while the other factor variable, Race, was shown in a more expanded format. This was the result of setting `compress.factors = "binary"` (`compress.factors` can be `TRUE`, `FALSE`, or `"binary"`).
 
 ### GEEs
 
-To summarize a fitted GEE, we can convert `tabdata` from wide to long format, fit a GEE, and then call `tabgee`. Here's a table for blood pressure vs. age, sex, race, BMI, and treatment group, with columns for Beta, SE, Z, and P:
+To summarize a fitted GEE, we can convert `tabdata` from wide to long format, fit a GEE, and then call *tabgee*. Here's a table for blood pressure vs. age, sex, race, BMI, and treatment group, with columns for Beta, SE, Z, and P:
 
 ``` r
 tabdata2 <- reshape(data = tabdata,
@@ -2022,7 +2022,7 @@ Group
 Closing comments
 ----------------
 
--   I suggest **printr** with `kable` for alignment, captions, etc.
+-   I suggest **printr** with *kable* for alignment, captions, etc.
 -   Working on functions for complex survey data.
 -   Feel free to collaborate on [GitHub](https://github.com/vandomed/tab)!
 
