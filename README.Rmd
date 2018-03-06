@@ -1,9 +1,9 @@
 ---
+output: github_document
 title: "Summary Tables with 'tab'"
-author: "Dane Van Domelen"
+author: "Dane Van Domelen <br> vandomed@gmail.com"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
-bibliography: bibliography.bib
+bibliography: vignettes/bibliography.bib
 nocite: | 
   @Kmisc, 
   @knitr1,
@@ -14,12 +14,10 @@ nocite: |
   @survival-package, 
   @survival-book,
   @xtable
-#csl: american-medical-association-alphabetical.csl
-vignette: >
-  %\VignetteIndexEntry{Summary Tables with 'tab'}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+  
 ---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
@@ -69,7 +67,11 @@ Here is how you can use `tabmulti` to generate a Table 1 comparing characteristi
                     yvarnames = c("Age", "Sex", "Race")))
 ```
 
-`tabmulti` created a character matrix, but it doesn't look like a table yet. If you want to get the table into Word, here are two approaches:
+`tabmulti` created a character matrix, but it doesn't look like a table yet. 
+
+### Exporting to Word 
+
+If you want to get the table into Microsoft Word, here are two approaches:
 
 1. Install/load **Kmisc** and run `write.cb(table1)` to copy the table to your clipboard. Paste the result into Word, then highlight the text and go to `Insert -> Table -> Convert Text to Table... OK`. 
 
@@ -77,7 +79,7 @@ Here is how you can use `tabmulti` to generate a Table 1 comparing characteristi
 
 If you want it to display it in a **knitr** document, you can add `latex = TRUE` and then use various approaches...
 
-### 'printr' ('kable' for options)
+### Printing in R (1): 'printr' with 'kable' for options
 
 I think the easiest approach is to simply load the **printr** package. Loading it results in R output printing more neatly, which includes character matrices showing up as neat tables.
 
@@ -101,9 +103,8 @@ kable(table1, align = "lrrr", caption = "Table 1.")
 detach("package:printr", unload = TRUE)
 ```
 
-### 'kable'
 
-**knitr**'s `kable` function works nicely:
+### Printing in R (2): **knitr**'s `kable` function
 
 ```{r table1d, message = FALSE}
 library("knitr")
@@ -113,7 +114,7 @@ kable(table1,
 ```
 
 
-### 'xtable'
+### Printing in R (3): **xtable**'s 'xtable' function
 
 Another option is the **xtable** package/function (requires adding `results = "asis"` as a chunk option!):
 
@@ -126,7 +127,8 @@ print(xtable(table1,
       include.rownames = FALSE)
 ```
 
-### 'pandoc.table'
+
+### Printing in R (4): **pander**'s 'pandoc.table' function
 
 And finally the `pandoc.table` function in **pander** (also requires `results = "asis"`):
 
