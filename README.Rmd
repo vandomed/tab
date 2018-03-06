@@ -131,6 +131,7 @@ print(xtable(table1,
       type = "html", 
       include.rownames = FALSE)
 ```
+<br>
 
 **pander's pandoc.table function**
 
