@@ -261,6 +261,8 @@ Race, n (%)
 </tr>
 </tbody>
 </table>
+<br>
+
 **xtable's xtable function**
 
 Another option is the **xtable** package/function (requires adding `results = "asis"` as a chunk option!):
