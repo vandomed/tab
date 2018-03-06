@@ -121,6 +121,7 @@ kable(table1,
       format = "html")
 ```
 
+Trial.
 
 ### xtable's *xtable* function
 
