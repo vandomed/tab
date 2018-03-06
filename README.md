@@ -112,8 +112,6 @@ If you want to add table options, e.g. a caption or non-default column alignment
 
 ### knitr's *kable* function
 
-Another approach:
-
 ``` r
 library("knitr")
 kable(table1,
@@ -261,8 +259,6 @@ Race, n (%)
 </tr>
 </tbody>
 </table>
-Trial.
-
 ### xtable's *xtable* function
 
 Another option is the **xtable** package/function (requires adding `results = "asis"` as a chunk option!):

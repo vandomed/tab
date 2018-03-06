@@ -108,10 +108,7 @@ kable(table1, align = "lrrr", caption = "Table 1.", format = "html")
 detach("package:printr", unload = TRUE)
 ```
 
-
 ### knitr's *kable* function
-
-Another approach:
 
 ```{r table1d}
 library("knitr")
@@ -120,8 +117,6 @@ kable(table1,
       align = 'lrrr', 
       format = "html")
 ```
-
-Trial.
 
 ### xtable's *xtable* function
 
@@ -136,7 +131,6 @@ print(xtable(table1,
       include.rownames = FALSE)
 ```
 
-
 ### pander's *pandoc.table* function
 
 And finally the *pandoc.table* function in **pander** (also requires `results = "asis"`):
@@ -149,7 +143,6 @@ pandoc.table(table1,
              justify = 'lrrr', 
              split.tables = Inf)
 ```
-
 
 ## More on *tabmulti*
 
