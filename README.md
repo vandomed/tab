@@ -414,7 +414,7 @@ And finally the `pandoc.table` function in **pander** (also requires `results = 
 ``` r
 library("pander")
 pandoc.table(table1, 
-             caption = "Characteristics (created by tabmulti/pandoc.table).", 
+             caption = "Table 1c. Characteristics (created by tabmulti/pandoc.table).", 
              style = "rmarkdown", 
              justify = 'lrrr', 
              split.tables = Inf)
