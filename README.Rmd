@@ -82,7 +82,7 @@ If you want it to display it in a **knitr** document, you can add `latex = TRUE`
 
 ## Printing in R
 
-### printr
+**printr**
 
 I think the easiest approach is to simply load the **printr** package. Loading it results in R output printing more neatly, which includes character matrices showing up as neat tables.
 
@@ -106,7 +106,7 @@ kable(table1, align = "lrrr", caption = "Table 1.", format = "html")
 detach("package:printr", unload = TRUE)
 ```
 
-### knitr's kable function
+**knitr's kable function**
 
 Another approach:
 
@@ -118,8 +118,7 @@ kable(table1,
       format = "html")
 ```
 
-
-### xtable's xtable function
+**xtable's xtable function**
 
 Another option is the **xtable** package/function (requires adding `results = "asis"` as a chunk option!):
 
@@ -132,7 +131,7 @@ print(xtable(table1,
       include.rownames = FALSE)
 ```
 
-### pander's *pandoc.table* function
+**pander's *pandoc.table* function**
 
 And finally the *pandoc.table* function in **pander** (also requires `results = "asis"`):
 

@@ -78,7 +78,7 @@ If you want it to display it in a **knitr** document, you can add `latex = TRUE`
 Printing in R
 -------------
 
-### printr
+**printr**
 
 I think the easiest approach is to simply load the **printr** package. Loading it results in R output printing more neatly, which includes character matrices showing up as neat tables.
 
@@ -110,7 +110,7 @@ detach("package:printr", unload = TRUE)
 
 If you want to add table options, e.g. a caption or non-default column alignment, you can use `kable` from the **knitr** package (e.g. try `kable(table1, align = "lrrr", caption = "Table 1.", format = "html")`.
 
-### knitr's kable function
+**knitr's kable function**
 
 Another approach:
 
@@ -261,7 +261,7 @@ Race, n (%)
 </tr>
 </tbody>
 </table>
-### xtable's xtable function
+**xtable's xtable function**
 
 Another option is the **xtable** package/function (requires adding `results = "asis"` as a chunk option!):
 
@@ -409,7 +409,7 @@ Race, n (%)
 </td>
 </tr>
 </table>
-### pander's *pandoc.table* function
+**pander's *pandoc.table* function**
 
 And finally the *pandoc.table* function in **pander** (also requires `results = "asis"`):
 
