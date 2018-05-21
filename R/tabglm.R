@@ -60,12 +60,21 @@
 #'
 #'
 #' @export
-tabglm <- function(fit, columns = NULL, xlabels = NULL,
-                   compress.factors = FALSE, omit.refgroups = compress.factors,
-                   sep.char = ", ", latex = FALSE, decimals = 2,
-                   p.decimals = c(2, 3), p.cuts = 0.01, p.lowerbound = 0.001,
-                   p.leading0 = TRUE, p.avoid1 = FALSE,
-                   variable.colname = "Variable", print.html = FALSE,
+tabglm <- function(fit,
+                   columns = NULL,
+                   xlabels = NULL,
+                   compress.factors = FALSE,
+                   omit.refgroups = compress.factors,
+                   sep.char = ", ",
+                   latex = FALSE,
+                   decimals = 2,
+                   p.decimals = c(2, 3),
+                   p.cuts = 0.01,
+                   p.lowerbound = 0.001,
+                   p.leading0 = TRUE,
+                   p.avoid1 = FALSE,
+                   variable.colname = "Variable",
+                   print.html = FALSE,
                    html.filename = "table1.html") {
 
   # Extract info from fit
