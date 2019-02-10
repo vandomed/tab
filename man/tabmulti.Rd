@@ -5,15 +5,16 @@
 \title{Generate Summary Table Comparing Multiple Variables Across Levels of One
 Categorical Variable}
 \usage{
-tabmulti(data, xvarname, yvarnames, ymeasures = NULL, columns = c("xgroups",
-  "p"), listwise.deletion = FALSE, sep.char = ", ", xlevels = NULL,
-  ynames = yvarnames, ylevels = NULL, quantiles = NULL,
-  quantile.vals = NULL, latex = FALSE, decimals = NULL,
-  p.decimals = c(2, 3), p.cuts = 0.01, p.lowerbound = 0.001,
-  p.leading0 = TRUE, p.avoid1 = FALSE, n.headings = FALSE,
+tabmulti(data, xvarname, yvarnames, ymeasures = NULL,
+  columns = c("xgroups", "p"), listwise.deletion = FALSE,
+  sep.char = ", ", xlevels = NULL, ynames = yvarnames,
+  ylevels = NULL, quantiles = NULL, quantile.vals = NULL,
+  latex = FALSE, decimals = NULL, p.decimals = c(2, 3),
+  p.cuts = 0.01, p.lowerbound = 0.001, p.leading0 = TRUE,
+  p.avoid1 = FALSE, n.headings = FALSE,
   variable.colname = "Variable", print.html = FALSE,
-  html.filename = "table1.html", means.list = NULL, medians.list = NULL,
-  freq.list = NULL)
+  html.filename = "table1.html", means.list = NULL,
+  medians.list = NULL, freq.list = NULL)
 }
 \arguments{
 \item{data}{Data frame.}

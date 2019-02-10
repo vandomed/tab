@@ -8,9 +8,10 @@ Maintainer: Dane R. Van Domelen <vandomed@gmail.com>
 Description: Contains functions for generating tables for statistical reports written in Microsoft Word or LaTeX. There are functions for I-by-J frequency tables, comparison of means or medians across levels of a categorical variable, and summarizing fitted generalized linear models, generalized estimating equations, and Cox proportional hazards regression. Functions are available to handle data simple random samples or survey data. The package is intended to make it easier for researchers to translate results from statistical analyses in R to their reports or manuscripts.
 License: GPL (>=3)
 LazyData: true
+Encoding: UTF-8
 Depends: gee, survival
 Imports: graphics, grDevices, Kmisc, MASS, stats, survey, xtable
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
 Suggests: knitr,
     rmarkdown,
     pander,

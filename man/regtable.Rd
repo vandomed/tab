@@ -4,10 +4,10 @@
 \alias{regtable}
 \title{Create Regression Table from Betas and Standard Errors}
 \usage{
-regtable(betas, ses, varcov = NULL, columns = c("variable", "beta.se", "p"),
-  sep.char = ", ", decimals = NULL, p.decimals = c(2, 3), p.cuts = 0.01,
-  p.lowerbound = 0.001, p.leading0 = TRUE, p.avoid1 = FALSE,
-  labels = NULL)
+regtable(betas, ses, varcov = NULL, columns = c("variable", "beta.se",
+  "p"), sep.char = ", ", decimals = NULL, p.decimals = c(2, 3),
+  p.cuts = 0.01, p.lowerbound = 0.001, p.leading0 = TRUE,
+  p.avoid1 = FALSE, labels = NULL)
 }
 \arguments{
 \item{betas}{Numeric vector.}

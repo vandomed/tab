@@ -5,13 +5,13 @@
 \title{Generate Summary Table Comparing Group Means}
 \usage{
 tabmeans(x, y, columns = c("xgroups", "p"), parenth = "sd",
-  sep.char = ", ", variance = "unequal", xname = NULL, xlevels = NULL,
-  yname = NULL, text.label = NULL, quantiles = NULL,
-  quantile.vals = FALSE, latex = FALSE, decimals = NULL,
-  p.decimals = c(2, 3), p.cuts = 0.01, p.lowerbound = 0.001,
-  p.leading0 = TRUE, p.avoid1 = FALSE, n.headings = TRUE,
-  variable.colname = "Variable", fig = FALSE, print.html = FALSE,
-  html.filename = "table1.html", ...)
+  sep.char = ", ", variance = "unequal", xname = NULL,
+  xlevels = NULL, yname = NULL, text.label = NULL,
+  quantiles = NULL, quantile.vals = FALSE, latex = FALSE,
+  decimals = NULL, p.decimals = c(2, 3), p.cuts = 0.01,
+  p.lowerbound = 0.001, p.leading0 = TRUE, p.avoid1 = FALSE,
+  n.headings = TRUE, variable.colname = "Variable", fig = FALSE,
+  print.html = FALSE, html.filename = "table1.html", ...)
 }
 \arguments{
 \item{x}{Vector of values for the categorical \code{x} variable.}

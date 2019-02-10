@@ -6,11 +6,12 @@
 \usage{
 tabfreq(x = NULL, y, columns = c("xgroups", "p"), cell = "counts",
   parenth = "col.percent", sep.char = ", ", test = "chi.fisher",
-  xlevels = NULL, yname = NULL, ylevels = NULL, compress.binary = FALSE,
-  yname.row = !compress.binary, text.label = NULL, quantiles = NULL,
-  quantile.vals = FALSE, latex = FALSE, decimals = 1, p.decimals = c(2,
-  3), p.cuts = 0.01, p.lowerbound = 0.001, p.leading0 = TRUE,
-  p.avoid1 = FALSE, n.headings = FALSE, variable.colname = "Variable",
+  xlevels = NULL, yname = NULL, ylevels = NULL,
+  compress.binary = FALSE, yname.row = !compress.binary,
+  text.label = NULL, quantiles = NULL, quantile.vals = FALSE,
+  latex = FALSE, decimals = 1, p.decimals = c(2, 3), p.cuts = 0.01,
+  p.lowerbound = 0.001, p.leading0 = TRUE, p.avoid1 = FALSE,
+  n.headings = FALSE, variable.colname = "Variable",
   print.html = FALSE, html.filename = "table1.html")
 }
 \arguments{
