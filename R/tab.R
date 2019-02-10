@@ -30,7 +30,6 @@
 #' @import gee
 #' @import graphics
 #' @importFrom grDevices recordPlot
-#' @importFrom Kmisc write.cb
 #' @import MASS
 #' @import stats
 #' @importFrom survey svymean svyvar
