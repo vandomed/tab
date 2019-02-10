@@ -13,7 +13,7 @@
 #'
 #' \enumerate{
 #'
-#' \item Use the \code{\link[Kmisc]{write.cb}} function in \pkg{Kmisc} [2].
+#' \item Use the \emph{write.cb} function in \strong{Kmisc} [2].
 #' If your table is stored in a character matrix named \code{table1}, use
 #' \code{write.cb(table1)} to copy the table to your clipboard. Paste the result
 #' into your document, then highlight the text and go to
