@@ -4,3 +4,5 @@ r:
   - release
   - devel
 cache: packages
+install:
+  - ./travis-tool.sh install_github kevinushey/Kmisc
