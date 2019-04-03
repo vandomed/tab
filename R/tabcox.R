@@ -61,7 +61,7 @@ tabcox <- function(fit, columns = c("beta.se", "hr.hrci", "p"), xlabels = NULL,
                    html.filename = "table1.html") {
 
   # Extract info from fit
-  summary.fit <- summary(fit)
+  invisible(capture.output(summary.fit <- summary(fit)))
   coefmat <- summary.fit$coefficients
   rownames.coefmat <- rownames(coefmat)
   betas <- coefmat[, "coef"]

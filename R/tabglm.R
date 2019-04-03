@@ -78,7 +78,7 @@ tabglm <- function(fit,
                    html.filename = "table1.html") {
 
   # Extract info from fit
-  summary.fit <- summary(fit)
+  invisible(capture.output(summary.fit <- summary(fit)))
   coefmat <- summary.fit$coefficients
   rownames.coefmat <- rownames(coefmat)
   betas <- coefmat[, "Estimate"]

@@ -1,7 +1,7 @@
 Summary Tables with 'tab'
 ================
 Dane Van Domelen <br> <vandomed@gmail.com>
-2018-03-06
+2019-04-03
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 Scope

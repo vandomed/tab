@@ -118,7 +118,7 @@ Character matrix comparing \code{y} variables across levels of
 \description{
 Provides an alternative to making multiple calls to \code{\link{tabmeans}},
 \code{\link{tabmedians}}, and \code{\link{tabfreq}}, and then combining
-via \code{\link[base]{rbind}}.
+via \code{\link{rbind}}.
 }
 \section{Note}{
 
