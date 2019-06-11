@@ -1,205 +1,154 @@
-#' Create Frequency Table
+#' Generate Frequency Table
 #'
-#' Creates an I-by-J frequency table comparing the distribution of \code{y}
-#' across levels of \code{x}.
+#' Creates I-by-J frequency table comparing the distribution of \code{y} across
+#' levels of \code{x}.
 #'
 #'
-#' @param formula Formula, e.g. \code{Sex ~ Group}.
-#' @param data Data frame containing variables named in \code{formula}.
+#' @inherit tabmeans references
+#' @inheritSection tabmeans Note
+#' @inheritParams tabmeans
+#'
+#'
 #' @param x Vector indicating group membership for columns of I-by-J table.
+#'
 #' @param y Vector indicating group membership for rows of I-by-J table.
+#'
 #' @param columns Character vector specifying what columns to include. Choices
 #' for each element are \code{"n"} for total sample size, \code{"overall"} for
 #' overall distribution of \code{y}, \code{"xgroups"} for distributions of
 #' \code{y} for each \code{x} group, \code{"test"} for test statistic, and
 #' \code{"p"} for p-value.
+#'
 #' @param cell Character string specifying what statistic to display in cells.
 #' Choices are \code{"counts"}, \code{"tot.percent"}, \code{"col.percent"},
 #' and \code{"row.percent"}.
+#'
 #' @param parenth Character string specifying what statistic to display in
 #' parentheses. Choices are \code{"none"}, \code{"se"}, \code{"ci"},
 #' \code{"counts"}, \code{"tot.percent"}, \code{"col.percent"}, and
 #' \code{"row.percent"}.
+#'
 #' @param sep.char Character string with separator to place between lower and
 #' upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.
+#'
 #' @param test Character string specifying which test for association between
 #' \code{x} and \code{y} should be used. Choices are \code{"chi.fisher"} for
 #' Pearson's chi-squared test if its assumptions are met, otherwise Fisher's
 #' exact test; \code{"chi"}; \code{"fisher"}; \code{"z"} for z test without
 #' continuity correction; and \code{"z.continuity"} for z test with continuity
 #' correction. The last two only work if both \code{x} and \code{y} are binary.
+#'
 #' @param xlevels Character vector with labels for the levels of \code{x}, used
 #' in column headings.
+#'
 #' @param yname Character string with a label for the \code{y} variable.
+#'
 #' @param ylevels Character vector with labels for the levels of \code{y}. Note
 #' that levels of \code{y} are listed in the order that they appear when you run
 #' \code{table(y, x)}.
+#'
 #' @param compress.binary Logical value for whether to compress binary \code{y}
 #' variable to a single row, excluding the first level rather than showing both.
+#'
 #' @param yname.row Logical value for whether to include a row displaying the
 #' name of the \code{y} variable.
+#'
 #' @param text.label Character string with text to put after the \code{y}
 #' variable name, identifying what cell values and parentheses represent.
+#'
 #' @param quantiles Numeric value. If specified, table compares \code{y} across
 #' quantiles of \code{x} created on the fly.
+#'
 #' @param quantile.vals Logical value for whether labels for \code{x} quantiles
 #' should show quantile number and corresponding range, e.g. Q1 [0.00, 0.25),
 #' rather than just the quantile number.
+#'
 #' @param latex Logical value for whether to format table so it is
 #' ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
 #' \code{\link[knitr]{kable}}.
+#'
 #' @param decimals Numeric value specifying number of decimal places for numbers
 #' other than p-values.
-#' @param formatp.list List of arguments to pass to \code{\link[tab]{formatp}}.
+#'
+#' @param p.decimals Numeric value specifying number of decimal places for
+#' p-values. Can be a vector if you want the number of decimals to depend on
+#' what range the p-value is in. See \code{p.cuts}.
+#'
+#' @param p.cuts Numeric value or vector of cutpoints to control number of
+#' decimal places for p-values. For example, by default \code{p.cuts = 0.1} and
+#' \code{p.decimals = c(2, 3)}, meaning p-values in the range [0.1, 1] are
+#' printed to 2 decimal places while p-values in the range [0, 0.1) are printed
+#' to 3.
+#'
+#' @param p.lowerbound Numeric value specifying cutpoint beneath which p-values
+#' appear as <p.lowerbound.
+#'
+#' @param p.leading0 Logical value for whether p-values should appear with
+#' leading 0's before the decimal point.
+#'
+#' @param p.avoid1 Logical value for whether p-values that round to 1 should
+#' appear as \code{>0.99} (or similarly depending on \code{p.decimals} and
+#' \code{p.cuts}) rather than 1.
+#'
 #' @param n.headings Logical value for whether to display group sample sizes in
 #' parentheses in column headings.
+#'
+#' @param variable.colname Character string with desired heading for first
+#' column of table, in case you prefer something other than \code{"Variable"}.
+#'
 #' @param print.html Logical value for whether to write a .html file with the
 #' table to the current working directory.
+#'
 #' @param html.filename Character string specifying the name of the .html file
 #' that gets written if \code{print.html = TRUE}.
 #'
 #'
-#' @return Data frame which you can print in R (e.g. with \strong{xtable}'s
-#' \code{\link[xtable]{xtable}} or \strong{knitr}'s \code{\link[knitr]{kable}})
-#' or export to Word, Excel, or some other program. To export the table, set
-#' \code{print.html = TRUE}. This will result in a .html file being written to
-#' your current working directory, which you can open and copy/paste into your
-#' document.
+#' @return Character matrix comparing the distribution of \code{y} across levels
+#' of \code{x}.
 #'
 #'
 #' @examples
-#' # Compare sex distribution by group
-#' (freqtable1 <- tabfreq(Sex ~ Group, data = tabdata))
+#' # Load in sample dataset and drop rows with missing values
+#' data(tabdata)
+#' tabdata <- tabdata[complete.cases(tabdata), ]
 #'
-#' # Same as previous, but specifying input vectors rather than formula
-#' (freqtable2 <- tabfreq(x = tabdata$Group, y = tabdata$Sex))
+#' # Compare sex distribution by group, with group as column variable
+#' (freqtable1 <- tabfreq(x = tabdata$Group, y = tabdata$Sex))
 #'
-#' # Same as previous, but showing male row only and percent (SE) rather than n
-#' # (percent)
-#' (freqtable3 <- tabfreq(Sex ~ Group, data = tabdata,
+#' # Same comparison, but compress table to show male row only and show percent
+#' # (SE) rather than n (percent)
+#' (freqtable2 <- tabfreq(x = tabdata$Group, y = tabdata$Sex,
 #'                        cell = "col.percent", parenth = "se",
 #'                        compress.binary = TRUE))
 #'
-#' # Create single table comparing sex and race in control vs. treatment group.
-#' # Drop missing observations first.
-#' tabdata2 <- subset(tabdata, ! is.na(Sex) & ! is.na(Race))
-#' (freqtable4 <- rbind(tabfreq(Sex ~ Group, data = tabdata2),
-#'                      tabfreq(Race ~ Group, data = tabdata2)))
+#' # Use rbind to create single table comparing sex and race in control vs.
+#' # treatment group
+#' (freqtable3 <- rbind(tabfreq(x = tabdata$Group, y = tabdata$Sex),
+#'                      tabfreq(x = tabdata$Group, y = tabdata$Race)))
 #'
-#' # Same as previous, but using tabmulti for convenience
-#' #(freqtable5 <- tabmulti(data = d, xvarname = "Group",
-#' #                        yvarnames = c("Sex", "Race")))
+#' # An easier way to make this table is to use tabmulti
+#' (freqtable4 <- tabmulti(data = d, xvarname = "Group",
+#'                         yvarnames = c("Sex", "Race")))
 #'
 #'
 #' @export
-tabfreq <- function(formula = NULL, data = NULL,
-                    x = NULL, y = NULL,
-                    columns = c("xgroups", "p"),
-                    cell = "counts",
-                    parenth = "col.percent",
-                    sep.char = ", ",
-                    test = "chi.fisher",
-                    xlevels = NULL,
-                    yname = NULL,
-                    ylevels = NULL,
-                    compress.binary = FALSE,
-                    yname.row = FALSE,
-                    text.label = NULL,
-                    quantiles = NULL,
-                    quantile.vals = FALSE,
-                    latex = FALSE,
-                    decimals = 1,
-                    formatp.list = NULL,
-                    n.headings = FALSE,
-                    print.html = FALSE,
+tabfreq <- function(x = NULL, y, columns = c("xgroups", "p"),
+                    cell = "counts", parenth = "col.percent", sep.char = ", ",
+                    test = "chi.fisher", xlevels = NULL, yname = NULL,
+                    ylevels = NULL, compress.binary = FALSE,
+                    yname.row = ! compress.binary, text.label = NULL,
+                    quantiles = NULL, quantile.vals = FALSE,
+                    latex = FALSE, decimals = 1, p.decimals = c(2, 3),
+                    p.cuts = 0.01, p.lowerbound = 0.001, p.leading0 = TRUE,
+                    p.avoid1 = FALSE, n.headings = FALSE,
+                    variable.colname = "Variable", print.html = FALSE,
                     html.filename = "table1.html") {
 
-  # Error checking
-  if (! is.null(formula) && class(formula) != "formula") {
-    stop("The input 'formula' must be a formula.")
-  }
-  if (! is.null(data) && ! is.data.frame(data)) {
-    stop("The input 'data' must be a data frame.")
-  }
-  if (! all(columns %in% c("n", "overall", "xgroups", "test", "p"))) {
-    stop("Each element of 'columns' must be one of the following: 'n', 'overall', 'xgroups', 'test', 'p'.")
-  }
-  if (! cell %in% c("counts", "tot.percent", "col.percent", "row.percent")) {
-    stop("The input 'cell' must be one of the following: 'counts', 'tot.percent', 'col.percent', 'row.percent'.")
-  }
-  if (! parenth %in% c("none", "se", "ci", "counts", "tot.percent",
-                       "col.percent", "row.percent")) {
-    stop("The input 'parenth' must be one of the following: 'none', 'se', 'ci', 'counts', 'tot.percent', 'col.percent', 'row.percent'.")
-  }
-  if (! is.character(sep.char)) {
-    stop("The input 'sep.char' must be a character string.")
-  }
-  if (! test %in% c("chi.fisher", "chi", "fisher", "z", "z.continuity")) {
-    stop("The input 'test' must be one of the following: 'chi.fisher', 'chi', 'fisher', 'z', 'z.continuity'.")
-  }
-  if (! is.null(xlevels) && ! is.character(xlevels)) {
-    stop("The input 'xlevels' must be a character vector.")
-  }
-  if (! is.null(yname) && ! is.character(yname)) {
-    stop("The input 'yname' must be a character string.")
-  }
-  if (! is.null(ylevels) && ! is.character(ylevels)) {
-    stop("The input 'ylevels' must be a character vector.")
-  }
-  if (! is.logical(compress.binary)) {
-    stop("The input 'compress.binary' must be a logical.")
-  }
-  if (! is.logical(yname.row)) {
-    stop("The input 'yname.row' must be a logical.")
-  }
-  if (! is.null(text.label) && ! is.character(text.label)) {
-    stop("The input 'text.label' must be a character string.")
-  }
-  if (! is.null(quantiles) && ! (is.numeric(quantiles) && quantiles > 1 &&
-                                 quantiles == as.integer(quantiles))) {
-    stop("The input 'quantiles' must be an integer greater than 1.")
-  }
-  if (! is.logical(quantile.vals)) {
-    stop("The input 'quantile.vals' must be a logical.")
-  }
-  if (! is.logical(latex)) {
-    stop("The input 'latex' must be a logical.")
-  }
-  if (! (is.numeric(decimals) && decimals >= 0 &&
-         decimals == as.integer(decimals))) {
-    stop("The input 'decimals' must be a non-negative integer.")
-  }
-  if (! is.null(formatp.list) &&
-      ! (is.list(formatp.list) && all(names(formatp.list) %in%
-                                      names(as.list(args(formatp)))))) {
-    stop("The input 'formatp.list' must be a named list of arguments to pass to 'formatp'.")
-  }
-  if (! is.logical(n.headings)) {
-    stop("The input 'n.headings' must be a logical.")
-  }
-  if (! is.logical(print.html)) {
-    stop("The input 'print.html' must be a logical.")
-  }
-  if (! is.character("html.filename")) {
-    stop("The input 'html.filename' must be a character string.")
-  }
-
-  # If formula specified, figure out x and y
-  if (! is.null(formula)) {
-    varnames <- all.vars(formula)
-    xvarname <- varnames[2]
-    yvarname <- varnames[1]
-    x <- data[, xvarname]
-    y <- data[, yvarname]
-    if (is.null(yname)) {
-      yname <- yvarname
-    }
-  } else {
-    if (is.null(yname)) {
-      yname <- deparse(substitute(y))
-      if (grepl("\\$", yname)) {
-        yname <- strsplit(yname, "\\$")[[1]][2]
-      }
+  # If yname unspecified, use variable name
+  if (is.null(yname)) {
+    yname <- deparse(substitute(y))
+    if (grepl("\\$", yname)) {
+      yname <- strsplit(yname, "\\$")[[1]][2]
     }
   }
 
@@ -232,7 +181,7 @@ tabfreq <- function(formula = NULL, data = NULL,
   col.percents <- 100 * prop.table(counts, margin = 2)
   row.percents <- 100 * prop.table(counts, margin = 1)
 
-  # If xlevels or ylevels unspecified, set to actual values
+  # If xlevels unspecified, set to actual values
   if (is.null(xlevels)) {
     if (! is.null(quantiles)) {
       if (quantile.vals) {
@@ -244,7 +193,11 @@ tabfreq <- function(formula = NULL, data = NULL,
       xlevels <- colnames(counts)
     }
   }
-  if (is.null(ylevels)) ylevels <- rownames(counts)
+
+  # If ylevels unspecified, set to actual values
+  if (is.null(ylevels)) {
+    ylevels <- rownames(counts)
+  }
 
   # Hypothesis test
   if (test == "chi.fisher") {
@@ -287,22 +240,26 @@ tabfreq <- function(formula = NULL, data = NULL,
     p <- fit$p.value
   }
 
+  # Initialize table
+  tbl <- matrix(ylevels, ncol = 1, dimnames = list(NULL, variable.colname))
+
   # Convert decimals to variable for sprintf
   spf <- paste("%0.", decimals, "f", sep = "")
 
-  # Initialize table
-  df <- data.frame(Variable = ylevels, stringsAsFactors = FALSE)
+  # Loop through column input and add each
+  for (ii in 1: length(columns)) {
 
-  # Loop through and add columns requested
-  for (column in columns) {
+    column.ii <- columns[ii]
 
-    if (column == "n") {
+    if (column.ii == "n") {
 
-      df$N <- ""
-      df$N[1] <- n
+      # N
+      newcol <- matrix(c(n, rep("", num.ylevels - 1)),
+                       dimnames = list(NULL, "N"))
 
-    } else if (column == "overall") {
+    } else if (column.ii == "overall") {
 
+      # Overall
       if (cell == "counts") {
         part1 <- rowsums.counts
       } else if (cell %in% c("tot.percent", "col.percent")) {
@@ -330,13 +287,14 @@ tabfreq <- function(formula = NULL, data = NULL,
         part2 <- paste(" (", sprintf(spf, y.percents), ")", sep = "")
       }
 
-      df$Overall <- paste(part1, part2, sep = "")
+      newcol <- matrix(paste(part1, part2, sep = ""), ncol = 1,
+                       dimnames = list(NULL, "Overall"))
 
-    } else if (column == "xgroups") {
+    } else if (column.ii == "xgroups") {
 
       # Cell (parenth)
       if (cell == "counts") {
-        part1 <- sprintf("%.0f", counts)
+        part1 <- as.vector(counts)
       } else if (cell == "tot.percent") {
         part1 <- sprintf(spf, tot.percents)
       } else if (cell == "col.percent") {
@@ -389,42 +347,47 @@ tabfreq <- function(formula = NULL, data = NULL,
       } else if (parenth == "row.percent") {
         part2 <- paste(" (", sprintf(spf, row.percents), ")", sep = "")
       }
+      newcol <- matrix(paste(part1, part2, sep = ""), ncol = num.xlevels,
+                       dimnames = list(NULL, xlevels))
 
-      newcols <- matrix(paste(part1, part2, sep = ""), ncol = num.xlevels,
-                        dimnames = list(NULL, xlevels))
-      df <- cbind(df, newcols, stringsAsFactors = FALSE)
+    } else if (column.ii == "test") {
 
-    } else if (column == "test") {
+      # Chi-sq.
+      newcol <- matrix(c(sprintf(spf, test.stat), rep("", num.ylevels - 1)),
+                       dimnames = list(NULL, test.label))
 
-      newcol <- c(sprintf(spf, test.stat), rep("", num.ylevels - 1))
-      names(newcol) <- test.label
-      df <- cbind(df, newcol)
+    } else if (column.ii == "p") {
 
-    } else if (column == "p") {
-
-      df$P <- ""
-      df$P[1] <- do.call(formatp, c(list(p = p), formatp.list))
+      # P
+      p.formatted <- formatp(p = p, cuts = p.cuts, decimals = p.decimals,
+                             lowerbound = p.lowerbound, leading0 = p.leading0,
+                             avoid1 = p.avoid1)
+      newcol <- matrix(c(p.formatted, rep("", num.ylevels - 1)),
+                       dimnames = list(NULL, "P"))
 
     }
+
+    # Add column to table
+    tbl <- cbind(tbl, newcol)
 
   }
 
   # Remove first row if requested
   if (compress.binary & num.ylevels == 2) {
-    row1 <- df[1, , drop = FALSE]
-    df <- df[-1, , drop = FALSE]
-    summary.cols <- which(names(df) %in% c("N", "Chi-sq", "P"))
-    df[1, summary.cols] <- row1[1, summary.cols]
+    row1 <- tbl[1, , drop = FALSE]
+    tbl <- tbl[-1, , drop = FALSE]
+    summary.cols <- which(colnames(tbl) %in% c("N", "Chi-sq", "P"))
+    tbl[1, summary.cols] <- row1[1, summary.cols]
   }
 
   # Add yname row and indent ylevels if requested
   if (yname.row) {
-    row1 <- df[1, , drop = FALSE]
-    df[, 1] <- paste(ifelse(latex, "\\ \\ ", "  "), df[, 1], sep = "")
-    df <- rbind(c(yname, rep("", ncol(df) - 1)), df)
-    summary.cols <- which(colnames(df) %in% c("N", "Chi-sq", "P"))
-    df[1, summary.cols] <- row1[1, summary.cols]
-    df[2, summary.cols] <- ""
+    row1 <- tbl[1, , drop = FALSE]
+    tbl[, 1] <- paste(ifelse(latex, "\\ \\ \\ \\ ", "  "), tbl[, 1], sep = "")
+    tbl <- rbind(c(yname, rep("", ncol(tbl) - 1)), tbl)
+    summary.cols <- which(colnames(tbl) %in% c("N", "Chi-sq", "P"))
+    tbl[1, summary.cols] <- row1[1, summary.cols]
+    tbl[2, summary.cols] <- ""
   }
 
   # Add text.label to first entry of first column, whether it happens to be
@@ -447,28 +410,33 @@ tabfreq <- function(formula = NULL, data = NULL,
   } else {
     text.label <- paste(",", text.label)
   }
-  df[1, 1] <- paste(df[1, 1], text.label, sep = "")
+  tbl[1, 1] <- paste(tbl[1, 1], text.label, sep = "")
 
   # Add sample sizes to column headings if requested
   if (n.headings) {
 
-    names(df)[names(df) == "Overall"] <- paste("Overall (n = ", n, ")", sep = "")
-    names(df)[names(df) %in% xlevels] <- paste(xlevels, " (n = ", colsums.counts, ")", sep = "")
+    colnames(tbl)[colnames(tbl) == "Overall"] <-
+      paste("Overall (n = ", n, ")", sep = "")
+    colnames(tbl)[colnames(tbl) %in% xlevels] <-
+      paste(xlevels, " (n = ", colsums.counts, ")", sep = "")
 
   }
 
   # Print html version of table if requested
   if (print.html) {
 
-    df.xtable <- xtable(
-      df,
-      align = paste("ll", paste(rep("r", ncol(df) - 1), collapse = ""), sep = "", collapse = "")
-    )
-    print(df.xtable, include.rownames = FALSE, type = "html", file = html.filename)
+    tbl.xtable <-
+      xtable(tbl, align = paste("ll",
+                                paste(rep("r", ncol(tbl) - 1), collapse = ""),
+                                sep = "", collapse = ""))
+    print(tbl.xtable, include.rownames = FALSE, type = "html",
+          file = html.filename, sanitize.text.function = function(x) {
+            ifelse(substr(x, 1, 1) == " ", paste("&nbsp &nbsp", x), x)
+          })
 
   }
 
   # Return table
-  return(df)
+  return(tbl)
 
 }

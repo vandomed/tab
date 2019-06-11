@@ -1,29 +1,22 @@
-#' Create Table Comparing Group Medians
+#' Create Table Comparing Group Medians (for Complex Survey Data)
 #'
 #' Creates a table comparing the median of \code{y} across levels of \code{x}.
 #'
-#' If \code{x} has 2 levels, a Mann-Whitney U (also known as Wilcoxon
-#' rank-sum) test is used to test whether the distribution of \code{y} differs
-#' in the two groups; if \code{x} has more than 2 levels, a Kruskal-Wallis test
-#' is used to test whether the distribution of \code{y} differs across at
-#' least two of the groups. Observations with missing values for \code{x} and/or
-#' \code{y} are dropped.
+#' Basically \code{\link{tabmedians}} for complex survey data. Relies heavily on
+#' the \pkg{survey} package.
 #'
 #'
-#' @param formula Formula, e.g. \code{BMI ~ Group}.
-#' @param data Data frame containing variables named in \code{formula}.
-#' @param x Vector of values for the categorical \code{x} variable.
-#' @param y Vector of values for the continuous \code{y} variable.
+#' @param formula Formula, e.g. \code{BMI ~ Sex}.
+#' @param design Survey design object from \code{\link[survey]{svydesign}}.
 #' @param columns Character vector specifying what columns to include. Choices
 #' for each element are \code{"n"} for total sample size, \code{"overall"} for
 #' overall median, \code{"xgroups"} for \code{x} group medians, \code{"diff"}
 #' for difference in \code{x} group medians (only available for binary
-#' \code{x}), \code{"test"} for test statistic, and \code{"p"} for p-value.
+#' \code{x}), and \code{"p"} for p-value.
 #' @param parenth Character string specifying what values are shown in
 #' parentheses after the medians in each cell. Choices are \code{"none"},
 #' \code{"iqr"}, \code{"q1q3"} for first and third quartiles, \code{"range"},
-#' \code{"minmax"}, and \code{"ci"} for 95\% confidence interval for the medians
-#' based on normal approximation to binomial.
+#' \code{"minmax"}, and \code{"ci"} for 95\% confidence interval for the median.
 #' @param sep.char Character string with separator to place between lower and
 #' upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.
 #' @param xlevels Character vector with labels for the levels of \code{x}, used
@@ -31,13 +24,10 @@
 #' @param yname Character string with a label for the \code{y} variable.
 #' @param text.label Character string with text to put after the \code{y}
 #' variable name, identifying what cell values and parentheses represent.
-#' @param quantiles Numeric value. If specified, table compares \code{y} across
-#' quantiles of \code{x} created on the fly.
-#' @param quantile.vals Logical value for whether labels for \code{x} quantiles
-#' should show quantile number and corresponding range, e.g. Q1 [0.00, 0.25),
-#' rather than just the quantile number.
 #' @param decimals Numeric value specifying number of decimal places for numbers
 #' other than p-values.
+#' @param svyranktest.list List of arguments to pass to
+#' \code{\link[survey]{svyranktest}}.
 #' @param formatp.list List of arguments to pass to \code{\link[tab]{formatp}}.
 #' @param n.headings Logical value for whether to display group sample sizes in
 #' parentheses in column headings.
@@ -56,56 +46,53 @@
 #'
 #'
 #' @examples
-#' # Compare median BMI in control group vs. treatment group in sample dataset
-#' (medtable1 <- tabmedians(BMI ~ Group, data = tabdata))
+#' # Create survey design object
+#' library("survey")
+#' design <- svydesign(
+#'   data = tabsvydata,
+#'   ids = ~sdmvpsu,
+#'   strata = ~sdmvstra,
+#'   weights = ~wtmec2yr,
+#'   nest = TRUE
+#' )
 #'
-#' # Same as previous, but specifying input vectors rather than formula
-#' (medtable2 <- tabmedians(x = tabdata$Group, y = tabdata$BMI))
+#' # Compare median BMI by sex
+#' (medtable1 <- tabmedians.svy(BMI ~ Sex, design = design))
 #'
-#' # Compare median baseline systolic BP across tertiles of BMI
-#' (medtable3 <- tabmedians(bp.1 ~ BMI, data = tabdata,
-#'                          quantiles = 3, yname = "Systolic BP"))
-#'
-#' # Create single table comparing mean BMI and mean age in control vs.
-#' # treatment group. Drop missing observations first
-#' tabdata2 <- subset(tabdata, ! is.na(BMI) & ! is.na(Age))
-#' (medtable4 <- rbind(tabmeans(BMI ~ Group, data = tabdata2),
-#'                     tabmeans(Age ~ Group, data = tabdata2)))
+#' # Create single table comparing median BMI and median age by sex. Drop missing
+#' # observations first.
+#' design2 <- subset(design, ! is.na(BMI) & ! is.na(Age) & ! is.na(Sex))
+#' (medtable2 <- rbind(tabmedians.svy(BMI ~ Sex, design = design2),
+#'                     tabmedians.svy(Age ~ Sex, design = design2)))
 #'
 #' # Same as previous, but using tabmulti for convenience
-#' #(medtable5 <- tabmulti(data = tabdata, xvarname = "Group",
-#' #                       yvarnames = c("BMI", "Age"), ymeasures = "median))
-#'
+#' # (medtable3 <- tabmulti.svy(BMI + Age ~ Sex, data = tabsvydata))
 #'
 #' @export
-tabmedians <- function(formula = NULL, data = NULL,
-                       x = NULL, y = NULL,
-                       columns = c("xgroups", "p"),
-                       parenth = "iqr",
-                       sep.char = ", ",
-                       xlevels = NULL,
-                       yname = NULL,
-                       text.label = NULL,
-                       quantiles = NULL,
-                       quantile.vals = FALSE,
-                       decimals = NULL,
-                       formatp.list = NULL,
-                       n.headings = TRUE,
-                       print.html = FALSE,
-                       html.filename = "table1.html") {
+tabmedians.svy <- function(formula, design,
+                           columns = c("xgroups", "p"),
+                           parenth = "iqr",
+                           sep.char = ", ",
+                           xlevels = NULL,
+                           yname = NULL,
+                           text.label = NULL,
+                           decimals = NULL,
+                           svyranktest.list = NULL,
+                           formatp.list = NULL,
+                           n.headings = TRUE,
+                           print.html = FALSE,
+                           html.filename = "table1.html") {
 
   # Error checking
-  if (! is.null(formula) && class(formula) != "formula") {
+  if (class(formula) != "formula") {
     stop("The input 'formula' must be a formula.")
   }
-  if (! is.null(data) && ! is.data.frame(data)) {
-    stop("The input 'data' must be a data frame.")
+  if (! "survey.design" %in% class(design)) {
+    stop("The input 'design' must be a survey design object.")
   }
-  if (! is.null(y) && ! is.numeric(y)) {
-    stop("The input 'y' must be a numeric vector.")
-  }
-  if (! all(columns %in% c("n", "overall", "xgroups", "diff", "test", "p"))) {
-    stop("Each element of 'columns' must be one of the following: 'n', 'overall', 'xgroups', 'diff', 'test', 'p'.")
+  if (! all(columns %in% c("n", "overall", "xgroups", "diff", "diffci",
+                           "diff.ci", "p"))) {
+    stop("Each element of 'columns' must be one of the following: 'n', 'overall', 'xgroups', 'diff', 'diffci', 'diff.ci', 'p'.")
   }
   if (! parenth %in% c("none", "iqr", "q1q3", "range", "minmax", "ci")) {
     stop("The input 'parenth' must be one of the following: 'none', 'iqr', 'q1q3', 'range', 'minmax', 'ci'.")
@@ -121,13 +108,6 @@ tabmedians <- function(formula = NULL, data = NULL,
   }
   if (! is.null(text.label) && ! is.character(text.label)) {
     stop("The input 'text.label' must be a character string.")
-  }
-  if (! is.null(quantiles) && ! (is.numeric(quantiles) && quantiles > 1 &&
-                                 quantiles == as.integer(quantiles))) {
-    stop("The input 'quantiles' must be an integer greater than 1.")
-  }
-  if (! is.logical(quantile.vals)) {
-    stop("The input 'quantile.vals' must be a logical.")
   }
   if (! is.null(decimals) && ! (is.numeric(decimals) && decimals >= 0 &&
                                 decimals == as.integer(decimals))) {
@@ -148,53 +128,34 @@ tabmedians <- function(formula = NULL, data = NULL,
     stop("The input 'html.filename' must be a character string.")
   }
 
-  # If formula specified, figure out x and y
-  if (! is.null(formula)) {
-    varnames <- all.vars(formula)
-    xvarname <- varnames[2]
-    yvarname <- varnames[1]
-    x <- data[, xvarname]
-    y <- data[, yvarname]
-    if (is.null(yname)) {
-      yname <- yvarname
-    }
-  } else {
-    if (is.null(yname)) {
-      yname <- deparse(substitute(y))
-      if (grepl("\\$", yname)) {
-        yname <- strsplit(yname, "\\$")[[1]][2]
-      }
-    }
-  }
-
-  # If yname unspecified, use variable name
-  if (is.null(yname)) {
-    yname <- deparse(substitute(y))
-    if (grepl("\\$", yname)) {
-      yname <- strsplit(yname, "\\$")[[1]][2]
-    }
-  }
+  # Get variable names etc.
+  varnames <- all.vars(formula)
+  xvarname <- varnames[2]
+  yvarname <- varnames[1]
+  if (is.null(yname)) yname <- yvarname
 
   # Drop missing values
-  locs.complete <- which(! is.na(x) & ! is.na(y))
-  x <- x[locs.complete]
-  y <- y[locs.complete]
+  design <- eval(str2expression(paste("subset(design, ! is.na(", xvarname, ") & ! is.na(", yvarname, "))", sep = "")))
 
-  # Create quantiles if necessary
-  if (! is.null(quantiles)) {
-    x <- cut(x = x, breaks = quantile(x, probs = seq(0, 1, 1 / quantiles)),
-             include.lowest = TRUE, right = TRUE, dig.lab = 3)
-  }
+  # Extract x and y values
+  x <- design$variables[, xvarname]
+  y <- design$variables[, yvarname]
 
   # Calculate various statistics
-  medians <- tapply(X = y, INDEX = x, FUN = median)
-  ns <- tapply(X = y, INDEX = x, FUN = length)
+  svyby.svyquantile <- svyby(as.formula(paste("~", yvarname, sep = "")),
+                             by = as.formula(paste("~", xvarname, sep = "")),
+                             design = design, FUN = svyquantile, quantiles = 0.5,
+                             keep.var = FALSE, ci = TRUE)
+  medians <- unlist(svyby.svyquantile$statistic.quantiles)
+  lower <- sapply(svyby.svyquantile$statistic.CIs, function(x) x[1])
+  upper <- sapply(svyby.svyquantile$statistic.CIs, function(x) x[2])
+  ns <- table(x)
 
-  median.y <- median(y)
-  n <- sum(ns)
+  xvals <- names(ns)
+  num.groups <- length(xvals)
 
-  xvals <- names(medians)
-  num.groups <- length(medians)
+  # If xlevels unspecified, set to actual values
+  if (is.null(xlevels)) xlevels <- xvals
 
   # If decimals is unspecified, set to a reasonable value
   if (is.null(decimals)) {
@@ -217,42 +178,10 @@ tabmedians <- function(formula = NULL, data = NULL,
   }
   spf <- paste("%0.", decimals, "f", sep = "")
 
-  # If xlevels unspecified, set to actual values
-  if (is.null(xlevels)) {
-    if (! is.null(quantiles)) {
-      if (quantile.vals) {
-        xlevels <- paste("Q", 1: num.groups, " ", xvals, sep = "")
-      } else {
-        xlevels <- paste("Q", 1: num.groups, sep = "")
-      }
-    } else {
-      xlevels <- xvals
-    }
-  }
-
   # Hypothesis test
-  if (length(xlevels) == 2) {
-
-    # Mann-Whitney U test a.k.a. Wilcoxon rank-sum test
-    fit <- wilcox.test(y ~ x)
-    message(paste("Mann-Whitney U was used to test whether the distribution of ",
-                  yname, " differs in the two groups.", sep = ""))
-    test.stat <- fit$statistic
-    test.label <- "W"
-    p <- fit$p.value
-
-  } else {
-
-    # Kruskal-Wallis rank-sum test
-    fit <- kruskal.test(y ~ as.factor(x))
-    message(paste("Kruskal-Wallis was used to test whether the distribution of ",
-                  yname, " differs across at least two of the groups.",
-                  sep = ""))
-    test.stat <- fit$statistic
-    test.label <- "Chi-sq"
-    p <- fit$p.value
-
-  }
+  fit <- do.call(svyranktest, c(list(formula = formula, design = design),
+                                svyranktest.list))
+  p <- fit$p.value
 
   # Figure out text.label for first column of table
   if (is.null(text.label)) {
@@ -281,20 +210,34 @@ tabmedians <- function(formula = NULL, data = NULL,
 
     if (column == "n") {
 
-      df$N <- n
+      df$N <- sum(ns)
 
     } else if (column == "overall") {
+
+      svyquantile.q2 <- svyquantile(
+        as.formula(paste("~", yvarname, sep = "")),
+        design = design, quantiles = 0.5, keep.var = FALSE, ci = TRUE
+      )
+      median.y <- as.numeric(svyquantile.q2$quantiles)
 
       if (parenth == "none") {
         df$Overall <- sprintf(spf, median.y)
       } else if (parenth == "iqr") {
+        svyquantile.q1q3 <- svyquantile(
+          as.formula(paste("~", yvarname, sep = "")),
+          design = design, quantiles = c(0.25, 0.75), keep.var = FALSE, ci = FALSE
+        )
         df$Overall <- paste(sprintf(spf, median.y), " (",
-                            sprintf(spf, IQR(y)), ")", sep = "")
+                            sprintf(spf, diff(as.numeric(svyquantile.q1q3))),
+                            ")", sep = "")
       } else if (parenth == "q1q3") {
-        df$Overall <-
-          paste(sprintf(spf, median.y), " (",
-                sprintf(spf, quantile(y, probs = 0.25)), sep.char,
-                sprintf(spf, quantile(y, probs = 0.75)), ")", sep = "")
+        svyquantile.q1q3 <- svyquantile(
+          as.formula(paste("~", yvarname, sep = "")),
+          design = design, quantiles = c(0.25, 0.75), keep.var = FALSE, ci = FALSE
+        )
+        df$Overall <- paste(sprintf(spf, median.y), " (",
+                            sprintf(spf, svyquantile.q1q3[1]), sep.char,
+                            sprintf(spf, svyquantile.q1q3[2]), ")", sep = "")
       } else if (parenth == "range") {
         df$Overall <- paste(sprintf(spf, median.y), " (",
                             sprintf(spf, diff(range(y))), ")", sep = "")
@@ -303,15 +246,9 @@ tabmedians <- function(formula = NULL, data = NULL,
                             sprintf(spf, min(y)), sep.char,
                             sprintf(spf, max(y)), ")", sep = "")
       } else if (parenth == "ci") {
-
-        zcrit <- qnorm(p = 0.975)
-        sort.y <- sort(y)
-        lower <- sort.y[n / 2 - zcrit * sqrt(n) / 2]
-        upper <- sort.y[1 + n / 2 + zcrit * sqrt(n) / 2]
         df$Overall <- paste(sprintf(spf, median.y), " (",
-                            sprintf(spf, lower), sep.char,
-                            sprintf(spf, upper), ")", sep = "")
-
+                            sprintf(spf, svyquantile.q2$CIs[1]), sep.char,
+                            sprintf(spf, svyquantile.q2$CIs[2]), ")", sep = "")
       }
 
     } else if (column == "xgroups") {
@@ -319,16 +256,24 @@ tabmedians <- function(formula = NULL, data = NULL,
       if (parenth == "none") {
         newcols <- paste(sprintf(spf, medians))
       } else if (parenth == "iqr") {
-        iqrs <- tapply(X = y, INDEX = x, FUN = IQR)
+        svyby.svyquantile.q1q3 <- svyby(
+          as.formula(paste("~", yvarname, sep = "")),
+          by = as.formula(paste("~", xvarname, sep = "")),
+          design = design, FUN = svyquantile, quantiles = c(0.25, 0.75),
+          keep.var = FALSE
+        )
+        iqrs <- svyby.svyquantile.q1q3$statistic2 - svyby.svyquantile.q1q3$statistic1
         newcols <- paste(sprintf(spf, medians), " (",
                          sprintf(spf, iqrs), ")", sep = "")
       } else if (parenth == "q1q3") {
-        q1s <- tapply(X = y, INDEX = x, FUN = function(x) {
-          quantile(x, probs = 0.25)
-        })
-        q3s <- tapply(X = y, INDEX = x, FUN = function(x) {
-          quantile(x, probs = 0.75)
-        })
+        svyby.svyquantile.q1q3 <- svyby(
+          as.formula(paste("~", yvarname, sep = "")),
+          by = as.formula(paste("~", xvarname, sep = "")),
+          design = design, FUN = svyquantile, quantiles = c(0.25, 0.75),
+          keep.var = FALSE
+        )
+        q1s <- svyby.svyquantile.q1q3$statistic1
+        q3s <- svyby.svyquantile.q1q3$statistic2
         newcols <- paste(sprintf(spf, medians), " (",
                          sprintf(spf, q1s), sep.char,
                          sprintf(spf, q3s), ")", sep = "")
@@ -343,13 +288,8 @@ tabmedians <- function(formula = NULL, data = NULL,
                          sprintf(spf, mins), sep.char,
                          sprintf(spf, maxes), ")", sep = "")
       } else if (parenth == "ci") {
-        zcrit <- qnorm(p = 0.975)
-        lower <- tapply(X = y, INDEX = x, FUN = function(x) {
-          sort(x)[length(x) / 2 - zcrit * sqrt(length(x)) / 2]
-        })
-        upper <- tapply(X = y, INDEX = x, FUN = function(x) {
-          sort(x)[1 + length(x) / 2 + zcrit * sqrt(length(x)) / 2]
-        })
+        lower <- sapply(svyby.svyquantile$statistic.CIs, function(x) x[1])
+        upper <- sapply(svyby.svyquantile$statistic.CIs, function(x) x[2])
         newcols <- paste(sprintf(spf, medians), " (",
                          sprintf(spf, lower), sep.char,
                          sprintf(spf, upper), ")", sep = "")
@@ -360,12 +300,6 @@ tabmedians <- function(formula = NULL, data = NULL,
     } else if (column == "diff") {
 
       df$`Diff.` <- sprintf(spf, -diff(medians))
-
-    } else if (column == "test") {
-
-      newcol <- data.frame(sprintf(spf, test.stat))
-      names(newcol) <- test.label
-      df <- cbind(df, newcol)
 
     } else if (column == "p") {
 
@@ -378,7 +312,7 @@ tabmedians <- function(formula = NULL, data = NULL,
   # Add sample sizes to column headings if requested
   if (n.headings) {
 
-    names(df)[names(df) == "Overall"] <- paste("Overall (n = ", n, ")", sep = "")
+    names(df)[names(df) == "Overall"] <- paste("Overall (n = ", sum(ns), ")", sep = "")
     names(df)[names(df) %in% xlevels] <- paste(xlevels, " (n = ", ns, ")", sep = "")
 
   }

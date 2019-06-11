@@ -2,47 +2,43 @@
 % Please edit documentation in R/tabgee.R
 \name{tabgee}
 \alias{tabgee}
-\title{Generate Summary Table for Fitted Generalized Estimating Equation (GEE) Model}
+\title{Create Summary Table for Fitted Generalized Estimating Equation Model}
 \usage{
-tabgee(fit, columns = NULL, robust = TRUE, xlabels = NULL,
-  compress.factors = is.null(data), omit.refgroups = compress.factors,
-  data = NULL, sep.char = ", ", latex = FALSE, decimals = 2,
-  p.decimals = c(2, 3), p.cuts = 0.01, p.lowerbound = 0.001,
-  p.leading0 = TRUE, p.avoid1 = FALSE, variable.colname = "Variable",
+tabgee(fit, data = NULL, columns = NULL, robust = TRUE,
+  var.labels = NULL, factor.compression = 1, sep.char = ", ",
+  latex = TRUE, decimals = 2, formatp.list = NULL,
   print.html = FALSE, html.filename = "table1.html")
 }
 \arguments{
-\item{fit}{Object returned from \code{\link[gee]{gee}}.}
+\item{fit}{Fitted \code{\link[gee]{gee}} object.}
+
+\item{data}{Data frame that served as 'data' in function call to
+\code{\link[gee]{gee}}. Only needs to be specified if one or more of the
+predictors is a factor and \code{factor.compression} is 1, 2, 3, or 4.}
 
 \item{columns}{Character vector specifying what columns to include. Choices
-for each element are \code{"n"}, \code{"events"} (for binary outcomes)
-\code{"beta"}, \code{"se"}, \code{"beta.se"}, \code{"beta.betaci"},
-\code{"betaci"}, \code{"or"}, \code{"or.orci"}, \code{"orci"}, \code{"z"},
-and \code{"p"}.}
+for each element are \code{"beta"}, \code{"se"}, \code{"betaci"} for 95\% CI
+for Beta, \code{"beta.se"} for Beta (SE), \code{"beta.ci"} for Beta
+(95\% CI), \code{"or"}, \code{"orci"} for 95\% CI for OR, \code{"or.ci"} for
+OR (95\% CI), \code{"hr"}, \code{"hrci"} for 95\% CI for HR, \code{"hr.ci"}
+for HR (95\% CI), \code{"z"} for z statistic, and \code{"p"}. If OR's or HR's
+are requested, the function will trust that exponentiated betas correspond to
+these quantities.}
 
-\item{robust}{Logical value for whether 'robust' standard errors should be
-used for inference.}
+\item{robust}{Logical value for whether to use robust standard errors.}
 
-\item{xlabels}{Character vector with labels for the \code{x} variables and
-their levels. Often useful to leave as \code{NULL} first, see how the table
-looks, and then re-run with labels where they need to be.}
+\item{var.labels}{Named list specifying labels to use for certain predictors.
+For example, if \code{fit} includes a predictor named "race"
+that you want to label "Race/ethnicity" and a predictor named "age_yrs" that
+you want to label "Age (years)", use
+\code{var.labels = list(race = "Race/ethnicity", age_yrs = "Age (years)"}.}
 
-\item{compress.factors}{Logical value for whether to display factor variables
-in compressed format, with variable names omitted and levels not indented.
-Can also be "binary" to compress binary factor variables only.}
-
-\item{omit.refgroups}{Logical value for whether to omit reference groups
-for factor variables. Can also be "binary" to omit reference groups for
-binary factor variables only.
-
-
-as one row for each of the non-reference group levels, as opposed to one row
-for the variable name and one row for each of the levels including the
-reference group.}
-
-\item{data}{Data frame containing variables passed to \code{\link[gee]{gee}}
-to create \code{fit}. Only needs to be specified when one or more of the
-predictors is a factor variable and \code{compres.factors = FALSE}.}
+\item{factor.compression}{Integer value from 1 to 5 controlling how much
+compression is applied to factor predictors (higher value = more
+compression). If 1, rows are Variable, Level 1 (ref), Level 2, ...; if 2,
+rows are Variable (ref = Level 1), Level 2, ...; if 3, rows are Level 1
+(ref), Level 2, ...; if 4, rows are Level 2 (ref = Level 1), ...; if 5, rows
+are Level 2, ...}
 
 \item{sep.char}{Character string with separator to place between lower and
 upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.}
@@ -54,28 +50,7 @@ ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
 \item{decimals}{Numeric value specifying number of decimal places for numbers
 other than p-values.}
 
-\item{p.decimals}{Numeric value specifying number of decimal places for
-p-values. Can be a vector if you want the number of decimals to depend on
-what range the p-value is in. See \code{p.cuts}.}
-
-\item{p.cuts}{Numeric value or vector of cutpoints to control number of
-decimal places for p-values. For example, by default \code{p.cuts = 0.1} and
-\code{p.decimals = c(2, 3)}, meaning p-values in the range [0.1, 1] are
-printed to 2 decimal places while p-values in the range [0, 0.1) are printed
-to 3.}
-
-\item{p.lowerbound}{Numeric value specifying cutpoint beneath which p-values
-appear as <p.lowerbound.}
-
-\item{p.leading0}{Logical value for whether p-values should appear with
-leading 0's before the decimal point.}
-
-\item{p.avoid1}{Logical value for whether p-values that round to 1 should
-appear as \code{>0.99} (or similarly depending on \code{p.decimals} and
-\code{p.cuts}) rather than 1.}
-
-\item{variable.colname}{Character string with desired heading for first
-column of table, in case you prefer something other than \code{"Variable"}.}
+\item{formatp.list}{List of arguments to pass to \code{\link[tab]{formatp}}.}
 
 \item{print.html}{Logical value for whether to write a .html file with the
 table to the current working directory.}
@@ -84,47 +59,17 @@ table to the current working directory.}
 that gets written if \code{print.html = TRUE}.}
 }
 \value{
-Character matrix with table summarizing the fitted GEE.
+Data frame which you can print in R (e.g. with \strong{xtable}'s
+\code{\link[xtable]{xtable}} or \strong{knitr}'s \code{\link[knitr]{kable}})
+or export to Word, Excel, or some other program. To export the table, set
+\code{print.html = TRUE}. This will result in a .html file being written to
+your current working directory, which you can open and copy/paste into your
+document.
 }
 \description{
-Creates table summarizing a GEE model fit using the \code{\link[gee]{gee}}
-function [1].
+Creates a table summarizing a GEE fit using the \code{\link[gee]{gee}}
+function.
 }
-\details{
-Interaction and polynomial terms are compatible with \code{tabgee}. If
-interaction terms are included, the table will be formatted a little
-differently. Basically including an interaction is equivalent to setting
-\code{basic.form = TRUE}. All variable names and levels will be exactly as
-they appear when you run \code{summary(fit)}, where \code{fit} is the
-object returned from a call to \code{\link[gee]{gee}}.
-}
-\section{Note}{
-
-If you want to paste your tables into Microsoft Word, you can use either of
-these approaches:
-
-\enumerate{
-
-\item Use the \emph{write.cb} function in \strong{Kmisc} [2].
-If your table is stored in a character matrix named \code{table1}, use
-\code{write.cb(table1)} to copy the table to your clipboard. Paste the result
-into your document, then highlight the text and go to
-\code{Insert -> Table -> Convert Text to Table... OK}.
-
-\item Set \code{print.html = TRUE}. This will result in a .html file
-being written to your current working directory. When you open this file, you
-will see a (hopefully) nice-looking table that you can copy and paste into
-your document. You can control the name of this file with
-\code{html.filename}.
-}
-
-If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-\code{latex = TRUE}. Then, you can pass the returned object to
-\code{\link[xtable]{xtable}} or \code{\link[knitr]{kable}} for printing. For
-\code{\link[xtable]{xtable}}, you may have to set
-\code{sanitize.text.function = identity} when printing.
-}
-
 \examples{
 # Load in sample dataset and convert to long format
 data(tabdata)
@@ -134,28 +79,28 @@ tabdata2 <- reshape(data = tabdata,
                     timevar = "bp.visit", direction = "long")
 tabdata2 <- tabdata2[order(tabdata2$id), ]
 
-# GEE: Blood pressure at 1, 2, and 3 months vs. predictors
-geefit1 <- gee(bp ~ Age + Sex + Race + BMI + Group, id = id, data = tabdata2,
-               corstr = "unstructured")
-(geetable1 <- tabgee(fit = geefit1, data = tabdata2))
+# Blood pressure at 1, 2, and 3 months vs. age, sex, race, and treatment
+library("gee")
+fit <- gee(bp ~ Age + Sex + Race + Group, id = id, data = tabdata2,
+           corstr = "unstructured")
+kable(tabgee(fit, data = tabdata2))
 
-# GEE: High blood pressure at 1, 2, and 3 months vs. predictors. Display
-# factors in "compressed" format
-geefit2 <- gee(highbp ~ Age + Sex + Race + BMI + Group, id = id,
-               data = tabdata2, family = binomial, corstr = "unstructured")
-(geetable2 <- tabgee(fit = geefit2, data = tabdata2,
-                     compress.factors = TRUE))
+# Can also use piping
+fit \%>\% tabgee(data = tabdata2) \%>\% kable()
+
+# Same as previous, but with custom labels for Age and Race and factors
+# displayed in slightly more compressed format
+fit \%>\%
+  tabgee(data = tabdata2,
+         var.labels = list(Age = "Age (years)", Race = "Race/ethnicity"),
+         factor.compression = 2) \%>\%
+  kable()
+
+# GEE with some higher-order terms
+# higher-order terms
+fit <- gee(highbp ~ poly(Age, 2, raw = TRUE) + Sex + Race + Group + Race*Group,
+           id = id, data = tabdata2, family = "binomial", corstr = "unstructured")
+fit \%>\% tabgee(data = tabdata2) \%>\% kable()
 
 
-}
-\references{
-1. Carey, V.J. (2015). gee: Generalized Estimation Equation Solver. R package
-version 4.13-19. Ported to R by Thomas Lumley and Brian Ripley.
-\url{https://cran.r-project.org/package=gee}.
-
-2. Dahl, D.B. (2016). xtable: Export Tables to LaTeX or HTML. R package
-version 1.8-2, \url{https://cran.r-project.org/package=xtable}.
-
-3. Ushley, K. (2013). Kmisc: Kevin Miscellaneous. R package version 0.5.0.
-\url{https://CRAN.R-project.org/package=Kmisc}.
 }

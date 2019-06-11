@@ -4,7 +4,6 @@
 #' creates a table summarizing the results.
 #'
 #'
-#' @inheritSection tabmeans Note
 #' @inheritParams tabmeans
 #' @inheritParams tabglm
 #'

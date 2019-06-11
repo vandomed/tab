@@ -1,41 +1,53 @@
-#' Generate Summary Table for Fitted Generalized Estimating Equation (GEE) Model
+#' Create Summary Table for Fitted Generalized Estimating Equation Model
+#'
+#' Creates a table summarizing a GEE fit using the \code{\link[gee]{gee}}
+#' function.
 #'
 #'
-#' Creates table summarizing a GEE model fit using the \code{\link[gee]{gee}}
-#' function [1].
-#'
-#' Interaction and polynomial terms are compatible with \code{tabgee}. If
-#' interaction terms are included, the table will be formatted a little
-#' differently. Basically including an interaction is equivalent to setting
-#' \code{basic.form = TRUE}. All variable names and levels will be exactly as
-#' they appear when you run \code{summary(fit)}, where \code{fit} is the
-#' object returned from a call to \code{\link[gee]{gee}}.
-#'
-#'
-#' @inheritSection tabmeans Note
-#' @inheritParams tabmeans
-#' @inheritParams tabglm
-#'
-#'
-#' @param fit Object returned from \code{\link[gee]{gee}}.
-#'
+#' @param fit Fitted \code{\link[gee]{gee}} object.
+#' @param data Data frame that served as 'data' in function call to
+#' \code{\link[gee]{gee}}. Only needs to be specified if one or more of the
+#' predictors is a factor and \code{factor.compression} is 1, 2, 3, or 4.
 #' @param columns Character vector specifying what columns to include. Choices
-#' for each element are \code{"n"}, \code{"events"} (for binary outcomes)
-#' \code{"beta"}, \code{"se"}, \code{"beta.se"}, \code{"beta.betaci"},
-#' \code{"betaci"}, \code{"or"}, \code{"or.orci"}, \code{"orci"}, \code{"z"},
-#' and \code{"p"}.
+#' for each element are \code{"beta"}, \code{"se"}, \code{"betaci"} for 95\% CI
+#' for Beta, \code{"beta.se"} for Beta (SE), \code{"beta.ci"} for Beta
+#' (95\% CI), \code{"or"}, \code{"orci"} for 95\% CI for OR, \code{"or.ci"} for
+#' OR (95\% CI), \code{"hr"}, \code{"hrci"} for 95\% CI for HR, \code{"hr.ci"}
+#' for HR (95\% CI), \code{"z"} for z statistic, and \code{"p"}. If OR's or HR's
+#' are requested, the function will trust that exponentiated betas correspond to
+#' these quantities.
+#' @param robust Logical value for whether to use robust standard errors.
+#' @param var.labels Named list specifying labels to use for certain predictors.
+#' For example, if \code{fit} includes a predictor named "race"
+#' that you want to label "Race/ethnicity" and a predictor named "age_yrs" that
+#' you want to label "Age (years)", use
+#' \code{var.labels = list(race = "Race/ethnicity", age_yrs = "Age (years)"}.
+#' @param factor.compression Integer value from 1 to 5 controlling how much
+#' compression is applied to factor predictors (higher value = more
+#' compression). If 1, rows are Variable, Level 1 (ref), Level 2, ...; if 2,
+#' rows are Variable (ref = Level 1), Level 2, ...; if 3, rows are Level 1
+#' (ref), Level 2, ...; if 4, rows are Level 2 (ref = Level 1), ...; if 5, rows
+#' are Level 2, ...
+#' @param sep.char Character string with separator to place between lower and
+#' upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.
+#' @param latex Logical value for whether to format table so it is
+#' ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
+#' \code{\link[knitr]{kable}}.
+#' @param decimals Numeric value specifying number of decimal places for numbers
+#' other than p-values.
+#' @param formatp.list List of arguments to pass to \code{\link[tab]{formatp}}.
+#' @param print.html Logical value for whether to write a .html file with the
+#' table to the current working directory.
+#' @param html.filename Character string specifying the name of the .html file
+#' that gets written if \code{print.html = TRUE}.
 #'
-#' @param robust Logical value for whether 'robust' standard errors should be
-#' used for inference.
 #'
-#' @param data Data frame containing variables passed to \code{\link[gee]{gee}}
-#' to create \code{fit}. Only needs to be specified when one or more of the
-#' predictors is a factor variable and \code{compres.factors = FALSE}.
-#'
-#'
-#'
-#'
-#' @return Character matrix with table summarizing the fitted GEE.
+#' @return Data frame which you can print in R (e.g. with \strong{xtable}'s
+#' \code{\link[xtable]{xtable}} or \strong{knitr}'s \code{\link[knitr]{kable}})
+#' or export to Word, Excel, or some other program. To export the table, set
+#' \code{print.html = TRUE}. This will result in a .html file being written to
+#' your current working directory, which you can open and copy/paste into your
+#' document.
 #'
 #'
 #' @examples
@@ -47,40 +59,81 @@
 #'                     timevar = "bp.visit", direction = "long")
 #' tabdata2 <- tabdata2[order(tabdata2$id), ]
 #'
-#' # GEE: Blood pressure at 1, 2, and 3 months vs. predictors
-#' geefit1 <- gee(bp ~ Age + Sex + Race + BMI + Group, id = id, data = tabdata2,
-#'                corstr = "unstructured")
-#' (geetable1 <- tabgee(fit = geefit1, data = tabdata2))
+#' # Blood pressure at 1, 2, and 3 months vs. age, sex, race, and treatment
+#' library("gee")
+#' fit <- gee(bp ~ Age + Sex + Race + Group, id = id, data = tabdata2,
+#'            corstr = "unstructured")
+#' kable(tabgee(fit, data = tabdata2))
 #'
-#' # GEE: High blood pressure at 1, 2, and 3 months vs. predictors. Display
-#' # factors in "compressed" format
-#' geefit2 <- gee(highbp ~ Age + Sex + Race + BMI + Group, id = id,
-#'                data = tabdata2, family = binomial, corstr = "unstructured")
-#' (geetable2 <- tabgee(fit = geefit2, data = tabdata2,
-#'                      compress.factors = TRUE))
+#' # Can also use piping
+#' fit %>% tabgee(data = tabdata2) %>% kable()
 #'
+#' # Same as previous, but with custom labels for Age and Race and factors
+#' # displayed in slightly more compressed format
+#' fit %>%
+#'   tabgee(data = tabdata2,
+#'          var.labels = list(Age = "Age (years)", Race = "Race/ethnicity"),
+#'          factor.compression = 2) %>%
+#'   kable()
 #'
-#' @references
-#' 1. Carey, V.J. (2015). gee: Generalized Estimation Equation Solver. R package
-#' version 4.13-19. Ported to R by Thomas Lumley and Brian Ripley.
-#' \url{https://cran.r-project.org/package=gee}.
-#'
-#' 2. Dahl, D.B. (2016). xtable: Export Tables to LaTeX or HTML. R package
-#' version 1.8-2, \url{https://cran.r-project.org/package=xtable}.
-#'
-#' 3. Ushley, K. (2013). Kmisc: Kevin Miscellaneous. R package version 0.5.0.
-#'\url{https://CRAN.R-project.org/package=Kmisc}.
+#' # GEE with some higher-order terms
+#' # higher-order terms
+#' fit <- gee(highbp ~ poly(Age, 2, raw = TRUE) + Sex + Race + Group + Race*Group,
+#'            id = id, data = tabdata2, family = "binomial", corstr = "unstructured")
+#' fit %>% tabgee(data = tabdata2) %>% kable()
 #'
 #'
 #'@export
-tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
-                   compress.factors = is.null(data),
-                   omit.refgroups = compress.factors, data = NULL,
-                   sep.char = ", ", latex = FALSE, decimals = 2,
-                   p.decimals = c(2, 3), p.cuts = 0.01, p.lowerbound = 0.001,
-                   p.leading0 = TRUE, p.avoid1 = FALSE,
-                   variable.colname = "Variable", print.html = FALSE,
+tabgee <- function(fit,
+                   data = NULL,
+                   columns = NULL,
+                   robust = TRUE,
+                   var.labels = NULL,
+                   factor.compression = 1,
+                   sep.char = ", ",
+                   latex = TRUE,
+                   decimals = 2,
+                   formatp.list = NULL,
+                   print.html = FALSE,
                    html.filename = "table1.html") {
+
+  # Error checking
+  if (! "gee" %in% class(fit)) {
+    stop("The input 'fit' must be a fitted 'gee'.")
+  }
+  if (! is.null(columns) &&
+      ! all(columns %in% c("beta", "se", "betaci", "beta.se", "beta.ci", "or",
+                           "orci", "or.ci", "hr", "hrci", "hr.ci", "z",
+                           "p"))) {
+    stop("Each element of 'columns' must be one of the following: 'beta', 'se', 'betaci', 'beta.se', 'beta.ci', 'or', 'orci', 'or.ci', 'hr', 'hrci', 'hr.ci', 'z', 'p'.")
+  }
+  if (! is.logical(robust)) {
+    stop("The input 'robust' must be a logical.")
+  }
+  if (! factor.compression %in% 1: 5) {
+    stop("The input 'factor.compression' must be set to 1, 2, 3, 4, or 5.")
+  }
+  if (! is.character(sep.char)) {
+    stop("The input 'sep.char' must be a character string.")
+  }
+  if (! is.logical(latex)) {
+    stop("The input 'latex' must be a logical.")
+  }
+  if (! (is.numeric(decimals) && decimals >= 0 &&
+         decimals == as.integer(decimals))) {
+    stop("The input 'decimals' must be a non-negative integer.")
+  }
+  if (! is.null(formatp.list) &&
+      ! (is.list(formatp.list) && all(names(formatp.list) %in%
+                                      names(as.list(args(formatp)))))) {
+    stop("The input 'format.p' must be a named list of arguments to pass to 'formatp'.")
+  }
+  if (! is.logical(print.html)) {
+    stop("The input 'print.html' must be a logical.")
+  }
+  if (! is.character("html.filename")) {
+    stop("The input 'html.filename' must be a character string.")
+  }
 
   # Extract info from fit
   invisible(capture.output(summary.fit <- summary(fit)))
@@ -89,359 +142,261 @@ tabgee <- function(fit, columns = NULL, robust = TRUE, xlabels = NULL,
   betas <- coefmat[, "Estimate"]
   if (robust) {
     ses <- coefmat[, "Robust S.E."]
-    zs <- coefmat[, "Robust z"]
   } else {
     ses <- coefmat[, "Naive S.E."]
-    zs <- coefmat[, "Naive z"]
   }
+  lower <- betas - qnorm(0.975) * ses
+  upper <- betas + qnorm(0.975) * ses
+  zs <- betas / ses
   ps <- pnorm(-abs(zs)) * 2
-  intercept <- rownames.coefmat[1] == "(Intercept)"
-  gee.fam <- fit$family$family
-  gee.link <- fit$family$link
+  intercept <- attr(fit$terms, "intercept") == 1
 
-  # Default columns to include depending on family of GEE
+  # If columns unspecified, figure out reasonable defaults
   if (is.null(columns)) {
-    if (gee.fam == "binomial" & gee.link == "logit") {
-      columns <- c("beta.se", "or.orci", "p")
+
+    gee.family <- fit$family$family
+    gee.link <- fit$family$link
+    if (gee.family == "binomial" & gee.link == "logit") {
+      columns <- c("beta.se", "or.ci", "p")
+    } else if (gee.family == "poisson" & gee.link == "log") {
+      columns <- c("beta.se", "hr.ci", "p")
     } else {
-      columns <- c("beta.se", "p")
+      columns <- c("beta.se", "betaci", "p")
     }
+
   }
-
-  # Determine whether xlabels has to be created
-  create.xlabels <- is.null(xlabels)
-
-  # Determine whether there are factors, interactions, or polynomials
-  classes <- attr(fit$terms, "dataClasses")
-  x.factors <- names(classes)[classes == "factor"]
-  factors <- length(x.factors) > 0
-
-  interactions <- length(grep(pattern = ":", x = rownames.coefmat)) > 1
-
-  polynomial.rows <- grep(pattern = "poly(", x = rownames.coefmat, fixed = TRUE)
-  polynomials <- length(polynomial.rows) > 0
-
-  # If necessary, force compress.factors to be TRUE and notify user of reason
-  if (interactions & (compress.factors != FALSE | omit.refgroups != FALSE)) {
-    message("Because the fitted GEE has interaction terms, 'compress.factors' and 'omit.refgroups' are being set to TRUE. This limitation may be addressed in future versions of 'tabgee'.")
-    compress.factors <- omit.refgroups <- TRUE
-  } else if (omit.refgroups != TRUE & is.null(data) & create.xlabels) {
-    message("The 'omit.refgroups' input is being switched to TRUE because reference group labels are not available. If you want to display reference groups, re-run with 'data' or 'xlabels' specified.")
-    omit.refgroups <- TRUE
-  }
-
-  # Determine row indices for table entries and create xlabels vector
-  if (compress.factors == TRUE & omit.refgroups == TRUE) {
-
-    # Compressed factor formatting
-
-    # All rows of table have entries
-    entry.rows <- 1: nrow(coefmat)
-    ref.rows <- NULL
-
-    # Create xlabels
-    if (create.xlabels) {
-
-      # Start with row names
-      if (intercept) {
-        xlabels <- c("Intercept", rownames.coefmat[-1])
-      } else {
-        xlabels <- rownames.coefmat
-      }
-
-      # Clean up polynomials
-      if (polynomials) {
-
-        for (ii in polynomial.rows) {
-          xlabel.parts <- unlist(strsplit(x = xlabels[ii], split = ","))
-          varname.ii <- substring(xlabel.parts[1], first = 6)
-          poly.order <- as.numeric(substring(xlabel.parts[3],
-                                             first = nchar(xlabel.parts[3])))
-          if (poly.order == 1) {
-            xlabels[ii] <- varname.ii
-          } else if (poly.order == 2) {
-            xlabels[ii] <- paste(varname.ii, "squared")
-          } else if (poly.order == 3) {
-            xlabels[ii] <- paste(varname.ii, "cubed")
-          } else {
-            xlabels[ii] <- paste(varname.ii, poly.order, sep = "^")
-          }
-        }
-
-      }
-
-      # Clean up factors (imperfect solution - could go wrong!)
-      if (factors | interactions) {
-
-        for (ii in 1: length(x.factors)) {
-          xlabels <- unlist(lapply(xlabels, function(x)
-            gsub(pattern = x.factors[ii], replacement = "", x = x)))
-        }
-
-      }
-
-    }
-
-  } else {
-
-    # Expanded factor formatting
-
-    rowcount <- ifelse(intercept, 1, 0)
-    entry.rows <- rowcount
-    factorname.rows <- c()
-    ref.rows <- c()
-    bfactorname.rows <- c()
-    blevel.rows <- c()
-    bref.rows <- c()
-
-    if (create.xlabels & intercept) {
-      xlabels <- "Intercept"
-    }
-    for (ii in 1:
-         length(unlist(strsplit(x = deparse(fit$call, width.cutoff = 500),
-                                split = "+", fixed = TRUE)))) {
-
-      rowcount <- rowcount + 1
-      varname.ii <- deparse(fit$terms[ii][[3]])
-      if (substr(varname.ii, 1, 4) == "poly") {
-
-        # Clean up polynomial
-        varname.ii.split <-
-          unlist(strsplit(substring(varname.ii, first = 6), split = ","))
-        varname.ii <- varname.ii.split[1]
-        poly.order <- as.numeric(varname.ii.split[2])
-        if (create.xlabels) {
-          if (poly.order == 1) {
-            xlabels[rowcount] <- varname.ii
-          } else if (poly.order == 2) {
-            xlabels[rowcount: (rowcount + 1)] <-
-              c(varname.ii, paste(varname.ii, "squared"))
-          } else if (poly.order == 3) {
-            xlabels[rowcount: (rowcount + 2)] <-
-              c(varname.ii, paste(varname.ii, c("squared", "cubed")))
-          } else {
-            xlabels[rowcount: (rowcount + poly.order - 1)] <-
-              c(varname.ii, paste(varname.ii, 2: poly.order, sep = "^"))
-          }
-        }
-        entry.rows <- c(entry.rows, rowcount: (rowcount + poly.order - 1))
-        rowcount <- rowcount + poly.order - 1
-
-      } else if (varname.ii %in% x.factors) {
-
-        # Clean up factor
-        locs <- which(substr(rownames.coefmat, start = 1,
-                             stop = nchar(varname.ii)) == varname.ii)
-        levels.ii <- levels(data[[varname.ii]])
-        nlevels.ii <- length(levels.ii)
-        new.entries <- (rowcount + 1): (rowcount + nlevels.ii)
-        if (create.xlabels) {
-          xlabels[rowcount] <- varname.ii
-          xlabels[new.entries] <- levels.ii
-        }
-        xlabels[new.entries] <-
-          paste("  ", xlabels[new.entries], sep = "")
-        xlabels[rowcount + 1] <- paste(xlabels[rowcount + 1], "(ref)")
-
-        entry.rows <- c(entry.rows, (rowcount + 2): (rowcount + nlevels.ii))
-        factorname.rows <- c(factorname.rows, rowcount)
-        ref.rows <- c(ref.rows, rowcount + 1)
-        if (nlevels.ii == 2) {
-          bfactorname.rows <- c(bfactorname.rows, rowcount)
-          bref.rows <- c(bref.rows, rowcount + 1)
-          blevel.rows <- c(blevel.rows, rowcount + 1, rowcount + 2)
-        }
-        rowcount <- rowcount + nlevels.ii
-
-      } else {
-
-        entry.rows <- c(entry.rows, rowcount)
-        if (create.xlabels) {
-          xlabels[rowcount] <- varname.ii
-        }
-
-      }
-    }
-  }
-
-  # Initialize table
-  tbl <- matrix(xlabels, ncol = 1, dimnames = list(NULL, variable.colname))
-  nrows <- nrow(tbl)
 
   # Convert decimals to variable for sprintf
   spf <- paste("%0.", decimals, "f", sep = "")
 
-  # Loop through column input and add each
-  for (ii in 1: length(columns)) {
+  # Initialize table
+  df <- data.frame(Variable = rownames.coefmat, stringsAsFactors = FALSE)
 
-    column.ii <- columns[ii]
+  # Loop through and add columns requested
+  for (column in columns) {
 
-    if (column.ii == "n") {
+    if (column == "beta") {
 
-      # N
-      newcol <- matrix(c(length(fit$residuals), rep("", nrows - 1)), ncol = 1,
-                       dimnames = list(NULL, "N"))
+      df$`Beta` <- sprintf(spf, betas)
 
-    } else if (column.ii == "events") {
+    } else if (column == "se") {
 
-      # Events
-      newcol <- matrix(c(sum(fit$model[, 1]), rep("", nrows - 1)), ncol = 1,
-                       dimnames = list(NULL, "Events"))
+      df$`SE` <- sprintf(spf, ses)
 
-    } else if (column.ii == "beta") {
+    } else if (column == "betaci") {
 
-      # Beta
-      newcol <- matrix("", ncol = 1, nrow = nrows,
-                       dimnames = list(NULL, "Beta"))
-      newcol[entry.rows, 1] <- sprintf(spf, betas)
-      newcol[ref.rows, 1] <- "-"
+      df$`95% CI` <- paste("(", sprintf(spf, lower), sep.char,
+                           sprintf(spf, upper), ")", sep = "")
 
-    } else if (column.ii == "se") {
+    } else if (column == "beta.se") {
 
-      # SE
-      newcol <- matrix("", ncol = 1, nrow = nrows, dimnames = list(NULL, "SE"))
-      newcol[entry.rows, 1] <- sprintf(spf, ses)
-      newcol[ref.rows, 1] <- "-"
+      df$`Beta (SE)` <- paste(sprintf(spf, betas), " (",
+                              sprintf(spf, ses), ")", sep = "")
 
-    } else if (column.ii == "beta.se") {
+    } else if (column == "beta.ci") {
 
-      # Beta (SE)
-      newcol <- matrix("", ncol = 1, nrow = nrows,
-                       dimnames = list(NULL, "Beta (SE)"))
-      newcol[entry.rows, 1] <-
-        paste(sprintf(spf, betas), " (", sprintf(spf, ses), ")", sep = "")
-      newcol[ref.rows, 1] <- "-"
+      df$`Beta (95% CI)` <- paste(sprintf(spf, betas), " (",
+                                  sprintf(spf, lower), sep.char,
+                                  sprintf(spf, upper), ")", sep = "")
 
-    } else if (column.ii == "beta.betaci") {
+    } else if (column == "or") {
 
-      # Beta (95% CI)
-      newcol <- matrix("", ncol = 1, nrow = nrows,
-                       dimnames = list(NULL, "Beta (95% CI)"))
-      zcrit <- qnorm(0.975)
-      newcol[entry.rows, 1] <-
-        paste(sprintf(spf, betas), " (",
-              sprintf(spf, betas - zcrit * ses), sep.char,
-              sprintf(spf, betas + zcrit * ses), ")", sep = "")
-      newcol[ref.rows, 1] <- "-"
+      df$`OR` <- sprintf(spf, exp(betas))
+      if (intercept) df$`OR`[1] <- "-"
 
-    } else if (column.ii == "betaci") {
+    } else if (column == "orci") {
 
-      # 95% CI for Beta
-      newcol <- matrix("", ncol = 1, nrow = nrows,
-                       dimnames = list(NULL, "95% CI for Beta"))
-      zcrit <- qnorm(0.975)
-      newcol[entry.rows, 1] <-
-        paste(sprintf(spf, betas - zcrit * ses), sep.char,
-              sprintf(spf, betas + zcrit * ses), sep = "")
-      newcol[ref.rows, 1] <- "-"
+      df$`95% CI` <- paste("(", sprintf(spf, exp(lower)), sep.char,
+                           sprintf(spf, exp(upper)), ")", sep = "")
+      if (intercept) df$`95% CI`[1] <- "-"
 
-    } else if (column.ii == "or") {
+    } else if (column == "or.ci") {
 
-      # OR
-      newcol <- matrix("", ncol = 1, nrow = nrows, dimnames = list(NULL, "OR"))
-      newcol[entry.rows, 1] <- sprintf(spf, exp(betas))
-      if (intercept) {
-        newcol[1, 1] <- "-"
-      }
-      newcol[ref.rows, 1] <- "-"
+      df$`OR (95% CI)` <- paste(sprintf(spf, exp(betas)), " (",
+                                sprintf(spf, exp(lower)), sep.char,
+                                sprintf(spf, exp(upper)), ")", sep = "")
+      if (intercept) df$`OR (95% CI)`[1] <- "-"
 
-    } else if (column.ii == "or.orci") {
+    } else if (column == "hr") {
 
-      # OR (95% CI)
-      newcol <- matrix("", ncol = 1, nrow = nrows,
-                       dimnames = list(NULL, "OR (95% CI)"))
-      zcrit <- pnorm(0.975)
-      newcol[entry.rows, 1] <-
-        paste(sprintf(spf, exp(betas)), " (",
-              sprintf(spf, exp(betas - zcrit * ses)), sep.char,
-              sprintf(spf, exp(betas + zcrit * ses)), ")", sep = "")
-      if (intercept) {
-        newcol[1, 1] <- "-"
-      }
-      newcol[ref.rows, 1] <- "-"
+      df$`HR` <- sprintf(spf, exp(betas))
 
-    } else if (column.ii == "orci") {
+    } else if (column == "hrci") {
 
-      # 95% CI for OR
-      newcol <- matrix("", ncol = 1, nrow = nrows,
-                       dimnames = list(NULL, "95% CI for OR"))
-      zcrit <- pnorm(0.975)
-      newcol[entry.rows, 1] <-
-        paste(sprintf(spf, exp(betas - zcrit * ses)), sep.char,
-              sprintf(spf, exp(betas + zcrit * ses)), sep = "")
-      if (intercept) {
-        newcol[1, 1] <- "-"
-      }
-      newcol[ref.rows, 1] <- "-"
+      df$`95% CI` <- paste("(", sprintf(spf, exp(lower)), sep.char,
+                           sprintf(spf, exp(upper)), ")", sep = "")
+      if (intercept) df$`95% CI`[1] <- "-"
 
-    } else if (column.ii == "z") {
+    } else if (column == "hr.ci") {
 
-      # z
-      newcol <- matrix("", ncol = 1, nrow = nrows, dimnames = list(NULL, "Z"))
-      newcol[entry.rows, 1] <- sprintf(spf, zs)
-      newcol[ref.rows, 1] <- "-"
+      df$`HR (95% CI)` <- paste(sprintf(spf, exp(betas)), " (",
+                                sprintf(spf, exp(lower)), sep.char,
+                                sprintf(spf, exp(upper)), ")", sep = "")
+      if (intercept) df$`HR (95% CI)`[1] <- "-"
 
-    } else if (column.ii == "p") {
+    } else if (column == "z") {
 
-      # P
-      newcol <- matrix("", ncol = 1, nrow = nrows, dimnames = list(NULL, "P"))
-      newcol[entry.rows, 1] <-
-        formatp(p = ps, cuts = p.cuts, decimals = p.decimals,
-                lowerbound = p.lowerbound, leading0 = p.leading0,
-                avoid1 = p.avoid1)
-      newcol[ref.rows, 1] <- "-"
+      df$`z` <- sprintf(spf, zs)
+
+    } else if (column == "p") {
+
+      df$`P` <- do.call(formatp, c(list(p = ps), formatp.list))
 
     }
-
-    # Add column to table
-    tbl <- cbind(tbl, newcol)
 
   }
 
-  # Drop rows with factor variable names and reference groups if requested
-  if ((compress.factors != FALSE | omit.refgroups != FALSE) & !
-      (compress.factors == TRUE & omit.refgroups == TRUE)) {
-    rows.remove <- c()
-    if (compress.factors == "binary") {
-      tbl[blevel.rows, 1] <- gsub(pattern = "  ", replacement = "",
-                                  x = tbl[blevel.rows, 1], fixed = TRUE)
-      rows.remove <- c(rows.remove, bfactorname.rows)
-    } else if (compress.factors == TRUE) {
-      tbl[, 1] <- gsub(pattern = "  ", replacement = "",
-                       x = tbl[, 1], fixed = TRUE)
-      rows.remove <- c(rows.remove, factorname.rows)
+  # Remove parentheses around intercept
+  if (intercept) df$Variable[1] <- "Intercept"
+
+  # If data is unspecified, use highest possible factor compression
+  if (is.null(data)) {
+    if (factor.compression != 5) {
+      message("Changed 'factor.compression' from ", factor.compression, " to 5 because 'data' is unspecified.")
+      factor.compression <- 5
     }
-    if (omit.refgroups == "binary") {
-      rows.remove <- c(rows.remove, bref.rows)
-    } else if (omit.refgroups == TRUE) {
-      rows.remove <- c(rows.remove, ref.rows)
-    }
-    tbl <- tbl[-rows.remove, , drop = FALSE]
   }
 
-  # Reformat for xtable if necessary
-  if (latex) {
-    tbl[tbl == "-"] <- "--"
-    tbl[, 1] <- gsub(pattern = "  ", replacement = "\\ \\ \\ \\ ",
-                     x = tbl[, 1], fixed = TRUE)
+  # Clean up factor variables
+  dataClasses <- attr(fit$terms, "dataClasses")
+  factors <- names(dataClasses[dataClasses == "factor"])
+  if (length(factors) > 0) {
+
+    for (varname.ii in factors) {
+      if (factor.compression == 1) {
+
+        # Rows are Variable, Level 1 (ref), Level 2, ...
+        levels.ii <- levels(data[, varname.ii])
+        locs <- which(df$Variable %in% paste(varname.ii, levels.ii, sep = ""))
+        df$Variable[locs] <- gsub(pattern = varname.ii, replacement = "  ", x = df$Variable[locs])
+        newrows <- matrix("", nrow = 2, ncol = ncol(df), dimnames = list(NULL, names(df)))
+        newrows[2, ] <- "-"
+        newrows[1, 1] <- ifelse(varname.ii %in% names(var.labels), var.labels[[varname.ii]], varname.ii)
+        newrows[2, 1] <- paste("  ", paste(levels.ii[1], " (ref)", sep = ""), sep = "")
+        df <- rbind(df[setdiff(1: locs[1], locs[1]), ], newrows, df[locs[1]: nrow(df), ])
+
+      } else if (factor.compression == 2) {
+
+        # Rows are Variable (ref = Level 1), Level 2, ...
+        levels.ii <- levels(data[, varname.ii])
+        locs <- which(df$Variable %in% paste(varname.ii, levels.ii, sep = ""))
+        df$Variable[locs] <- gsub(pattern = varname.ii, replacement = "  ", x = df$Variable[locs])
+        newrow <- matrix("", nrow = 1, ncol = ncol(df), dimnames = list(NULL, names(df)))
+        newrow[1, 1] <- paste(
+          ifelse(varname.ii %in% names(var.labels), var.labels[[varname.ii]], varname.ii),
+          " (ref = ", levels.ii[1], ")", sep = ""
+        )
+        df <- rbind(df[setdiff(1: locs[1], locs[1]), ], newrow, df[locs[1]: nrow(df), ])
+
+      } else if (factor.compression == 3) {
+
+        # Rows are Level 1 (ref), Level 2, ...
+        levels.ii <- levels(data[, varname.ii])
+        locs <- which(df$Variable %in% paste(varname.ii, levels.ii, sep = ""))
+        df$Variable[locs] <- gsub(pattern = varname.ii, replacement = "", x = df$Variable[locs])
+        newrow <- matrix("-", nrow = 1, ncol = ncol(df), dimnames = list(NULL, names(df)))
+        newrow[1, 1] <- paste(levels.ii[1], " (ref)", sep = "")
+        df <- rbind(df[setdiff(1: locs[1], locs[1]), ], newrow, df[locs[1]: nrow(df), ])
+
+      } else if (factor.compression == 4) {
+
+        # Rows are Level 2 (ref = Level 1), ...
+        levels.ii <- levels(data[, varname.ii])
+        locs <- which(df$Variable %in% paste(varname.ii, levels.ii, sep = ""))
+        df$Variable[locs] <- paste(
+          gsub(pattern = varname.ii, replacement = "", x = df$Variable[locs]),
+          " (ref = ", levels.ii[1], ")", sep = ""
+        )
+
+      } else if (factor.compression == 5) {
+
+        # Rows are Level 2, ...
+        df$Variable[locs] <- gsub(pattern = varname.ii, replacement = "", x = df$Variable[locs])
+
+      }
+
+    }
+
+  }
+
+  # Clean up interaction terms
+  interactions <- grep(":", attr(fit$terms, "term.labels"), value = TRUE)
+  for (interaction.ii in interactions) {
+    components <- unlist(strsplit(interaction.ii, ":"))
+    locs <- intersect(grep(components[1], df$Variable),
+                      grep(components[2], df$Variable))
+    if (length(locs) == 1) {
+      components <- c(
+        ifelse(components[1] %in% names(var.labels), var.labels[[components[1]]], components[1]),
+        ifelse(components[2] %in% names(var.labels), var.labels[[components[2]]], components[2])
+      )
+      df$Variable[locs] <- paste(components, collapse = " by ")
+    } else {
+      labs <- df$Variable[locs]
+      labs <- gsub(components[1], "", labs)
+      labs <- gsub(components[2], "", labs)
+      labs <- gsub(":", ", ", labs)
+      df$Variable[locs] <- paste("  ", labs, sep = "")
+      newrow <- matrix("", nrow = 1, ncol = ncol(df), dimnames = list(NULL, names(df)))
+      components <- c(
+        ifelse(components[1] %in% names(var.labels), var.labels[[components[1]]], components[1]),
+        ifelse(components[2] %in% names(var.labels), var.labels[[components[2]]], components[2])
+      )
+      newrow[1, 1] <- paste(components, collapse = " by ")
+      df <- rbind(df[setdiff(1: locs[1], locs[1]), ], newrow, df[locs[1]: nrow(df), ])
+    }
+  }
+
+  # Clean up polynomial terms
+  polynomials <- grep("poly(", attr(fit$terms, "term.labels"), fixed = TRUE, value = TRUE)
+  for (polynomial.ii in polynomials) {
+    split.ii <- unlist(strsplit(polynomial.ii, split = ", "))
+    varname.ii <- substring(split.ii[1], first = 6)
+    poly.order <- as.numeric(split.ii[2])
+    locs <- grep(polynomial.ii, df$Variable, fixed = TRUE)
+    if (poly.order == 1) {
+      df$Variable[locs] <- varname.ii
+    } else if (poly.order == 2) {
+      df$Variable[locs] <- c(varname.ii, paste(varname.ii, "squared"))
+    } else if (poly.order == 3) {
+      df$Variable[locs] <- c(varname.ii, paste(varname.ii, c("squared", "cubed")))
+    } else {
+      df$Variable[locs] <- c(varname.ii, paste(varname.ii, 2: poly.order, sep = "^"))
+    }
+  }
+
+  # Add user-specified labels for numeric variables
+  if (! is.null(var.labels)) {
+    numerics <- names(dataClasses[dataClasses == "numeric"])
+    if (length(numerics) > 0) {
+      for (varname.ii in numerics) {
+        loc <- which(df$Variable == varname.ii)
+        if (length(loc) == 1) {
+          df$Variable[loc] <- ifelse(varname.ii %in% names(var.labels),
+                                     var.labels[[varname.ii]], varname.ii)
+        }
+      }
+    }
   }
 
   # Print html version of table if requested
   if (print.html) {
 
-    tbl.xtable <-
-      xtable(tbl, align = paste("ll",
-                                paste(rep("r", ncol(tbl) - 1), collapse = ""),
-                                sep = "", collapse = ""))
-    print(tbl.xtable, include.rownames = FALSE, type = "html",
-          file = html.filename,
-          sanitize.text.function = function(x) {
-            ifelse(substr(x, 1, 1) == " ", paste("&nbsp &nbsp", x), x)
-          })
+    df.xtable <- xtable(
+      df,
+      align = paste("ll", paste(rep("r", ncol(df) - 1), collapse = ""), sep = "", collapse = "")
+    )
+    print(df.xtable, include.rownames = FALSE, type = "html", file = html.filename)
 
   }
 
-  # Return tbl
-  return(tbl)
+  # Reformat for latex if requested
+  if (latex) {
+    df$Variable <- gsub(pattern = "  ", replacement = "\\ \\ ", x = df$Variable, fixed = TRUE)
+  }
+
+  # Remove row names and return table
+  rownames(df) <- NULL
+  return(df)
 
 }

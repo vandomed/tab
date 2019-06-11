@@ -1,18 +1,14 @@
-#' Create Summary Table for Fitted Generalized Linear Model
+#' Create Summary Table for Fitted Cox Proportional Hazards Model
 #'
-#' Creates a table summarizing a GLM fit using the \code{\link[stats]{glm}}
+#' Creates a table summarizing a GEE fit using the \code{\link[survival]{coxph}}
 #' function.
 #'
 #'
-#' @param fit Fitted \code{\link[stats]{glm}} object.
-#' @param columns Character vector specifying what columns to include. Choices
-#' for each element are \code{"beta"}, \code{"se"}, \code{"betaci"} for 95\% CI
-#' for Beta, \code{"beta.se"} for Beta (SE), \code{"beta.ci"} for Beta
-#' (95\% CI), \code{"or"}, \code{"orci"} for 95\% CI for OR, \code{"or.ci"} for
-#' OR (95\% CI), \code{"hr"}, \code{"hrci"} for 95\% CI for HR, \code{"hr.ci"}
-#' for HR (95\% CI), \code{"test"} for z/t statistic, and \code{"p"}. If OR's or
-#' HR's are requested, the function will trust that exponentiated betas
-#' correspond to these quantities.
+#' @param fit Fitted \code{\link[survival]{coxph}} object.
+#' @param columns Character vector specifying what columns to include. Choies
+#' for each element are \code{"events"}, \code{"beta"}, \code{"se"},
+#' \code{"beta.se"}, \code{"beta.betaci"}, \code{"betaci"}, \code{"hr"},
+#' \code{"hr.hrci"}, \code{"hrci"}, \code{"z"}, and \code{"p"}.
 #' @param var.labels Named list specifying labels to use for certain predictors.
 #' For example, if \code{fit} includes a predictor named "race"
 #' that you want to label "Race/ethnicity" and a predictor named "age_yrs" that
@@ -47,52 +43,57 @@
 #'
 #'
 #' @examples
-#' # Linear regression: BMI vs. age, sex, race, and treatment
-#' fit <- glm(BMI ~ Age + Sex + Race + Group, data = tabdata)
-#' kable(tabglm(fit))
+#' # Cox PH model with age, sex, race, and treatment
+#' library("survival")
+#' fit <- coxph(Surv(time = time, event = delta) ~ Age + Sex + Race + Group,
+#'              data = tabdata)
+#' kable(tabcoxph(fit))
 #'
 #' # Can also use piping
-#' fit %>% tabglm() %>% kable()
-#'
-#' # Logistic regression: 1-year mortality vs. age, sex, race, and treatment
-#' fit <- glm(death_1yr ~ Age + Sex + Race + Group, data = tabdata,
-#'            family = binomial)
-#' fit %>% tabglm() %>% kable()
+#' fit %>% tabcoxph() %>% kable()
 #'
 #' # Same as previous, but with custom labels for Age and Race and factors
 #' # displayed in slightly more compressed format
 #' fit %>%
-#'   tabglm(var.labels = list(Age = "Age (years)", Race = "Race/ethnicity"),
-#'          factor.compression = 2) %>%
-#'   kable()
+#'   tabcoxph(var.labels = list(Age = "Age (years)", Race = "Race/ethnicity"),
+#'            factor.compression = 2) %>%
+#'            kable()
 #'
-#' # Logistic regression model with some higher-order terms
-#' fit <- glm(death_1yr ~ poly(Age, 2, raw = TRUE) + Sex + BMI + Sex * BMI,
-#'            data = tabdata, family = "binomial")
-#' fit %>% tabglm() %>% kable()
+#' # Cox PH model with some higher-order terms
+#' fit <- coxph(Surv(time = time, event = delta) ~
+#'              poly(Age, 2, raw = TRUE) + Sex + Race + Group + Race*Group,
+#'              data = tabdata)
+#' fit %>% tabcoxph() %>% kable()
 #'
 #'
-#' @export
-tabglm <- function(fit,
-                   columns = NULL,
-                   var.labels = NULL,
-                   factor.compression = 1,
-                   sep.char = ", ",
-                   latex = TRUE,
-                   decimals = 2,
-                   formatp.list = NULL,
-                   print.html = FALSE,
-                   html.filename = "table1.html") {
+#' @references
+#' 1. Therneau, T. (2015). A Package for Survival Analysis in S. R package
+#' version 2.38. \url{https://cran.r-project.org/package=survival}.
+#'
+#' 2. Therneau, T.M. and Grambsch, P.M. (2000). Modeling Survival Data:
+#' Extending the Cox Model. Springer, New York. ISBN 0-387-98784-3.
+#'
+#'
+#'@export
+tabcoxph <- function(fit,
+                     columns = c("beta.se", "hr.ci", "p"),
+                     var.labels = NULL,
+                     factor.compression = 1,
+                     sep.char = ", ",
+                     latex = TRUE,
+                     decimals = 2,
+                     formatp.list = NULL,
+                     print.html = FALSE,
+                     html.filename = "table1.html") {
 
   # Error checking
-  if (! "glm" %in% class(fit)) {
-    stop("The input 'fit' must be a fitted 'glm'.")
+  if (! "coxph" %in% class(fit)) {
+    stop("The input 'fit' must be a fitted 'coxph'.")
   }
   if (! is.null(columns) &&
       ! all(columns %in% c("beta", "se", "betaci", "beta.se", "beta.ci", "or",
-                           "orci", "or.ci", "hr", "hrci", "hr.ci", "test",
-                           "p"))) {
-    stop("Each element of 'columns' must be one of the following: 'beta', 'se', 'betaci', 'beta.se', 'beta.ci', 'or', 'orci', 'or.ci', 'hr', 'hrci', 'hr.ci', 'test', 'p'.")
+                           "hr", "hrci", "hr.ci", "z", "p"))) {
+    stop("Each element of 'columns' must be one of the following: 'beta', 'se', 'betaci', 'beta.se', 'beta.ci', 'hr', 'hrci', 'hr.ci', 'z', 'p'.")
   }
   if (! factor.compression %in% 1: 5) {
     stop("The input 'factor.compression' must be set to 1, 2, 3, 4, or 5.")
@@ -123,27 +124,14 @@ tabglm <- function(fit,
   invisible(capture.output(summary.fit <- summary(fit)))
   coefmat <- summary.fit$coefficients
   rownames.coefmat <- rownames(coefmat)
-  betas <- coefmat[, "Estimate"]
-  ses <- coefmat[, "Std. Error"]
+  betas <- coefmat[, "coef"]
+  hrs <- coefmat[, "exp(coef)"]
+  ses <- coefmat[, "se(coef)"]
+  zs <- coefmat[, "z"]
+  ps <- coefmat[, "Pr(>|z|)"]
   confint.fit <- confint(fit)
   lower <- confint.fit[, 1]
   upper <- confint.fit[, 2]
-  intercept <- attr(fit$terms, "intercept") == 1
-
-  # If columns unspecified, figure out reasonable defaults
-  if (is.null(columns)) {
-
-    glm.family <- fit$family$family
-    glm.link <- fit$family$link
-    if (glm.family == "binomial" & glm.link == "logit") {
-      columns <- c("beta.se", "or.ci", "p")
-    } else if (glm.family == "poisson" & glm.link == "log") {
-      columns <- c("beta.se", "hr.ci", "p")
-    } else {
-      columns <- c("beta.se", "betaci", "p")
-    }
-
-  }
 
   # Convert decimals to variable for sprintf
   spf <- paste("%0.", decimals, "f", sep = "")
@@ -164,10 +152,8 @@ tabglm <- function(fit,
 
     } else if (column == "betaci") {
 
-      confint.fit <- confint(fit)
       df$`95% CI` <- paste("(", sprintf(spf, lower), sep.char,
-                                sprintf(spf, upper), ")", sep = "")
-      #if (intercept) df$`95% CI`[1] <- "-"
+                           sprintf(spf, upper), ")", sep = "")
 
     } else if (column == "beta.se") {
 
@@ -176,69 +162,36 @@ tabglm <- function(fit,
 
     } else if (column == "beta.ci") {
 
-      confint.fit <- confint(fit)
       df$`Beta (95% CI)` <- paste(sprintf(spf, betas), " (",
                                   sprintf(spf, lower), sep.char,
                                   sprintf(spf, upper), ")", sep = "")
-      #if (intercept) df$`Beta (95% CI)`[1] <- "-"
 
-    } else if (column == "or") {
-
-      df$`OR` <- sprintf(spf, exp(betas))
-      if (intercept) df$`OR`[1] <- "-"
-
-    } else if (column == "orci") {
-
-      confint.fit <- confint(fit)
-      df$`95% CI` <- paste("(", sprintf(spf, exp(lower)), sep.char,
-                                sprintf(spf, exp(upper)), ")", sep = "")
-      if (intercept) df$`95% CI`[1] <- "-"
-
-    } else if (column == "or.ci") {
-
-      confint.fit <- confint(fit)
-      df$`OR (95% CI)` <- paste(sprintf(spf, exp(betas)), " (",
-                                sprintf(spf, exp(lower)), sep.char,
-                                sprintf(spf, exp(upper)), ")", sep = "")
-      if (intercept) df$`OR (95% CI)`[1] <- "-"
-
-    } else if (column == "hr") {
+    }  else if (column == "hr") {
 
       df$`HR` <- sprintf(spf, exp(betas))
 
     } else if (column == "hrci") {
 
-      confint.fit <- confint(fit)
       df$`95% CI` <- paste("(", sprintf(spf, exp(lower)), sep.char,
                            sprintf(spf, exp(upper)), ")", sep = "")
-      if (intercept) df$`95% CI`[1] <- "-"
 
     } else if (column == "hr.ci") {
 
-      confint.fit <- confint(fit)
       df$`HR (95% CI)` <- paste(sprintf(spf, exp(betas)), " (",
                                 sprintf(spf, exp(lower)), sep.char,
                                 sprintf(spf, exp(upper)), ")", sep = "")
-      if (intercept) df$`HR (95% CI)`[1] <- "-"
 
-    } else if (column == "test") {
+    } else if (column == "z") {
 
-      if ("t value" %in% colnames(coefmat)) {
-        df$`t` <- sprintf(spf, coefmat[, "t value"])
-      } else if ("z value" %in% colnames(coefmat)) {
-        df$`z` <- sprintf(spf, coefmat[, "z value"])
-      }
+      df$`z` <- sprintf(spf, zs)
 
     } else if (column == "p") {
 
-      df$`P` <- do.call(formatp, c(list(p = coefmat[, ncol(coefmat)]),
-                                   formatp.list))
+      df$`P` <- do.call(formatp, c(list(p = ps), formatp.list))
 
     }
-  }
 
-  # Remove parentheses around intercept
-  if (intercept) df$Variable[1] <- "Intercept"
+  }
 
   # Clean up factor variables
   xlevels <- fit$xlevels

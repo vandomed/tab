@@ -2,18 +2,20 @@
 % Please edit documentation in R/tabmeans.R
 \name{tabmeans}
 \alias{tabmeans}
-\title{Generate Summary Table Comparing Group Means}
+\title{Create Table Comparing Group Means}
 \usage{
-tabmeans(x, y, columns = c("xgroups", "p"), parenth = "sd",
-  sep.char = ", ", variance = "unequal", xname = NULL,
-  xlevels = NULL, yname = NULL, text.label = NULL,
-  quantiles = NULL, quantile.vals = FALSE, latex = FALSE,
-  decimals = NULL, p.decimals = c(2, 3), p.cuts = 0.01,
-  p.lowerbound = 0.001, p.leading0 = TRUE, p.avoid1 = FALSE,
-  n.headings = TRUE, variable.colname = "Variable", fig = FALSE,
-  print.html = FALSE, html.filename = "table1.html", ...)
+tabmeans(formula = NULL, data = NULL, x = NULL, y = NULL,
+  columns = c("xgroups", "p"), parenth = "sd", sep.char = ", ",
+  variance = "unequal", xlevels = NULL, yname = NULL,
+  text.label = NULL, quantiles = NULL, quantile.vals = FALSE,
+  decimals = NULL, formatp.list = NULL, n.headings = TRUE,
+  print.html = FALSE, html.filename = "table1.html")
 }
 \arguments{
+\item{formula}{Formula, e.g. \code{BMI ~ Group}.}
+
+\item{data}{Data frame containing variables named in \code{formula}.}
+
 \item{x}{Vector of values for the categorical \code{x} variable.}
 
 \item{y}{Vector of values for the continuous \code{y} variable.}
@@ -21,8 +23,11 @@ tabmeans(x, y, columns = c("xgroups", "p"), parenth = "sd",
 \item{columns}{Character vector specifying what columns to include. Choices
 for each element are \code{"n"} for total sample size, \code{"overall"} for
 overall mean, \code{"xgroups"} for \code{x} group means, \code{"diff"} for
-difference in \code{x} group means (only available for binary \code{x}),
-\code{"test"} for test statistic, and \code{"p"} for p-value.}
+difference in \code{x} group means (this one and the next two are only
+available for binary \code{x}), \code{"diffci"} for 95% CI for difference in
+\code{x} group means, \code{"diff.ci"} for difference in group means and 95%
+confidence interval, \code{"test"} for test statistic, and \code{"p"} for
+p-value.}
 
 \item{parenth}{Character string specifying what statistic to display in
 parentheses after the means. Choices are \code{"none"}, \code{"sd"},
@@ -36,8 +41,6 @@ upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.}
 t-test to use if \code{x} has 2 levels. Choices are \code{"equal"} for equal
 variance t-test, \code{"unequal"} for unequal variance t-test, and \code{"f"}
 for F test to determine which to use.}
-
-\item{xname}{Character string with a label for the \code{x} variable.}
 
 \item{xlevels}{Character vector with labels for the levels of \code{x}, used
 in column headings.}
@@ -54,121 +57,55 @@ quantiles of \code{x} created on the fly.}
 should show quantile number and corresponding range, e.g. Q1 [0.00, 0.25),
 rather than just the quantile number.}
 
-\item{latex}{Logical value for whether to format table so it is
-ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
-\code{\link[knitr]{kable}}.}
-
 \item{decimals}{Numeric value specifying number of decimal places for numbers
 other than p-values.}
 
-\item{p.decimals}{Numeric value specifying number of decimal places for
-p-values. Can be a vector if you want the number of decimals to depend on
-what range the p-value is in. See \code{p.cuts}.}
-
-\item{p.cuts}{Numeric value or vector of cutpoints to control number of
-decimal places for p-values. For example, by default \code{p.cuts = 0.1} and
-\code{p.decimals = c(2, 3)}, meaning p-values in the range [0.1, 1] are
-printed to 2 decimal places while p-values in the range [0, 0.1) are printed
-to 3.}
-
-\item{p.lowerbound}{Numeric value specifying cutpoint beneath which p-values
-appear as <p.lowerbound.}
-
-\item{p.leading0}{Logical value for whether p-values should appear with
-leading 0's before the decimal point.}
-
-\item{p.avoid1}{Logical value for whether p-values that round to 1 should
-appear as \code{>0.99} (or similarly depending on \code{p.decimals} and
-\code{p.cuts}) rather than 1.}
+\item{formatp.list}{List of arguments to pass to \code{\link[tab]{formatp}}.}
 
 \item{n.headings}{Logical value for whether to display group sample sizes in
 parentheses in column headings.}
-
-\item{variable.colname}{Character string with desired heading for first
-column of table, in case you prefer something other than \code{"Variable"}.}
-
-\item{fig}{Logical value for whether to generate a figure rather than a
-table.}
 
 \item{print.html}{Logical value for whether to write a .html file with the
 table to the current working directory.}
 
 \item{html.filename}{Character string specifying the name of the .html file
 that gets written if \code{print.html = TRUE}.}
-
-\item{...}{Additional arguments to pass to \code{\link[graphics]{plot}}. Only
-used if \code{fig = TRUE}.}
 }
 \value{
-Character matrix comparing mean \code{y} across levels of \code{x}.
+Data frame which you can print in R (e.g. with \strong{xtable}'s
+\code{\link[xtable]{xtable}} or \strong{knitr}'s \code{\link[knitr]{kable}})
+or export to Word, Excel, or some other program. To export the table, set
+\code{print.html = TRUE}. This will result in a .html file being written to
+your current working directory, which you can open and copy/paste into your
+document.
 }
 \description{
-Creates table (or figure) comparing the mean of \code{y} across levels of
-\code{x}.
+Creates a table comparing the mean of \code{y} across levels of \code{x}.
 }
 \details{
 A t-test is used to compare means if \code{x} has two levels, and a one-way
 analysis of variance is used if \code{x} has more than two levels.
 Observations with missing values for \code{x} and/or \code{y} are dropped.
 }
-\section{Note}{
-
-If you want to paste your tables into Microsoft Word, you can use either of
-these approaches:
-
-\enumerate{
-
-\item Use the \emph{write.cb} function in \strong{Kmisc} [2].
-If your table is stored in a character matrix named \code{table1}, use
-\code{write.cb(table1)} to copy the table to your clipboard. Paste the result
-into your document, then highlight the text and go to
-\code{Insert -> Table -> Convert Text to Table... OK}.
-
-\item Set \code{print.html = TRUE}. This will result in a .html file
-being written to your current working directory. When you open this file, you
-will see a (hopefully) nice-looking table that you can copy and paste into
-your document. You can control the name of this file with
-\code{html.filename}.
-}
-
-If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-\code{latex = TRUE}. Then, you can pass the returned object to
-\code{\link[xtable]{xtable}} or \code{\link[knitr]{kable}} for printing. For
-\code{\link[xtable]{xtable}}, you may have to set
-\code{sanitize.text.function = identity} when printing.
-}
-
 \examples{
-# Load in sample dataset and drop rows with missing values
-data(tabdata)
-tabdata <- tabdata[complete.cases(tabdata), ]
+# Compare mean BMI in control vs. treatment group in sample dataset
+(meanstable1 <- tabmeans(BMI ~ Group, data = tabdata))
 
-# Compare mean BMI in control group vs. treatment group - table and figure
-(meanstable1 <- tabmeans(x = tabdata$Group, y = tabdata$BMI))
-meansfig1 <- tabmeans(x = tabdata$Group, y = tabdata$BMI, fig = TRUE)
+# Same as previous, but specifying input vectors rather than formula
+(meanstable2 <- tabmeans(x = tabdata$Group, y = tabdata$BMI))
 
-# Compare mean baseline systolic BP across tertiles of BMI - table and figure
-(meanstable2 <- tabmeans(x = tabdata$BMI, y = tabdata$bp.1,
-                         yname = "Systolic BP", quantiles = 3))
-meansfig2 <- tabmeans(x = tabdata$BMI, y = tabdata$bp.1, quantiles = 3,
-                      fig = TRUE, yname = "Systolic BP",
-                      xname = "BMI Tertile")
+# Compare mean baseline systolic BP across tertiles of BMI
+(meanstable3 <- tabmeans(bp.1 ~ BMI, data = tabdata,
+                         quantiles = 3, yname = "Systolic BP"))
 
 # Create single table comparing mean BMI and mean age in control vs.
-# treatment group
-(meanstable3 <- rbind(tabmeans(x = tabdata$Group, y = tabdata$BMI),
-                      tabmeans(x = tabdata$Group, y = tabdata$Age)))
+# treatment group. Drop missing observations first.
+tabdata2 <- subset(tabdata, ! is.na(BMI) & ! is.na(Age))
+(meanstable4 <- rbind(tabmeans(BMI ~ Group, data = tabdata2),
+                      tabmeans(Age ~ Group, data = tabdata2)))
 
-# An easier way to make this table is to use tabmulti
-(meanstable4 <- tabmulti(data = tabdata, xvarname = "Group",
-                         yvarnames = c("BMI", "Age")))
+# Same as previous, but using tabmulti for convenience
+(meanstable5 <- tabmulti(BMI + Age ~ Group, data = tabdata))
 
 
-}
-\references{
-1. Dahl, D.B. (2016). xtable: Export Tables to LaTeX or HTML. R package
-version 1.8-2, \url{https://cran.r-project.org/package=xtable}.
-
-2. Ushley, K. (2013). Kmisc: Kevin Miscellaneous. R package version 0.5.0.
-\url{https://CRAN.R-project.org/package=Kmisc}.
 }

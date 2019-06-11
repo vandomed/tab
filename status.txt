@@ -1,0 +1,13 @@
+May 1, 2019
+
+Version on CRAN is 3.1.2, from 2016. Version on GitHub is 4.1.1. Looks like I 
+updated a lot of the functions but then sort of stopped. Need to add tabmeans_svy, 
+tabmedians_svy, tabfreq_svy, and tabmulti_svy. Can decide whether to paste in 
+from old version (rforge_9_8_14 folder) or revamp.
+
+Currently, pasted in tabmeans_svy and started to fill out documentation. Need to 
+finish and do same for similar functions. 
+
+Also want to decide where to put function called regtable in tab and clean_glm 
+in dvmisc. Maybe make clean_glm, clean_gee, etc.? Seems like it belongs in tab, 
+though. Could also do clean_lme etc.

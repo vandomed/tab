@@ -2,19 +2,22 @@
 % Please edit documentation in R/tabfreq.R
 \name{tabfreq}
 \alias{tabfreq}
-\title{Generate Frequency Table}
+\title{Create Frequency Table}
 \usage{
-tabfreq(x = NULL, y, columns = c("xgroups", "p"), cell = "counts",
+tabfreq(formula = NULL, data = NULL, x = NULL, y = NULL,
+  columns = c("xgroups", "p"), cell = "counts",
   parenth = "col.percent", sep.char = ", ", test = "chi.fisher",
   xlevels = NULL, yname = NULL, ylevels = NULL,
-  compress.binary = FALSE, yname.row = !compress.binary,
-  text.label = NULL, quantiles = NULL, quantile.vals = FALSE,
-  latex = FALSE, decimals = 1, p.decimals = c(2, 3), p.cuts = 0.01,
-  p.lowerbound = 0.001, p.leading0 = TRUE, p.avoid1 = FALSE,
-  n.headings = FALSE, variable.colname = "Variable",
+  compress.binary = FALSE, yname.row = FALSE, text.label = NULL,
+  quantiles = NULL, quantile.vals = FALSE, latex = FALSE,
+  decimals = 1, formatp.list = NULL, n.headings = FALSE,
   print.html = FALSE, html.filename = "table1.html")
 }
 \arguments{
+\item{formula}{Formula, e.g. \code{Sex ~ Group}.}
+
+\item{data}{Data frame containing variables named in \code{formula}.}
+
 \item{x}{Vector indicating group membership for columns of I-by-J table.}
 
 \item{y}{Vector indicating group membership for rows of I-by-J table.}
@@ -76,31 +79,10 @@ ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
 \item{decimals}{Numeric value specifying number of decimal places for numbers
 other than p-values.}
 
-\item{p.decimals}{Numeric value specifying number of decimal places for
-p-values. Can be a vector if you want the number of decimals to depend on
-what range the p-value is in. See \code{p.cuts}.}
-
-\item{p.cuts}{Numeric value or vector of cutpoints to control number of
-decimal places for p-values. For example, by default \code{p.cuts = 0.1} and
-\code{p.decimals = c(2, 3)}, meaning p-values in the range [0.1, 1] are
-printed to 2 decimal places while p-values in the range [0, 0.1) are printed
-to 3.}
-
-\item{p.lowerbound}{Numeric value specifying cutpoint beneath which p-values
-appear as <p.lowerbound.}
-
-\item{p.leading0}{Logical value for whether p-values should appear with
-leading 0's before the decimal point.}
-
-\item{p.avoid1}{Logical value for whether p-values that round to 1 should
-appear as \code{>0.99} (or similarly depending on \code{p.decimals} and
-\code{p.cuts}) rather than 1.}
+\item{formatp.list}{List of arguments to pass to \code{\link[tab]{formatp}}.}
 
 \item{n.headings}{Logical value for whether to display group sample sizes in
 parentheses in column headings.}
-
-\item{variable.colname}{Character string with desired heading for first
-column of table, in case you prefer something other than \code{"Variable"}.}
 
 \item{print.html}{Logical value for whether to write a .html file with the
 table to the current working directory.}
@@ -109,69 +91,39 @@ table to the current working directory.}
 that gets written if \code{print.html = TRUE}.}
 }
 \value{
-Character matrix comparing the distribution of \code{y} across levels
-of \code{x}.
+Data frame which you can print in R (e.g. with \strong{xtable}'s
+\code{\link[xtable]{xtable}} or \strong{knitr}'s \code{\link[knitr]{kable}})
+or export to Word, Excel, or some other program. To export the table, set
+\code{print.html = TRUE}. This will result in a .html file being written to
+your current working directory, which you can open and copy/paste into your
+document.
 }
 \description{
-Creates I-by-J frequency table comparing the distribution of \code{y} across
-levels of \code{x}.
+Creates an I-by-J frequency table comparing the distribution of \code{y}
+across levels of \code{x}.
 }
-\section{Note}{
-
-If you want to paste your tables into Microsoft Word, you can use either of
-these approaches:
-
-\enumerate{
-
-\item Use the \emph{write.cb} function in \strong{Kmisc} [2].
-If your table is stored in a character matrix named \code{table1}, use
-\code{write.cb(table1)} to copy the table to your clipboard. Paste the result
-into your document, then highlight the text and go to
-\code{Insert -> Table -> Convert Text to Table... OK}.
-
-\item Set \code{print.html = TRUE}. This will result in a .html file
-being written to your current working directory. When you open this file, you
-will see a (hopefully) nice-looking table that you can copy and paste into
-your document. You can control the name of this file with
-\code{html.filename}.
-}
-
-If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-\code{latex = TRUE}. Then, you can pass the returned object to
-\code{\link[xtable]{xtable}} or \code{\link[knitr]{kable}} for printing. For
-\code{\link[xtable]{xtable}}, you may have to set
-\code{sanitize.text.function = identity} when printing.
-}
-
 \examples{
-# Load in sample dataset and drop rows with missing values
-data(tabdata)
-tabdata <- tabdata[complete.cases(tabdata), ]
+# Compare sex distribution by group
+(freqtable1 <- tabfreq(Sex ~ Group, data = tabdata))
 
-# Compare sex distribution by group, with group as column variable
-(freqtable1 <- tabfreq(x = tabdata$Group, y = tabdata$Sex))
+# Same as previous, but specifying input vectors rather than formula
+(freqtable2 <- tabfreq(x = tabdata$Group, y = tabdata$Sex))
 
-# Same comparison, but compress table to show male row only and show percent
-# (SE) rather than n (percent)
-(freqtable2 <- tabfreq(x = tabdata$Group, y = tabdata$Sex,
+# Same as previous, but showing male row only and percent (SE) rather than n
+# (percent)
+(freqtable3 <- tabfreq(Sex ~ Group, data = tabdata,
                        cell = "col.percent", parenth = "se",
                        compress.binary = TRUE))
 
-# Use rbind to create single table comparing sex and race in control vs.
-# treatment group
-(freqtable3 <- rbind(tabfreq(x = tabdata$Group, y = tabdata$Sex),
-                     tabfreq(x = tabdata$Group, y = tabdata$Race)))
+# Create single table comparing sex and race in control vs. treatment group.
+# Drop missing observations first.
+tabdata2 <- subset(tabdata, ! is.na(Sex) & ! is.na(Race))
+(freqtable4 <- rbind(tabfreq(Sex ~ Group, data = tabdata2),
+                     tabfreq(Race ~ Group, data = tabdata2)))
 
-# An easier way to make this table is to use tabmulti
-(freqtable4 <- tabmulti(data = d, xvarname = "Group",
-                        yvarnames = c("Sex", "Race")))
+# Same as previous, but using tabmulti for convenience
+#(freqtable5 <- tabmulti(data = d, xvarname = "Group",
+#                        yvarnames = c("Sex", "Race")))
 
 
-}
-\references{
-1. Dahl, D.B. (2016). xtable: Export Tables to LaTeX or HTML. R package
-version 1.8-2, \url{https://cran.r-project.org/package=xtable}.
-
-2. Ushley, K. (2013). Kmisc: Kevin Miscellaneous. R package version 0.5.0.
-\url{https://CRAN.R-project.org/package=Kmisc}.
 }

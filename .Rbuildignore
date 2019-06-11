@@ -3,4 +3,6 @@
 ^LICENSE$
 ^README.*$
 ^Thumbs.db$
+^misc$
 ^.travis.yml$
+^status.txt$

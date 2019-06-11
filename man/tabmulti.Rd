@@ -2,22 +2,22 @@
 % Please edit documentation in R/tabmulti.R
 \name{tabmulti}
 \alias{tabmulti}
-\title{Generate Summary Table Comparing Multiple Variables Across Levels of One
-Categorical Variable}
+\title{Create Table Comparing Characteristics Across Levels of a Categorical
+Variable}
 \usage{
-tabmulti(data, xvarname, yvarnames, ymeasures = NULL,
-  columns = c("xgroups", "p"), listwise.deletion = FALSE,
-  sep.char = ", ", xlevels = NULL, ynames = yvarnames,
-  ylevels = NULL, quantiles = NULL, quantile.vals = NULL,
-  latex = FALSE, decimals = NULL, p.decimals = c(2, 3),
-  p.cuts = 0.01, p.lowerbound = 0.001, p.leading0 = TRUE,
-  p.avoid1 = FALSE, n.headings = FALSE,
-  variable.colname = "Variable", print.html = FALSE,
-  html.filename = "table1.html", means.list = NULL,
-  medians.list = NULL, freq.list = NULL)
+tabmulti(formula = NULL, data, xvarname = NULL, yvarnames = NULL,
+  ymeasures = NULL, columns = c("xgroups", "p"),
+  listwise.deletion = FALSE, sep.char = ", ", xlevels = NULL,
+  ynames = NULL, ylevels = NULL, quantiles = NULL,
+  quantile.vals = FALSE, latex = FALSE, decimals = NULL,
+  formatp.list = NULL, n.headings = FALSE, print.html = FALSE,
+  html.filename = "table1.html", tabmeans.list = NULL,
+  tabmedians.list = NULL, tabfreq.list = NULL)
 }
 \arguments{
-\item{data}{Data frame.}
+\item{formula}{Formula, e.g. \code{Age + Sex + Race + BMI ~ Group}.}
+
+\item{data}{Data frame containing variables named in \code{formula}.}
 
 \item{xvarname}{Character string with name of column variable. Should be one
 of \code{names(data)}.}
@@ -26,13 +26,12 @@ of \code{names(data)}.}
 should be one of \code{names(data)}.}
 
 \item{ymeasures}{Character vector specifying whether each \code{y} variable
-should be summarized by mean, median, or frequency. For example, if
-\code{yvarnames} has length 3 and you want to display frequencies for the
-first variable, means for the second, and medians for the third, you would
-set \code{ymeasures = c("freq", "mean", "median")}. If unspecified, function
-displays frequencies for factor variables and numeric variable with 5 or
-fewer unique values, and means for numeric variables with more than five
-levels.}
+should be summarized by mean, median, or frequency. For example, if you want
+to compare frequencies for the first variable, means for the second, and
+medians for the third, you would set
+\code{ymeasures = c("freq", "mean", "median")}. If unspecified, function
+compares means for numeric variables and frequencies for factor and character
+variables.}
 
 \item{columns}{Character vector specifying what columns to include. Choices
 for each element are \code{"n"} for total sample size, \code{"overall"} for
@@ -73,31 +72,10 @@ ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
 numbers other than p-values for each \code{y} variable. Can be a single value
 to use for all \code{y} variables.}
 
-\item{p.decimals}{Numeric value specifying number of decimal places for
-p-values. Can be a vector if you want the number of decimals to depend on
-what range the p-value is in. See \code{p.cuts}.}
-
-\item{p.cuts}{Numeric value or vector of cutpoints to control number of
-decimal places for p-values. For example, by default \code{p.cuts = 0.1} and
-\code{p.decimals = c(2, 3)}, meaning p-values in the range [0.1, 1] are
-printed to 2 decimal places while p-values in the range [0, 0.1) are printed
-to 3.}
-
-\item{p.lowerbound}{Numeric value specifying cutpoint beneath which p-values
-appear as <p.lowerbound.}
-
-\item{p.leading0}{Logical value for whether p-values should appear with
-leading 0's before the decimal point.}
-
-\item{p.avoid1}{Logical value for whether p-values that round to 1 should
-appear as \code{>0.99} (or similarly depending on \code{p.decimals} and
-\code{p.cuts}) rather than 1.}
+\item{formatp.list}{List of arguments to pass to \code{\link[tab]{formatp}}.}
 
 \item{n.headings}{Logical value for whether to display group sample sizes in
 parentheses in column headings.}
-
-\item{variable.colname}{Character string with desired heading for first
-column of table, in case you prefer something other than \code{"Variable"}.}
 
 \item{print.html}{Logical value for whether to write a .html file with the
 table to the current working directory.}
@@ -105,74 +83,31 @@ table to the current working directory.}
 \item{html.filename}{Character string specifying the name of the .html file
 that gets written if \code{print.html = TRUE}.}
 
-\item{means.list}{List of arguments to pass to \code{\link{tabmeans}}.}
+\item{tabmeans.list}{List of arguments to pass to \code{\link{tabmeans}}.}
 
-\item{medians.list}{List of arguments to pass to \code{\link{tabmedians}}.}
+\item{tabmedians.list}{List of arguments to pass to \code{\link{tabmedians}}.}
 
-\item{freq.list}{List of arguments to pass to \code{\link{tabfreq}}.}
+\item{tabfreq.list}{List of arguments to pass to \code{\link{tabfreq}}.}
 }
 \value{
-Character matrix comparing \code{y} variables across levels of
-\code{x}.
+Data frame which you can print in R (e.g. with \strong{xtable}'s
+\code{\link[xtable]{xtable}} or \strong{knitr}'s \code{\link[knitr]{kable}})
+or export to Word, Excel, or some other program. To export the table, set
+\code{print.html = TRUE}. This will result in a .html file being written to
+your current working directory, which you can open and copy/paste into your
+document.
 }
 \description{
-Provides an alternative to making multiple calls to \code{\link{tabmeans}},
-\code{\link{tabmedians}}, and \code{\link{tabfreq}}, and then combining
-via \code{\link{rbind}}.
+Creates a table comparing multiple characteristics (e.g. median age, mean
+BMI, and race/ethnicity distribution) across levels of \code{x}.
 }
-\section{Note}{
-
-If you want to paste your tables into Microsoft Word, you can use either of
-these approaches:
-
-\enumerate{
-
-\item Use the \emph{write.cb} function in \strong{Kmisc} [2].
-If your table is stored in a character matrix named \code{table1}, use
-\code{write.cb(table1)} to copy the table to your clipboard. Paste the result
-into your document, then highlight the text and go to
-\code{Insert -> Table -> Convert Text to Table... OK}.
-
-\item Set \code{print.html = TRUE}. This will result in a .html file
-being written to your current working directory. When you open this file, you
-will see a (hopefully) nice-looking table that you can copy and paste into
-your document. You can control the name of this file with
-\code{html.filename}.
-}
-
-If you want to use LaTeX, R Markdown, knitr, Sweave, etc., set
-\code{latex = TRUE}. Then, you can pass the returned object to
-\code{\link[xtable]{xtable}} or \code{\link[knitr]{kable}} for printing. For
-\code{\link[xtable]{xtable}}, you may have to set
-\code{sanitize.text.function = identity} when printing.
-}
-
 \examples{
-# Load in sample dataset
-data(tabdata)
+# Compare age, sex, race, and BMI in control vs. treatment group
+(table1 <- tabmulti(Age + Sex + Race + BMI ~ Group, data = tabdata))
 
-# Compare age, sex, race, and BMI in control vs. treatment group using
-# listwise deletion
-(table1 <- tabmulti(data = tabdata, xvarname = "Group",
-                    yvarnames = c("Age", "Sex", "Race", "BMI")))
-
-# Repeat using pairwise deletion
-(table2 <- tabmulti(data = tabdata, xvarname = "Group",
-                    yvarnames = c("Age", "Sex", "Race", "BMI"),
-                    columns = c("n", "xgroups", "p"),
-                    listwise.deletion = FALSE))
-
-# Same as table1, but compare medians rather than means for BMI
-(table3 <- tabmulti(data = tabdata, xvarname = "Group",
-                    yvarnames = c("Age", "Sex", "Race", "BMI"),
+# Same as previous, but compare medians rather than means for BMI
+(table2 <- tabmulti(Age + Sex + Race + BMI ~ Group, data = tabdata,
                     ymeasures = c("mean", "freq", "freq", "median")))
 
 
-}
-\references{
-1. Dahl, D.B. (2016). xtable: Export Tables to LaTeX or HTML. R package
-version 1.8-2, \url{https://cran.r-project.org/package=xtable}.
-
-2. Ushley, K. (2013). Kmisc: Kevin Miscellaneous. R package version 0.5.0.
-\url{https://CRAN.R-project.org/package=Kmisc}.
 }

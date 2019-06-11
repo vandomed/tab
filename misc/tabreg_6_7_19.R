@@ -2,7 +2,7 @@
 #'
 #' Useful for quickly creating a summary table.
 #'
-#' @inheritParams tabmeans
+#'
 #' @param betas Numeric vector.
 #' @param ses Numeric vector.
 #' @param varcov Numeric matrix.
@@ -10,7 +10,19 @@
 #' are \code{"variable"}, \code{"beta"}, \code{"se"}, \code{"betaci"},
 #' \code{"beta.se"}, \code{"beta.ci"}, \code{"or"}, \code{"orci"},
 #' \code{"or.ci"}, and \code{"p"}.
+#' @param sep.char Character string with separator to place between lower and
+#' upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.
+#' @param latex Logical value for whether to format table so it is
+#' ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
+#' \code{\link[knitr]{kable}}.
+#' @param decimals Numeric value specifying number of decimal places for numbers
+#' other than p-values.
+#' @param formatp.list Arguments to pass to \code{\link[tab]{formatp}}.
 #' @param labels Character vector.
+#' @param print.html Logical value for whether to write a .html file with the
+#' table to the current working directory.
+#' @param html.filename Character string specifying the name of the .html file
+#' that gets written if \code{print.html = TRUE}.
 #'
 #'
 #' @return Data frame.
@@ -19,20 +31,61 @@
 #' @examples
 #' # Create summary table for mtcars regression
 #' fit <- lm(mpg ~ wt + hp + drat, data = mtcars)
-#' regtable(betas = fit$coef, varcov = vcov(fit),
-#'          labels = c("Intercept", "Weight", "HP", "Rear axle ratio"))
+#' tabreg(betas = fit$coef, varcov = vcov(fit),
+#'        labels = c("Intercept", "Weight", "HP", "Rear axle ratio"))
 #'
 #'
 #' @export
-regtable <- function(betas,
-                     ses,
-                     varcov = NULL,
-                     columns = c("variable", "beta.se", "p"),
-                     sep.char = ", ",
-                     decimals = NULL,
-                     p.decimals = c(2, 3), p.cuts = 0.01, p.lowerbound = 0.001,
-                     p.leading0 = TRUE, p.avoid1 = FALSE,
-                     labels = NULL) {
+tabreg <- function(betas,
+                   ses,
+                   varcov = NULL,
+                   columns = c("variable", "beta.se", "p"),
+                   sep.char = ", ",
+                   latex = TRUE,
+                   decimals = NULL,
+                   formatp.list = NULL,
+                   labels = NULL,
+                   print.html = FALSE,
+                   html.filename = "table1.html") {
+
+  # Error checking
+  if (! is.numeric(betas)) {
+    stop("The input 'betas' must be a numeric vector.")
+  }
+  if (! is.numeric(ses)) {
+    stop("The input 'ses' must be a numeric vector.")
+  }
+  if (! is.null(varcov) && ! (is.matrix(varcov) && ncol(varcov) == nrow(varcov))) {
+    stop("The input 'varcov' must be a square numeric matrix.")
+  }
+  if (! is.null(columns) &&
+      ! all(columns %in% c("variable", "beta", "se", "betaci", "beta.se",
+                           "beta.ci", "or", "orci", "or.ci", "hr", "hrci",
+                           "hr.ci", "test", "p"))) {
+    stop("Each element of 'columns' must be one of the following: 'variable', 'beta', 'se', 'betaci', 'beta.se', 'beta.ci', 'or', 'orci', 'or.ci', 'hr', 'hrci', 'hr.ci', 'test', 'p'.")
+  }
+  if (! is.character(sep.char)) {
+    stop("The input 'sep.char' must be a character string.")
+  }
+  if (! is.logical(latex)) {
+    stop("The input 'latex' must be a logical.")
+  }
+  if (! (is.numeric(decimals) && decimals >= 0 & decimals == as.integer(decimals))) {
+    stop("The input 'decimals' must be a non-negative integer.")
+  }
+  if (! is.null(formatp.list) &&
+      ! (is.list(formatp.list) && all(names(formatp.list) %in% names(as.list(args(formatp)))))) {
+    stop("The input 'format.p' must be a named list of arguments to pass to 'formatp'.")
+  }
+  if (! is.null(labels) && ! is.character(labels)) {
+    stop("The input 'labels' must be a character vector.")
+  }
+  if (! is.logical(print.html)) {
+    stop("The input 'print.html' must be a logical.")
+  }
+  if (! is.character("html.filename")) {
+    stop("The input 'html.filename' must be a character string.")
+  }
 
   # If decimals is unspecified, set to appropriate value
   if (is.null(decimals)) {
@@ -62,7 +115,7 @@ regtable <- function(betas,
     ses <- sqrt(diag(varcov))
   }
 
-  # If CI coverage requested, get z value
+  # Calculate CI if requested
   if (any(c("betaci", "beta.ci", "orci", "or.ci", "p") %in% columns)) {
     zval <- qnorm(0.975)
   }
@@ -145,9 +198,8 @@ regtable <- function(betas,
     } else if (column.ii == "p") {
 
       p <- pnorm(-abs(betas / ses)) * 2
-      tbl[, ii] <- formatp(p = p, cuts = p.cuts, decimals = p.decimals,
-                           lowerbound = p.lowerbound, leading0 = p.leading0,
-                           avoid1 = p.avoid1)
+      tbl[, ii] <- do.call(formatp, c(list(p = p),
+                                      formatp.list))
       tbl.colnames[ii] <- "P"
 
     }
