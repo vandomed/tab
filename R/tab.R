@@ -26,13 +26,10 @@
 #'
 #' @docType package
 #' @importFrom dplyr %>%
-#' @import graphics
-#' @importFrom grDevices recordPlot
 #' @importFrom knitr kable
 #' @import MASS
 #' @import stats
 #' @importFrom survey svyby svychisq svyglm svymean svyquantile svyranktest svytable svyttest svyvar
-#' @importFrom utils capture.output
 #' @importFrom xtable xtable
 #' @name tab
 NULL

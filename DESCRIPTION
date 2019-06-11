@@ -12,15 +12,12 @@ Encoding: UTF-8
 Depends: dplyr, knitr
 Imports: 
     gee, 
-    graphics,
-    grDevices, 
     MASS, 
     stats, 
     survey, 
-    survival, 
+    survival,
     xtable
 RoxygenNote: 6.1.1
 Suggests: 
-    rmarkdown,
-    printr
+    rmarkdown
 VignetteBuilder: knitr

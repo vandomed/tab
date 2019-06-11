@@ -14,7 +14,7 @@ fit %>% tabglm(xvarlabels = list(Age = "Age (years)", Race = "Race/ethnicity")) 
 fit <- coxph(Surv(time, delta) ~ Age + Sex + Race + Group, data = tabdata)
 fit %>% tabcoxph(columns = c("beta.se", "hr.ci")) %>% kable()
 
-# Here's a survey-weighted linear regression with some higher-order terms. Data is NHANES 2003-2004, adults age 18-39.
+# Here's a survey-weighted linear regression with some higher-order terms. Data is from NHANES 2003-2004 (adults age 18-39)
 design <- svydesign(
   data = tabsvydata,
   ids = ~sdmvpsu,
@@ -33,7 +33,7 @@ fit %>% tabglm() %>% kable()
 
 
 
-# Here's a complex survey Cox PH, with p-values to please enlightened journal editors:
+# Here's a complex survey Cox PH, with p-values to please enlightened journal editors
 design <- svydesign(
   data = tabsvydata,
   ids = ~sdmvpsu,
