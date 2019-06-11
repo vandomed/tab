@@ -1,16 +1,19 @@
 #' Create Table Comparing Characteristics Across Levels of a Categorical
-#' Variable
+#' Variable (for Complex Survey Data)
 #'
 #' Creates a table comparing multiple characteristics (e.g. median age, mean
 #' BMI, and race/ethnicity distribution) across levels of \code{x}.
 #'
+#' Basically \code{\link{tabmulti}} for complex survey data. Relies heavily on
+#' the \pkg{survey} package.
 #'
-#' @param formula Formula, e.g. \code{Age + Sex + Race + BMI ~ Group}.
-#' @param data Data frame containing variables named in \code{formula}.
+#'
+#' @param formula Formula, e.g. \code{Age + Race + BMI ~ Sex}.
+#' @param design Survey design object from \code{\link[survey]{svydesign}}.
 #' @param xvarname Character string with name of column variable. Should be one
-#' of \code{names(data)}.
+#' of \code{names(design$variables)}.
 #' @param yvarnames Character vector with names of row variables. Each element
-#' should be one of \code{names(data)}.
+#' should be one of \code{names(design$variables)}.
 #' @param ymeasures Character vector specifying whether each \code{y} variable
 #' should be summarized by mean, median, or frequency. For example, if you want
 #' to compare frequencies for the first variable, means for the second, and
@@ -19,9 +22,9 @@
 #' compares means for numeric variables and frequencies for factor and character
 #' variables.
 #' @param columns Character vector specifying what columns to include. Choices
-#' for each element are \code{"n"} for total sample size, \code{"overall"} for
-#' overall statistics, \code{"xgroups"} for \code{x} group statistics,
-#' \code{"test"} for test statistic, and \code{"p"} for p-value.
+#' for each element are \code{"n"} for unweighted sample size, \code{"N"} for
+#' weighted sample size, \code{"overall"} for overall statistics,
+#' \code{"xgroups"} for \code{x} group statistics, and \code{"p"} for p-value.
 #' @param listwise.deletion Logical value for whether observations with missing
 #' values for any \code{y} variable should be excluded entirely (as opposed to
 #' using all available data for each comparison).
@@ -36,14 +39,6 @@
 #' @param ylevels Character vector (if only 1 frequency comparison) or list of
 #' character vectors with labels for the levels of each categorical \code{y}
 #' variable.
-#' @param quantiles Numeric value. If specified, function compares \code{y}
-#' variables across quantiles of \code{x}. For example, if \code{x} contains BMI
-#' values and \code{yvarnames} includes HDL and race, setting
-#' \code{quantiles = 3} compares mean BMI and distribution of race across BMI
-#' tertiles.
-#' @param quantile.vals Logical value for whether labels for \code{x} quantiles
-#' should show quantile number and corresponding range, e.g. Q1 [0.00, 0.25),
-#' rather than just the quantile number.
 #' @param latex Logical value for whether to format table so it is
 #' ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
 #' \code{\link[knitr]{kable}}.
@@ -51,15 +46,20 @@
 #' numbers other than p-values for each \code{y} variable. Can be a single value
 #' to use for all \code{y} variables.
 #' @param formatp.list List of arguments to pass to \code{\link[tab]{formatp}}.
-#' @param n.headings Logical value for whether to display group sample sizes in
-#' parentheses in column headings.
+#' @param n.headings Logical value for whether to display unweighted sample
+#' sizes in parentheses in column headings.
+#' @param N.headings Logical value for whether to display weighted sample sizes
+#' in parentheses in column headings.
 #' @param print.html Logical value for whether to write a .html file with the
 #' table to the current working directory.
 #' @param html.filename Character string specifying the name of the .html file
 #' that gets written if \code{print.html = TRUE}.
-#' @param tabmeans.list List of arguments to pass to \code{\link{tabmeans}}.
-#' @param tabmedians.list List of arguments to pass to \code{\link{tabmedians}}.
-#' @param tabfreq.list List of arguments to pass to \code{\link{tabfreq}}.
+#' @param tabmeans.svy.list List of arguments to pass to
+#' \code{\link{tabmeans.svy}}.
+#' @param tabmedians.svy.list List of arguments to pass to
+#' \code{\link{tabmedians.svy}}.
+#' @param tabfreq.svy.list List of arguments to pass to
+#' \code{\link{tabfreq.svy}}.
 #'
 #'
 #' @return Data frame which you can print in R (e.g. with \strong{xtable}'s
@@ -71,58 +71,61 @@
 #'
 #'
 #' @examples
-#' # Compare age, sex, race, and BMI in control vs. treatment group
-#' tabmulti(Age + Sex + Race + BMI ~ Group, data = tabdata) %>%
-#'   kable()
+#' # Create survey design object
+#' library("survey")
+#' design <- svydesign(
+#'   data = tabsvydata,
+#'   ids = ~sdmvpsu,
+#'   strata = ~sdmvstra,
+#'   weights = ~wtmec2yr,
+#'   nest = TRUE
+#' )
 #'
-#' # Same as previous, but compare medians rather than means for BMI
-#' tabmulti(Age + Sex + Race + BMI ~ Group, data = tabdata,
-#'          ymeasures = c("mean", "freq", "freq", "median")) %>%
-#'   kable()
+#' # Compare age, race, and BMI by sex
+#' tabmulti.svy(Age + Race + BMI ~ Sex, design = design) %>% kable()
 #'
 #'
 #' @export
-tabmulti <- function(formula = NULL,
-                     data,
-                     xvarname = NULL,
-                     yvarnames = NULL,
-                     ymeasures = NULL,
-                     columns = c("xgroups", "p"),
-                     listwise.deletion = FALSE,
-                     sep.char = ", ",
-                     xlevels = NULL,
-                     yvarlabels = NULL,
-                     ylevels = NULL,
-                     quantiles = NULL,
-                     quantile.vals = FALSE,
-                     latex = TRUE,
-                     decimals = NULL,
-                     formatp.list = NULL,
-                     n.headings = FALSE,
-                     print.html = FALSE,
-                     html.filename = "table1.html",
-                     tabmeans.list = NULL,
-                     tabmedians.list = NULL,
-                     tabfreq.list = NULL) {
+tabmulti.svy <- function(formula = NULL,
+                         design,
+                         xvarname = NULL,
+                         yvarnames = NULL,
+                         ymeasures = NULL,
+                         columns = c("xgroups", "p"),
+                         listwise.deletion = FALSE,
+                         sep.char = ", ",
+                         xlevels = NULL,
+                         yvarlabels = NULL,
+                         ylevels = NULL,
+                         latex = TRUE,
+                         decimals = NULL,
+                         formatp.list = NULL,
+                         n.headings = FALSE,
+                         N.headings = FALSE,
+                         print.html = FALSE,
+                         html.filename = "table1.html",
+                         tabmeans.svy.list = NULL,
+                         tabmedians.svy.list = NULL,
+                         tabfreq.svy.list = NULL) {
 
   # Error checking
   if (! is.null(formula) && class(formula) != "formula") {
     stop("The input 'formula' must be a formula.")
   }
-  if (! is.data.frame(data)) {
-    stop("The input 'data' must be a data frame.")
+  if (! "survey.design" %in% class(design)) {
+    stop("The input 'design' must be a survey design object.")
   }
-  if (! is.null(xvarname) && ! xvarname %in% names(data)) {
-    stop("The input 'xvarname' must be a character string matching one of the variables in 'data'.")
+  if (! is.null(xvarname) && ! xvarname %in% names(design$variables)) {
+    stop("The input 'xvarname' must be a character string matching one of the variables in 'design'.")
   }
-  if (! is.null(yvarnames) && ! all(yvarnames %in% names(data))) {
-    stop("Each element of 'yvarnames' must be a character string matching one of the variables in 'data'.")
+  if (! is.null(yvarnames) && ! all(yvarnames %in% names(design$variables))) {
+    stop("Each element of 'yvarnames' must be a character string matching one of the variables in 'design'.")
   }
   if (! is.null(ymeasures) && ! all(ymeasures %in% c("freq", "mean", "median"))) {
     stop("Each element of 'ymeasures' must be one of the following: 'freq', 'mean', 'median'.")
   }
-  if (! all(columns %in% c("n", "overall", "xgroups", "test", "p"))) {
-    stop("Each element of 'columns' must be one of the following: 'n', 'overall', 'xgroups', 'test', 'p'.")
+  if (! all(columns %in% c("n", "N", "overall", "xgroups", "p"))) {
+    stop("Each element of 'columns' must be one of the following: 'n', 'N', 'overall', 'xgroups', 'p'.")
   }
   if (! is.logical(listwise.deletion)) {
     stop("The input 'listwise.deletion' must be a logical.")
@@ -135,13 +138,6 @@ tabmulti <- function(formula = NULL,
   }
   if (! is.null(ylevels) && ! is.character(ylevels)) {
     stop("The input 'ylevels' must be a character vector.")
-  }
-  if (! is.null(quantiles) && ! (is.numeric(quantiles) && quantiles > 1 &&
-                                 quantiles == as.integer(quantiles))) {
-    stop("The input 'quantiles' must be an integer greater than 1.")
-  }
-  if ( ! is.logical(quantile.vals)) {
-    stop("The input 'quantile.vals' must be a logical.")
   }
   if (! is.logical(latex)) {
     stop("The input 'latex' must be a logical.")
@@ -157,26 +153,29 @@ tabmulti <- function(formula = NULL,
   if (! is.logical(n.headings)) {
     stop("The input 'n.headings' must be a logical.")
   }
+  if (! is.logical(N.headings)) {
+    stop("The input 'N.headings' must be a logical.")
+  }
   if (! is.logical(print.html)) {
     stop("The input 'print.html' must be a logical.")
   }
   if (! is.character("html.filename")) {
     stop("The input 'html.filename' must be a character string.")
   }
-  if (! is.null(tabmeans.list) &&
-      ! (is.list(tabmeans.list) && all(names(tabmeans.list) %in%
-                                       names(as.list(args(tabmeans)))))) {
-    stop("The input 'tabmeans.list' must be a named list of arguments to pass to 'tabmeans'.")
+  if (! is.null(tabmeans.svy.list) &&
+      ! (is.list(tabmeans.svy.list) && all(names(tabmeans.svy.list) %in%
+                                       names(as.list(args(tabmeans.svy)))))) {
+    stop("The input 'tabmeans.svy.list' must be a named list of arguments to pass to 'tabmeans.svy'.")
   }
-  if (! is.null(tabmedians.list) &&
-      ! (is.list(tabmedians.list) && all(names(tabmedians.list) %in%
-                                         names(as.list(args(tabmedians)))))) {
-    stop("The input 'tabmedians.list' must be a named list of arguments to pass to 'tabmedians'.")
+  if (! is.null(tabmedians.svy.list) &&
+      ! (is.list(tabmedians.svy.list) && all(names(tabmedians.svy.list) %in%
+                                         names(as.list(args(tabmedians.svy)))))) {
+    stop("The input 'tabmedians.svy.list' must be a named list of arguments to pass to 'tabmedians.svy'.")
   }
-  if (! is.null(tabfreq.list) &&
-      ! (is.list(tabfreq.list) && all(names(tabfreq.list) %in%
-                                      names(as.list(args(tabfreq)))))) {
-    stop("The input 'tabfreq.list' must be a named list of arguments to pass to 'tabfreq'.")
+  if (! is.null(tabfreq.svy.list) &&
+      ! (is.list(tabfreq.svy.list) && all(names(tabfreq.svy.list) %in%
+                                      names(as.list(args(tabfreq.svy)))))) {
+    stop("The input 'tabfreq.svy.list' must be a named list of arguments to pass to 'tabfreq.svy'.")
   }
 
   # Figure out x and y
@@ -190,11 +189,11 @@ tabmulti <- function(formula = NULL,
   # If listwise.deletion is TRUE, drop observations with missing values for
   # column variable or any row variables
   if (listwise.deletion){
-    data <- subset(data, complete.cases(data[, c(xvarname, yvarnames)]))
+    design <- subset(design, complete.cases(design$variables[, c(xvarname, yvarnames)]))
   }
 
   # Create x vector
-  x <- data[, xvarname]
+  x <- design$variables[, xvarname]
 
   # Number of y variables
   num.yvars <- length(yvarnames)
@@ -202,7 +201,7 @@ tabmulti <- function(formula = NULL,
   # If ymeasures is NULL, compare frequencies for factor/character variables and
   # means for numeric variables
   if (is.null(ymeasures)) {
-    ymeasures <- ifelse(sapply(data[, yvarnames], class) == "numeric", "mean", "freq")
+    ymeasures <- ifelse(sapply(design$variables[, yvarnames], class) == "numeric", "mean", "freq")
   } else if (length(ymeasures) == 1) {
     ymeasures <- rep(ymeasures, num.yvars)
   }
@@ -217,7 +216,7 @@ tabmulti <- function(formula = NULL,
     ylevels <- list(ylevels)
   }
 
-  # Call tabmeans, tabmedians, or tabfreq repeatedly
+  # Call tabmeans.svy, tabmedians.svy, or tabfreq.svy repeatedly
   mediansindex <- 0
   meansindex <- 0
   freqindex <- 0
@@ -228,54 +227,51 @@ tabmulti <- function(formula = NULL,
 
       # Means
       meansindex <- meansindex + 1
-      args1 <- list(x = x,
-                    y = data[, yvarnames[ii]],
+      args1 <- list(formula = as.formula(paste(yvarnames[ii], " ~ ", xvarname, sep = "")),
+                    design = design,
                     columns = columns,
                     sep.char = sep.char,
                     xlevels = xlevels,
                     yname = ynames[ii],
-                    quantiles = quantiles,
-                    quantile.vals = quantile.vals,
                     decimals = decimals[ii],
                     formatp.list = formatp.list,
-                    n.headings = n.headings)
-      current <- do.call(tabmeans, c(args1, tabmeans.list))
+                    n.headings = n.headings,
+                    N.headings = N.headings)
+      current <- do.call(tabmeans.svy, c(args1, tabmeans.svy.list))
 
     } else if (ymeasures.ii == "median") {
 
       # Medians
       mediansindex <- mediansindex + 1
-      args1 <- list(x = x,
-                    y = data[, yvarnames[ii]],
+      args1 <- list(formula = as.formula(paste(yvarnames[ii], " ~ ", xvarname, sep = "")),
+                    design = design,
                     columns = columns,
                     sep.char = sep.char,
                     xlevels = xlevels,
                     yname = ynames[ii],
-                    quantiles = quantiles,
-                    quantile.vals = quantile.vals,
                     decimals = decimals[ii],
                     formatp.list = formatp.list,
-                    n.headings = n.headings)
-      current <- do.call(tabmedians, c(args1, tabmedians.list))
+                    n.headings = n.headings,
+                    N.headings = N.headings)
+      current <- do.call(tabmedians.svy, c(args1, tabmedians.svy.list))
 
     } else if (ymeasures.ii == "freq") {
 
       # Frequencies
       freqindex <- freqindex + 1
-      args1 <- list(x = x,
-                    y = data[, yvarnames[ii]],
+      args1 <- list(formula = as.formula(paste(yvarnames[ii], " ~ ", xvarname, sep = "")),
+                    design = design,
                     columns = columns,
                     sep.char = sep.char,
                     xlevels = xlevels,
                     yname = ynames[ii],
                     ylevels = ylevels[[freqindex]],
-                    quantiles = quantiles,
-                    quantile.vals = quantile.vals,
                     latex = latex,
                     decimals = ifelse(is.null(decimals[ii]), 1, decimals[ii]),
                     formatp.list = formatp.list,
-                    n.headings = n.headings)
-      current <- do.call(tabfreq, c(args1, tabfreq.list))
+                    n.headings = n.headings,
+                    N.headings = N.headings)
+      current <- do.call(tabfreq.svy, c(args1, tabfreq.svy.list))
 
     }
 

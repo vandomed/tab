@@ -37,7 +37,9 @@
 #' @param compress.binary Logical value for whether to compress binary \code{y}
 #' variable to a single row, excluding the first level rather than showing both.
 #' @param yname.row Logical value for whether to include a row displaying the
-#' name of the \code{y} variable.
+#' name of the \code{y} variable and indent the factor levels.
+#' @param indent.spaces Integer value specifying how many spaces to indent
+#' factor levels. Only used if \code{yname.row = TRUE}.
 #' @param text.label Character string with text to put after the \code{y}
 #' variable name, identifying what cell values and parentheses represent.
 #' @param quantiles Numeric value. If specified, table compares \code{y} across
@@ -92,8 +94,10 @@
 #'
 #'
 #' @export
-tabfreq <- function(formula = NULL, data = NULL,
-                    x = NULL, y = NULL,
+tabfreq <- function(formula = NULL,
+                    data = NULL,
+                    x = NULL,
+                    y = NULL,
                     columns = c("xgroups", "p"),
                     cell = "counts",
                     parenth = "col.percent",
@@ -103,11 +107,12 @@ tabfreq <- function(formula = NULL, data = NULL,
                     yname = NULL,
                     ylevels = NULL,
                     compress.binary = FALSE,
-                    yname.row = FALSE,
+                    yname.row = TRUE,
+                    indent.spaces = 3,
                     text.label = NULL,
                     quantiles = NULL,
                     quantile.vals = FALSE,
-                    latex = FALSE,
+                    latex = TRUE,
                     decimals = 1,
                     formatp.list = NULL,
                     n.headings = FALSE,
@@ -151,6 +156,9 @@ tabfreq <- function(formula = NULL, data = NULL,
   }
   if (! is.logical(yname.row)) {
     stop("The input 'yname.row' must be a logical.")
+  }
+  if (! is.null(indent.spaces) && ! (is.numeric(indent.spaces) && indent.spaces >= 0 && indent.spaces == as.integer(indent.spaces))) {
+    stop("The input 'indent.spaces' must be a non-negative integer.")
   }
   if (! is.null(text.label) && ! is.character(text.label)) {
     stop("The input 'text.label' must be a character string.")
@@ -420,7 +428,8 @@ tabfreq <- function(formula = NULL, data = NULL,
   # Add yname row and indent ylevels if requested
   if (yname.row) {
     row1 <- df[1, , drop = FALSE]
-    df[, 1] <- paste(ifelse(latex, "\\ \\ ", "  "), df[, 1], sep = "")
+    spaces <- paste(rep(ifelse(latex, "\\ ", " "), indent.spaces), collapse = "")
+    df[, 1] <- paste(spaces, df[, 1], sep = "")
     df <- rbind(c(yname, rep("", ncol(df) - 1)), df)
     summary.cols <- which(colnames(df) %in% c("N", "Chi-sq", "P"))
     df[1, summary.cols] <- row1[1, summary.cols]

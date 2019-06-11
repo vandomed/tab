@@ -31,6 +31,8 @@
 #' @param formatp.list List of arguments to pass to \code{\link[tab]{formatp}}.
 #' @param n.headings Logical value for whether to display group sample sizes in
 #' parentheses in column headings.
+#' @param N.headings Logical value for whether to display weighted sample sizes
+#' in parentheses in column headings.
 #' @param print.html Logical value for whether to write a .html file with the
 #' table to the current working directory.
 #' @param html.filename Character string specifying the name of the .html file
@@ -59,17 +61,10 @@
 #' # Compare median BMI by sex
 #' (medtable1 <- tabmedians.svy(BMI ~ Sex, design = design))
 #'
-#' # Create single table comparing median BMI and median age by sex. Drop missing
-#' # observations first.
-#' design2 <- subset(design, ! is.na(BMI) & ! is.na(Age) & ! is.na(Sex))
-#' (medtable2 <- rbind(tabmedians.svy(BMI ~ Sex, design = design2),
-#'                     tabmedians.svy(Age ~ Sex, design = design2)))
-#'
-#' # Same as previous, but using tabmulti for convenience
-#' # (medtable3 <- tabmulti.svy(BMI + Age ~ Sex, data = tabsvydata))
 #'
 #' @export
-tabmedians.svy <- function(formula, design,
+tabmedians.svy <- function(formula,
+                           design,
                            columns = c("xgroups", "p"),
                            parenth = "iqr",
                            sep.char = ", ",
@@ -79,7 +74,8 @@ tabmedians.svy <- function(formula, design,
                            decimals = NULL,
                            svyranktest.list = NULL,
                            formatp.list = NULL,
-                           n.headings = TRUE,
+                           n.headings = FALSE,
+                           N.headings = FALSE,
                            print.html = FALSE,
                            html.filename = "table1.html") {
 
@@ -135,7 +131,8 @@ tabmedians.svy <- function(formula, design,
   if (is.null(yname)) yname <- yvarname
 
   # Drop missing values
-  design <- eval(parse(text = paste("subset(design, ! is.na(", xvarname, ") & ! is.na(", yvarname, "))", sep = "")))
+  design <- subset(design, complete.cases(design$variables[, c(xvarname, yvarname)]))
+  # design <- eval(parse(text = paste("subset(design, ! is.na(", xvarname, ") & ! is.na(", yvarname, "))", sep = "")))
   # design <- eval(str2expression(paste("subset(design, ! is.na(", xvarname, ") & ! is.na(", yvarname, "))", sep = "")))
 
   # Extract x and y values
@@ -312,10 +309,13 @@ tabmedians.svy <- function(formula, design,
 
   # Add sample sizes to column headings if requested
   if (n.headings) {
-
     names(df)[names(df) == "Overall"] <- paste("Overall (n = ", sum(ns), ")", sep = "")
     names(df)[names(df) %in% xlevels] <- paste(xlevels, " (n = ", ns, ")", sep = "")
-
+  }
+  if (N.headings) {
+    Ns <- svytable(as.formula(paste("~", xvarname, sep = "")), design = design)
+    names(df)[names(df) == "Overall"] <- paste("Overall (N = ", sum(Ns), ")", sep = "")
+    names(df)[names(df) %in% xlevels] <- paste(xlevels, " (N = ", Ns, ")", sep = "")
   }
 
   # Print html version of table if requested

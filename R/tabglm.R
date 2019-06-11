@@ -13,11 +13,11 @@
 #' for HR (95\% CI), \code{"test"} for z/t statistic, and \code{"p"}. If OR's or
 #' HR's are requested, the function will trust that exponentiated betas
 #' correspond to these quantities.
-#' @param var.labels Named list specifying labels to use for certain predictors.
+#' @param xvarlabels Named list specifying labels to use for certain predictors.
 #' For example, if \code{fit} includes a predictor named "race"
 #' that you want to label "Race/ethnicity" and a predictor named "age_yrs" that
 #' you want to label "Age (years)", use
-#' \code{var.labels = list(race = "Race/ethnicity", age_yrs = "Age (years)"}.
+#' \code{xvarlabels = list(race = "Race/ethnicity", age_yrs = "Age (years)"}.
 #' @param factor.compression Integer value from 1 to 5 controlling how much
 #' compression is applied to factor predictors (higher value = more
 #' compression). If 1, rows are Variable, Level 1 (ref), Level 2, ...; if 2,
@@ -26,6 +26,8 @@
 #' are Level 2, ...
 #' @param sep.char Character string with separator to place between lower and
 #' upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.
+#' @param indent.spaces Integer value specifying how many spaces to indent
+#' factor levels.
 #' @param latex Logical value for whether to format table so it is
 #' ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
 #' \code{\link[knitr]{kable}}.
@@ -62,7 +64,7 @@
 #' # Same as previous, but with custom labels for Age and Race and factors
 #' # displayed in slightly more compressed format
 #' fit %>%
-#'   tabglm(var.labels = list(Age = "Age (years)", Race = "Race/ethnicity"),
+#'   tabglm(xvarlabels = list(Age = "Age (years)", Race = "Race/ethnicity"),
 #'          factor.compression = 2) %>%
 #'   kable()
 #'
@@ -75,9 +77,10 @@
 #' @export
 tabglm <- function(fit,
                    columns = NULL,
-                   var.labels = NULL,
+                   xvarlabels = NULL,
                    factor.compression = 1,
                    sep.char = ", ",
+                   indent.spaces = 3,
                    latex = TRUE,
                    decimals = 2,
                    formatp.list = NULL,
@@ -99,6 +102,9 @@ tabglm <- function(fit,
   }
   if (! is.character(sep.char)) {
     stop("The input 'sep.char' must be a character string.")
+  }
+  if (! is.null(indent.spaces) && ! (is.numeric(indent.spaces) && indent.spaces >= 0 && indent.spaces == as.integer(indent.spaces))) {
+    stop("The input 'indent.spaces' must be a non-negative integer.")
   }
   if (! is.logical(latex)) {
     stop("The input 'latex' must be a logical.")
@@ -241,6 +247,7 @@ tabglm <- function(fit,
   if (intercept) df$Variable[1] <- "Intercept"
 
   # Clean up factor variables
+  spaces <- paste(rep(ifelse(latex, "\\ ", " "), indent.spaces), collapse = "")
   xlevels <- fit$xlevels
   if (length(xlevels) > 0) {
     for (ii in 1: length(xlevels)) {
@@ -250,20 +257,21 @@ tabglm <- function(fit,
       if (factor.compression == 1) {
 
         # Rows are Variable, Level 1 (ref), Level 2, ...
-        df$Variable[locs] <- gsub(pattern = varname.ii, replacement = "  ", x = df$Variable[locs])
+        df$Variable[locs] <- gsub(pattern = varname.ii, replacement = spaces,
+                                  x = df$Variable[locs], fixed = TRUE)
         newrows <- matrix("", nrow = 2, ncol = ncol(df), dimnames = list(NULL, names(df)))
         newrows[2, ] <- "-"
-        newrows[1, 1] <- ifelse(varname.ii %in% names(var.labels), var.labels[[varname.ii]], varname.ii)
-        newrows[2, 1] <- paste("  ", paste(levels.ii[1], " (ref)", sep = ""), sep = "")
+        newrows[1, 1] <- ifelse(varname.ii %in% names(xvarlabels), xvarlabels[[varname.ii]], varname.ii)
+        newrows[2, 1] <- paste(spaces, paste(levels.ii[1], " (ref)", sep = ""), sep = "")
         df <- rbind(df[setdiff(1: locs[1], locs[1]), ], newrows, df[locs[1]: nrow(df), ])
 
       } else if (factor.compression == 2) {
 
         # Rows are Variable (ref = Level 1), Level 2, ...
-        df$Variable[locs] <- gsub(pattern = varname.ii, replacement = "  ", x = df$Variable[locs])
+        df$Variable[locs] <- gsub(pattern = varname.ii, replacement = spaces, x = df$Variable[locs])
         newrow <- matrix("", nrow = 1, ncol = ncol(df), dimnames = list(NULL, names(df)))
         newrow[1, 1] <- paste(
-          ifelse(varname.ii %in% names(var.labels), var.labels[[varname.ii]], varname.ii),
+          ifelse(varname.ii %in% names(xvarlabels), xvarlabels[[varname.ii]], varname.ii),
           " (ref = ", levels.ii[1], ")", sep = ""
         )
         df <- rbind(df[setdiff(1: locs[1], locs[1]), ], newrow, df[locs[1]: nrow(df), ])
@@ -301,8 +309,8 @@ tabglm <- function(fit,
                       grep(components[2], df$Variable))
     if (length(locs) == 1) {
       components <- c(
-        ifelse(components[1] %in% names(var.labels), var.labels[[components[1]]], components[1]),
-        ifelse(components[2] %in% names(var.labels), var.labels[[components[2]]], components[2])
+        ifelse(components[1] %in% names(xvarlabels), xvarlabels[[components[1]]], components[1]),
+        ifelse(components[2] %in% names(xvarlabels), xvarlabels[[components[2]]], components[2])
       )
       df$Variable[locs] <- paste(components, collapse = " by ")
     } else {
@@ -310,11 +318,11 @@ tabglm <- function(fit,
       labs <- gsub(components[1], "", labs)
       labs <- gsub(components[2], "", labs)
       labs <- gsub(":", ", ", labs)
-      df$Variable[locs] <- paste("  ", labs, sep = "")
+      df$Variable[locs] <- paste(spaces, labs, sep = "")
       newrow <- matrix("", nrow = 1, ncol = ncol(df), dimnames = list(NULL, names(df)))
       components <- c(
-        ifelse(components[1] %in% names(var.labels), var.labels[[components[1]]], components[1]),
-        ifelse(components[2] %in% names(var.labels), var.labels[[components[2]]], components[2])
+        ifelse(components[1] %in% names(xvarlabels), xvarlabels[[components[1]]], components[1]),
+        ifelse(components[2] %in% names(xvarlabels), xvarlabels[[components[2]]], components[2])
       )
       newrow[1, 1] <- paste(components, collapse = " by ")
       df <- rbind(df[setdiff(1: locs[1], locs[1]), ], newrow, df[locs[1]: nrow(df), ])
@@ -328,7 +336,7 @@ tabglm <- function(fit,
     varname.ii <- substring(split.ii[1], first = 6)
     poly.order <- as.numeric(split.ii[2])
     locs <- grep(polynomial.ii, df$Variable, fixed = TRUE)
-    varname.ii <- ifelse(varname.ii %in% names(var.labels), var.labels[[varname.ii]], varname.ii)
+    varname.ii <- ifelse(varname.ii %in% names(xvarlabels), xvarlabels[[varname.ii]], varname.ii)
     if (poly.order == 1) {
       df$Variable[locs] <- varname.ii
     } else if (poly.order == 2) {
@@ -341,15 +349,15 @@ tabglm <- function(fit,
   }
 
   # Add user-specified labels for numeric variables
-  if (! is.null(var.labels)) {
+  if (! is.null(xvarlabels)) {
     dataClasses <- attr(fit$terms, "dataClasses")
     numerics <- names(dataClasses[dataClasses == "numeric"])
     if (length(numerics) > 0) {
       for (varname.ii in numerics) {
         loc <- which(df$Variable == varname.ii)
         if (length(loc) == 1) {
-          df$Variable[loc] <- ifelse(varname.ii %in% names(var.labels),
-                                     var.labels[[varname.ii]], varname.ii)
+          df$Variable[loc] <- ifelse(varname.ii %in% names(xvarlabels),
+                                     xvarlabels[[varname.ii]], varname.ii)
         }
       }
     }
@@ -366,10 +374,10 @@ tabglm <- function(fit,
 
   }
 
-  # Reformat for latex if requested
-  if (latex) {
-    df$Variable <- gsub(pattern = "  ", replacement = "\\ \\ ", x = df$Variable, fixed = TRUE)
-  }
+  # # Reformat for latex if requested
+  # if (latex) {
+  #   df$Variable <- gsub(pattern = "   ", replacement = "\\ \\ \\ ", x = df$Variable, fixed = TRUE)
+  # }
 
   # Remove row names and return table
   rownames(df) <- NULL

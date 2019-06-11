@@ -30,6 +30,8 @@
 #' are Level 2, ...
 #' @param sep.char Character string with separator to place between lower and
 #' upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.
+#' @param indent.spaces Integer value specifying how many spaces to indent
+#' factor levels.
 #' @param latex Logical value for whether to format table so it is
 #' ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
 #' \code{\link[knitr]{kable}}.
@@ -91,6 +93,7 @@ tabgee <- function(fit,
                    var.labels = NULL,
                    factor.compression = 1,
                    sep.char = ", ",
+                   indent.spaces = 3,
                    latex = TRUE,
                    decimals = 2,
                    formatp.list = NULL,
@@ -115,6 +118,9 @@ tabgee <- function(fit,
   }
   if (! is.character(sep.char)) {
     stop("The input 'sep.char' must be a character string.")
+  }
+  if (! is.null(indent.spaces) && ! (is.numeric(indent.spaces) && indent.spaces >= 0 && indent.spaces == as.integer(indent.spaces))) {
+    stop("The input 'indent.spaces' must be a non-negative integer.")
   }
   if (! is.logical(latex)) {
     stop("The input 'latex' must be a logical.")
@@ -258,6 +264,7 @@ tabgee <- function(fit,
   }
 
   # Clean up factor variables
+  spaces <- paste(rep(ifelse(latex, "\\ ", " "), indent.spaces), collapse = "")
   dataClasses <- attr(fit$terms, "dataClasses")
   factors <- names(dataClasses[dataClasses == "factor"])
   if (length(factors) > 0) {
@@ -268,11 +275,12 @@ tabgee <- function(fit,
         # Rows are Variable, Level 1 (ref), Level 2, ...
         levels.ii <- levels(data[, varname.ii])
         locs <- which(df$Variable %in% paste(varname.ii, levels.ii, sep = ""))
-        df$Variable[locs] <- gsub(pattern = varname.ii, replacement = "  ", x = df$Variable[locs])
+        df$Variable[locs] <- gsub(pattern = varname.ii, replacement = spaces,
+                                  x = df$Variable[locs], fixed = TRUE)
         newrows <- matrix("", nrow = 2, ncol = ncol(df), dimnames = list(NULL, names(df)))
         newrows[2, ] <- "-"
         newrows[1, 1] <- ifelse(varname.ii %in% names(var.labels), var.labels[[varname.ii]], varname.ii)
-        newrows[2, 1] <- paste("  ", paste(levels.ii[1], " (ref)", sep = ""), sep = "")
+        newrows[2, 1] <- paste(spaces, paste(levels.ii[1], " (ref)", sep = ""), sep = "")
         df <- rbind(df[setdiff(1: locs[1], locs[1]), ], newrows, df[locs[1]: nrow(df), ])
 
       } else if (factor.compression == 2) {
@@ -280,7 +288,7 @@ tabgee <- function(fit,
         # Rows are Variable (ref = Level 1), Level 2, ...
         levels.ii <- levels(data[, varname.ii])
         locs <- which(df$Variable %in% paste(varname.ii, levels.ii, sep = ""))
-        df$Variable[locs] <- gsub(pattern = varname.ii, replacement = "  ", x = df$Variable[locs])
+        df$Variable[locs] <- gsub(pattern = varname.ii, replacement = spaces, x = df$Variable[locs])
         newrow <- matrix("", nrow = 1, ncol = ncol(df), dimnames = list(NULL, names(df)))
         newrow[1, 1] <- paste(
           ifelse(varname.ii %in% names(var.labels), var.labels[[varname.ii]], varname.ii),
@@ -336,7 +344,7 @@ tabgee <- function(fit,
       labs <- gsub(components[1], "", labs)
       labs <- gsub(components[2], "", labs)
       labs <- gsub(":", ", ", labs)
-      df$Variable[locs] <- paste("  ", labs, sep = "")
+      df$Variable[locs] <- paste(spaces, labs, sep = "")
       newrow <- matrix("", nrow = 1, ncol = ncol(df), dimnames = list(NULL, names(df)))
       components <- c(
         ifelse(components[1] %in% names(var.labels), var.labels[[components[1]]], components[1]),
@@ -390,10 +398,10 @@ tabgee <- function(fit,
 
   }
 
-  # Reformat for latex if requested
-  if (latex) {
-    df$Variable <- gsub(pattern = "  ", replacement = "\\ \\ ", x = df$Variable, fixed = TRUE)
-  }
+  # # Reformat for latex if requested
+  # if (latex) {
+  #   df$Variable <- gsub(pattern = "   ", replacement = "\\ \\ \\ ", x = df$Variable, fixed = TRUE)
+  # }
 
   # Remove row names and return table
   rownames(df) <- NULL

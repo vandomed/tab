@@ -80,8 +80,10 @@
 #'
 #'
 #' @export
-tabmeans <- function(formula = NULL, data = NULL,
-                     x = NULL, y = NULL,
+tabmeans <- function(formula = NULL,
+                     data = NULL,
+                     x = NULL,
+                     y = NULL,
                      columns = c("xgroups", "p"),
                      parenth = "sd",
                      sep.char = ", ",

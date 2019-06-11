@@ -7,10 +7,11 @@
 tabfreq.svy(formula, design, columns = c("xgroups", "p"),
   cell = "col.percent", parenth = "se", sep.char = ", ",
   xlevels = NULL, yname = NULL, ylevels = NULL,
-  compress.binary = FALSE, yname.row = FALSE, text.label = NULL,
-  latex = FALSE, decimals = 1, svychisq.list = NULL,
-  formatp.list = NULL, n.headings = FALSE, N.headings = FALSE,
-  print.html = FALSE, html.filename = "table1.html")
+  compress.binary = FALSE, yname.row = TRUE, indent.spaces = 3,
+  text.label = NULL, latex = TRUE, decimals = 1,
+  svychisq.list = NULL, formatp.list = NULL, n.headings = FALSE,
+  N.headings = FALSE, print.html = FALSE,
+  html.filename = "table1.html")
 }
 \arguments{
 \item{formula}{Formula, e.g. \code{Race ~ Sex}.}
@@ -47,6 +48,9 @@ variable to a single row, excluding the first level rather than showing both.}
 
 \item{yname.row}{Logical value for whether to include a row displaying the
 name of the \code{y} variable.}
+
+\item{indent.spaces}{Integer value specifying how many spaces to indent
+factor levels. Only used if \code{yname.row = TRUE}.}
 
 \item{text.label}{Character string with text to put after the \code{y}
 variable name, identifying what cell values and parentheses represent.}
@@ -95,7 +99,7 @@ design <- svydesign(
 )
 
 # Compare race distribution by sex
-(freqtable1 <- tabfreq.svy(Race ~ Sex, design = design))
+tabfreq.svy(Race ~ Sex, design = design) \%>\% kable()
 
 
 }

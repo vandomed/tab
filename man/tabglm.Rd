@@ -4,10 +4,10 @@
 \alias{tabglm}
 \title{Create Summary Table for Fitted Generalized Linear Model}
 \usage{
-tabglm(fit, columns = NULL, var.labels = NULL,
-  factor.compression = 1, sep.char = ", ", latex = TRUE,
-  decimals = 2, formatp.list = NULL, print.html = FALSE,
-  html.filename = "table1.html")
+tabglm(fit, columns = NULL, xvarlabels = NULL,
+  factor.compression = 1, sep.char = ", ", indent.spaces = 3,
+  latex = TRUE, decimals = 2, formatp.list = NULL,
+  print.html = FALSE, html.filename = "table1.html")
 }
 \arguments{
 \item{fit}{Fitted \code{\link[stats]{glm}} object.}
@@ -21,11 +21,11 @@ for HR (95\% CI), \code{"test"} for z/t statistic, and \code{"p"}. If OR's or
 HR's are requested, the function will trust that exponentiated betas
 correspond to these quantities.}
 
-\item{var.labels}{Named list specifying labels to use for certain predictors.
+\item{xvarlabels}{Named list specifying labels to use for certain predictors.
 For example, if \code{fit} includes a predictor named "race"
 that you want to label "Race/ethnicity" and a predictor named "age_yrs" that
 you want to label "Age (years)", use
-\code{var.labels = list(race = "Race/ethnicity", age_yrs = "Age (years)"}.}
+\code{xvarlabels = list(race = "Race/ethnicity", age_yrs = "Age (years)"}.}
 
 \item{factor.compression}{Integer value from 1 to 5 controlling how much
 compression is applied to factor predictors (higher value = more
@@ -36,6 +36,9 @@ are Level 2, ...}
 
 \item{sep.char}{Character string with separator to place between lower and
 upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.}
+
+\item{indent.spaces}{Integer value specifying how many spaces to indent
+factor levels.}
 
 \item{latex}{Logical value for whether to format table so it is
 ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
@@ -80,7 +83,7 @@ fit \%>\% tabglm() \%>\% kable()
 # Same as previous, but with custom labels for Age and Race and factors
 # displayed in slightly more compressed format
 fit \%>\%
-  tabglm(var.labels = list(Age = "Age (years)", Race = "Race/ethnicity"),
+  tabglm(xvarlabels = list(Age = "Age (years)", Race = "Race/ethnicity"),
          factor.compression = 2) \%>\%
   kable()
 

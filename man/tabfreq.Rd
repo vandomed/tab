@@ -8,10 +8,11 @@ tabfreq(formula = NULL, data = NULL, x = NULL, y = NULL,
   columns = c("xgroups", "p"), cell = "counts",
   parenth = "col.percent", sep.char = ", ", test = "chi.fisher",
   xlevels = NULL, yname = NULL, ylevels = NULL,
-  compress.binary = FALSE, yname.row = FALSE, text.label = NULL,
-  quantiles = NULL, quantile.vals = FALSE, latex = FALSE,
-  decimals = 1, formatp.list = NULL, n.headings = FALSE,
-  print.html = FALSE, html.filename = "table1.html")
+  compress.binary = FALSE, yname.row = TRUE, indent.spaces = 3,
+  text.label = NULL, quantiles = NULL, quantile.vals = FALSE,
+  latex = TRUE, decimals = 1, formatp.list = NULL,
+  n.headings = FALSE, print.html = FALSE,
+  html.filename = "table1.html")
 }
 \arguments{
 \item{formula}{Formula, e.g. \code{Sex ~ Group}.}
@@ -60,7 +61,10 @@ that levels of \code{y} are listed in the order that they appear when you run
 variable to a single row, excluding the first level rather than showing both.}
 
 \item{yname.row}{Logical value for whether to include a row displaying the
-name of the \code{y} variable.}
+name of the \code{y} variable and indent the factor levels.}
+
+\item{indent.spaces}{Integer value specifying how many spaces to indent
+factor levels. Only used if \code{yname.row = TRUE}.}
 
 \item{text.label}{Character string with text to put after the \code{y}
 variable name, identifying what cell values and parentheses represent.}

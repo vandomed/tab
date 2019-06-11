@@ -101,8 +101,8 @@ tabdata2 <- subset(tabdata, ! is.na(BMI) & ! is.na(Age))
                     tabmeans(Age ~ Group, data = tabdata2)))
 
 # Same as previous, but using tabmulti for convenience
-#(medtable5 <- tabmulti(data = tabdata, xvarname = "Group",
-#                       yvarnames = c("BMI", "Age"), ymeasures = "median))
+(medtable5 <- tabmulti(data = tabdata, xvarname = "Group",
+                       yvarnames = c("BMI", "Age"), ymeasures = "median"))
 
 
 }

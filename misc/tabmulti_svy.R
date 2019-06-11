@@ -1,16 +1,95 @@
-tabmulti.svy <- function(svy, xvarname, yvarnames, ymeasures = NULL,
-                         listwise.deletion = FALSE, latex = FALSE,
-                         xlevels = NULL, ynames = yvarnames, ylevels = NULL,
-                         mean.tests = "Wald", median.tests = "wilcoxon",
-                         freq.tests = "F", parenth = "iqr", text.label = NULL,
-                         parenth.sep = "-", decimals = 1, p.include = TRUE,
-                         p.decimals = c(2, 3), p.cuts = 0.01,
-                         p.lowerbound = 0.001, p.leading0 = TRUE,
-                         p.avoid1 = FALSE, n.column = FALSE, n.headings = TRUE,
-                         se = FALSE, compress = FALSE, bold.colnames = TRUE,
-                         bold.varnames = FALSE, bold.varlevels = FALSE,
-                         variable.colname = "Variable", print.html = FALSE,
-                         html.filename = "table1.html") {
+#' Create Table Comparing Characteristics Across Levels of a Categorical
+#' Variable (for Complex Survey Data)
+#'
+#' Creates a table comparing multiple characteristics (e.g. median age, mean
+#' BMI, and race/ethnicity distribution) across levels of \code{x}.
+#'
+#' Basically \code{\link{tabmulti}} for complex survey data. Relies heavily on
+#' the \pkg{survey} package.
+#'
+#'
+#'
+#' @export
+formula <- Age + Race + BMI ~ Sex
+design <- svydesign(
+  data = tabsvydata,
+  ids = ~sdmvpsu,
+  strata = ~sdmvstra,
+  weights = ~wtmec2yr,
+  nest = TRUE
+)
+xvarname = NULL
+yvarnames = NULL
+ymeasures = NULL
+columns = c("xgroups", "p")
+listwise.deletion = FALSE
+sep.char = ", "
+xlevels = NULL
+ynames = NULL
+ylevels = NULL
+latex = TRUE
+decimals = NULL
+formatp.list = NULL
+n.headings = FALSE
+print.html = FALSE
+html.filename = "table1.html"
+tabmeans.svy.list = NULL
+tabmedians.svy.list = NULL
+tabfreq.svy.list = NULL
+
+tabmulti.svy <- function(formula = NULL,
+                         design,
+                         xvarname = NULL,
+                         yvarnames = NULL,
+                         ymeasures = NULL,
+                         columns = c("xgroups", "p"),
+                         listwise.deletion = FALSE,
+                         sep.char = ", ",
+                         xlevels = NULL,
+                         ynames = NULL,
+                         ylevels = NULL,
+                         quantiles = NULL,
+                         quantile.vals = FALSE,
+                         latex = TRUE,
+                         decimals = NULL,
+                         formatp.list = NULL,
+                         n.headings = FALSE,
+                         print.html = FALSE,
+                         html.filename = "table1.html",
+                         tabmeans.list = NULL,
+                         tabmedians.list = NULL,
+                         tabfreq.list = NULL) {
+
+  # Figure out x and y
+  if (! is.null(formula)) {
+    varnames <- all.vars(formula)
+    xvarname <- varnames[length(varnames)]
+    yvarnames <- varnames[-length(varnames)]
+  }
+  if (is.null(ynames)) ynames <- yvarnames
+
+  # If listwise.deletion is TRUE, drop observations with missing values for
+  # column variable or any row variables
+  if (listwise.deletion){
+    design <- subset(design, complete.cases(design$variables[, c(xvarname, yvarnames)]))
+  }
+
+  # Create x vector
+  x <- design$variables[, xvarname]
+
+  # Number of y variables
+  num.yvars <- length(yvarnames)
+
+  # If ymeasures is NULL, compare frequencies for factor/character variables and
+  # means for numeric variables
+  if (is.null(ymeasures)) {
+    ymeasures <- ifelse(sapply(data[, yvarnames], class) == "numeric", "mean", "freq")
+  } else if (length(ymeasures) == 1) {
+    ymeasures <- rep(ymeasures, num.yvars)
+  }
+
+
+
 
   # If any inputs are not correct class, return error
   if (!is.character(xvarname)) {

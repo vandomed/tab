@@ -73,13 +73,15 @@
 #'                     tabmeans(Age ~ Group, data = tabdata2)))
 #'
 #' # Same as previous, but using tabmulti for convenience
-#' #(medtable5 <- tabmulti(data = tabdata, xvarname = "Group",
-#' #                       yvarnames = c("BMI", "Age"), ymeasures = "median))
+#' (medtable5 <- tabmulti(data = tabdata, xvarname = "Group",
+#'                        yvarnames = c("BMI", "Age"), ymeasures = "median"))
 #'
 #'
 #' @export
-tabmedians <- function(formula = NULL, data = NULL,
-                       x = NULL, y = NULL,
+tabmedians <- function(formula = NULL,
+                       data = NULL,
+                       x = NULL,
+                       y = NULL,
                        columns = c("xgroups", "p"),
                        parenth = "iqr",
                        sep.char = ", ",

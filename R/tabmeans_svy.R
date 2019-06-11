@@ -34,6 +34,8 @@
 #' @param formatp.list List of arguments to pass to \code{\link[tab]{formatp}}.
 #' @param n.headings Logical value for whether to display group sample sizes in
 #' parentheses in column headings.
+#' @param N.headings Logical value for whether to display weighted sample sizes
+#' in parentheses in column headings.
 #' @param print.html Logical value for whether to write a .html file with the
 #' table to the current working directory.
 #' @param html.filename Character string specifying the name of the .html file
@@ -60,20 +62,12 @@
 #' )
 #'
 #' # Compare mean BMI by sex
-#' (meanstable1 <- tabmeans.svy(BMI ~ Sex, design = design))
-#'
-#' # Create single table comparing mean BMI and mean age by sex. Drop missing
-#' # observations first.
-#' design2 <- subset(design, ! is.na(BMI) & ! is.na(Age) & ! is.na(Sex))
-#' (meanstable2 <- rbind(tabmeans.svy(BMI ~ Sex, design = design2),
-#'                       tabmeans.svy(Age ~ Sex, design = design2)))
-#'
-#' # Same as previous, but using tabmulti for convenience
-#' # (meanstable3 <- tabmulti.svy(BMI + Age ~ Sex, data = tabsvydata))
+#' (meanstable <- tabmeans.svy(BMI ~ Sex, design = design))
 #'
 #'
 #' @export
-tabmeans.svy <- function(formula, design,
+tabmeans.svy <- function(formula,
+                         design,
                          columns = c("xgroups", "p"),
                          parenth = "sd",
                          sep.char = ", ",
@@ -83,7 +77,8 @@ tabmeans.svy <- function(formula, design,
                          decimals = 1,
                          anova.svyglm.list = NULL,
                          formatp.list = NULL,
-                         n.headings = TRUE,
+                         n.headings = FALSE,
+                         N.headings = FALSE,
                          print.html = FALSE,
                          html.filename = "table1.html") {
 
@@ -125,6 +120,9 @@ tabmeans.svy <- function(formula, design,
   if (! is.logical(n.headings)) {
     stop("The input 'n.headings' must be a logical.")
   }
+  if (! is.logical(N.headings)) {
+    stop("The input 'N.headings' must be a logical.")
+  }
   if (! is.logical(print.html)) {
     stop("The input 'print.html' must be a logical.")
   }
@@ -139,7 +137,8 @@ tabmeans.svy <- function(formula, design,
   if (is.null(yname)) yname <- yvarname
 
   # Drop missing values
-  design <- eval(parse(text = paste("subset(design, ! is.na(", xvarname, ") & ! is.na(", yvarname, "))", sep = "")))
+  design <- subset(design, complete.cases(design$variables[, c(xvarname, yvarname)]))
+  # design <- eval(parse(text = paste("subset(design, ! is.na(", xvarname, ") & ! is.na(", yvarname, "))", sep = "")))
   # design <- eval(str2expression(paste("subset(design, ! is.na(", xvarname, ") & ! is.na(", yvarname, "))", sep = "")))
 
   # Extract x and y values
@@ -278,8 +277,12 @@ tabmeans.svy <- function(formula, design,
       } else if (parenth == "t.ci") {
         ttests <- lapply(X = xvals, FUN = function(x) {
           svyttest(as.formula(paste(yvarname, "~ 1", sep = "")),
-                   design = eval(parse(text = paste("subset(design, ", xvarname, " == '", x, "')", sep = ""))))
+                   design = subset(design, design$variables[, xvarname] == x))
         })
+        # ttests <- lapply(X = xvals, FUN = function(x) {
+        #   svyttest(as.formula(paste(yvarname, "~ 1", sep = "")),
+        #            design = eval(parse(text = paste("subset(design, ", xvarname, " == '", x, "')", sep = ""))))
+        # })
         # ttests <- lapply(X = xvals, FUN = function(x) {
         #   svyttest(as.formula(paste(yvarname, "~ 1", sep = "")),
         #            design = eval(str2expression(paste("subset(design, ", xvarname, " == '", x, "')", sep = ""))))
@@ -334,10 +337,13 @@ tabmeans.svy <- function(formula, design,
 
   # Add sample sizes to column headings if requested
   if (n.headings) {
-
     names(df)[names(df) == "Overall"] <- paste("Overall (n = ", sum(ns), ")", sep = "")
     names(df)[names(df) %in% xlevels] <- paste(xlevels, " (n = ", ns, ")", sep = "")
-
+  }
+  if (N.headings) {
+    Ns <- svytable(as.formula(paste("~", xvarname, sep = "")), design = design)
+    names(df)[names(df) == "Overall"] <- paste("Overall (N = ", sum(Ns), ")", sep = "")
+    names(df)[names(df) %in% xlevels] <- paste(xlevels, " (N = ", Ns, ")", sep = "")
   }
 
   # Print html version of table if requested

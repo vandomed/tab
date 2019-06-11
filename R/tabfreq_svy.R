@@ -30,6 +30,8 @@
 #' variable to a single row, excluding the first level rather than showing both.
 #' @param yname.row Logical value for whether to include a row displaying the
 #' name of the \code{y} variable.
+#' @param indent.spaces Integer value specifying how many spaces to indent
+#' factor levels. Only used if \code{yname.row = TRUE}.
 #' @param text.label Character string with text to put after the \code{y}
 #' variable name, identifying what cell values and parentheses represent.
 #' @param latex Logical value for whether to format table so it is
@@ -62,11 +64,12 @@
 #' )
 #'
 #' # Compare race distribution by sex
-#' (freqtable1 <- tabfreq.svy(Race ~ Sex, design = design))
+#' tabfreq.svy(Race ~ Sex, design = design) %>% kable()
 #'
 #'
 #' @export
-tabfreq.svy <- function(formula, design,
+tabfreq.svy <- function(formula,
+                        design,
                         columns = c("xgroups", "p"),
                         cell = "col.percent",
                         parenth = "se",
@@ -75,9 +78,10 @@ tabfreq.svy <- function(formula, design,
                         yname = NULL,
                         ylevels = NULL,
                         compress.binary = FALSE,
-                        yname.row = FALSE,
+                        yname.row = TRUE,
+                        indent.spaces = 3,
                         text.label = NULL,
-                        latex = FALSE,
+                        latex = TRUE,
                         decimals = 1,
                         svychisq.list = NULL,
                         formatp.list = NULL,
@@ -120,6 +124,9 @@ tabfreq.svy <- function(formula, design,
   if (! is.logical(yname.row)) {
     stop("The input 'yname.row' must be a logical.")
   }
+  if (! is.null(indent.spaces) && ! (is.numeric(indent.spaces) && indent.spaces >= 0 && indent.spaces == as.integer(indent.spaces))) {
+    stop("The input 'indent.spaces' must be a non-negative integer.")
+  }
   if (! is.null(text.label) && ! is.character(text.label)) {
     stop("The input 'text.label' must be a character string.")
   }
@@ -160,8 +167,9 @@ tabfreq.svy <- function(formula, design,
   if (is.null(yname)) yname <- yvarname
 
   # Drop missing values
-  #design <- eval(str2expression(paste("subset(design, ! is.na(", xvarname, ") & ! is.na(", yvarname, "))", sep = "")))
-  design <- eval(parse(text = paste("subset(design, ! is.na(", xvarname, ") & ! is.na(", yvarname, "))", sep = "")))
+  design <- subset(design, complete.cases(design$variables[, c(xvarname, yvarname)]))
+  # design <- eval(parse(text = paste("subset(design, ! is.na(", xvarname, ") & ! is.na(", yvarname, "))", sep = "")))
+  # design <- eval(str2expression(paste("subset(design, ! is.na(", xvarname, ") & ! is.na(", yvarname, "))", sep = "")))
 
   # Extract x and y values
   x <- design$variables[, xvarname]
@@ -242,8 +250,12 @@ tabfreq.svy <- function(formula, design,
 
       svymeans <- lapply(X = xvals, FUN = function(x) {
         as.data.frame(svymean(as.formula(paste("~", yvarname, sep = "")),
-                              design = eval(parse(text = paste("subset(design, ", xvarname, " == '", x, "')", sep = "")))))
+                              design = subset(design, design$variables[, xvarname] == x)))
       })
+      # svymeans <- lapply(X = xvals, FUN = function(x) {
+      #   as.data.frame(svymean(as.formula(paste("~", yvarname, sep = "")),
+      #                         design = eval(parse(text = paste("subset(design, ", xvarname, " == '", x, "')", sep = "")))))
+      # })
       # svymeans <- lapply(X = xvals, FUN = function(x) {
       #   as.data.frame(svymean(as.formula(paste("~", yvarname, sep = "")),
       #           design = eval(str2expression(paste("subset(design, ", xvarname, " == '", x, "')", sep = "")))))
@@ -305,7 +317,8 @@ tabfreq.svy <- function(formula, design,
   # Add yname row and indent ylevels if requested
   if (yname.row) {
     row1 <- df[1, , drop = FALSE]
-    df[, 1] <- paste(ifelse(latex, "\\ \\ ", "  "), df[, 1], sep = "")
+    spaces <- paste(rep(ifelse(latex, "\\ ", " "), indent.spaces), collapse = "")
+    df[, 1] <- paste(spaces, df[, 1], sep = "")
     df <- rbind(c(yname, rep("", ncol(df) - 1)), df)
     summary.cols <- which(colnames(df) %in% c("n", "N", "P"))
     df[1, summary.cols] <- row1[1, summary.cols]
@@ -340,15 +353,11 @@ tabfreq.svy <- function(formula, design,
 
   # Add sample sizes to column headings if requested
   if (n.headings) {
-
     names(df)[names(df) == "Overall"] <- paste("Overall (n = ", n, ")", sep = "")
     names(df)[names(df) %in% xlevels] <- paste(xlevels, " (n = ", colsums.counts, ")", sep = "")
-
   } else if (N.headings) {
-
     names(df)[names(df) == "Overall"] <- paste("Overall (N = ", N, ")", sep = "")
     names(df)[names(df) %in% xlevels] <- paste(xlevels, " (N = ", colsums.svycounts, ")", sep = "")
-
   }
 
   # Print html version of table if requested

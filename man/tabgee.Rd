@@ -6,8 +6,9 @@
 \usage{
 tabgee(fit, data = NULL, columns = NULL, robust = TRUE,
   var.labels = NULL, factor.compression = 1, sep.char = ", ",
-  latex = TRUE, decimals = 2, formatp.list = NULL,
-  print.html = FALSE, html.filename = "table1.html")
+  indent.spaces = 3, latex = TRUE, decimals = 2,
+  formatp.list = NULL, print.html = FALSE,
+  html.filename = "table1.html")
 }
 \arguments{
 \item{fit}{Fitted \code{\link[gee]{gee}} object.}
@@ -42,6 +43,9 @@ are Level 2, ...}
 
 \item{sep.char}{Character string with separator to place between lower and
 upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.}
+
+\item{indent.spaces}{Integer value specifying how many spaces to indent
+factor levels.}
 
 \item{latex}{Logical value for whether to format table so it is
 ready for printing in LaTeX via \code{\link[xtable]{xtable}} or

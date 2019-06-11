@@ -7,8 +7,8 @@
 tabmeans.svy(formula, design, columns = c("xgroups", "p"),
   parenth = "sd", sep.char = ", ", xlevels = NULL, yname = NULL,
   text.label = NULL, decimals = 1, anova.svyglm.list = NULL,
-  formatp.list = NULL, n.headings = TRUE, print.html = FALSE,
-  html.filename = "table1.html")
+  formatp.list = NULL, n.headings = FALSE, N.headings = FALSE,
+  print.html = FALSE, html.filename = "table1.html")
 }
 \arguments{
 \item{formula}{Formula, e.g. \code{BMI ~ Sex}.}
@@ -51,6 +51,9 @@ levels.}
 \item{n.headings}{Logical value for whether to display group sample sizes in
 parentheses in column headings.}
 
+\item{N.headings}{Logical value for whether to display weighted sample sizes
+in parentheses in column headings.}
+
 \item{print.html}{Logical value for whether to write a .html file with the
 table to the current working directory.}
 
@@ -84,16 +87,7 @@ design <- svydesign(
 )
 
 # Compare mean BMI by sex
-(meanstable1 <- tabmeans.svy(BMI ~ Sex, design = design))
-
-# Create single table comparing mean BMI and mean age by sex. Drop missing
-# observations first.
-design2 <- subset(design, ! is.na(BMI) & ! is.na(Age) & ! is.na(Sex))
-(meanstable2 <- rbind(tabmeans.svy(BMI ~ Sex, design = design2),
-                      tabmeans.svy(Age ~ Sex, design = design2)))
-
-# Same as previous, but using tabmulti for convenience
-# (meanstable3 <- tabmulti.svy(BMI + Age ~ Sex, data = tabsvydata))
+(meanstable <- tabmeans.svy(BMI ~ Sex, design = design))
 
 
 }
