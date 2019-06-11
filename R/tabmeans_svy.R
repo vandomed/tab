@@ -139,7 +139,8 @@ tabmeans.svy <- function(formula, design,
   if (is.null(yname)) yname <- yvarname
 
   # Drop missing values
-  design <- eval(str2expression(paste("subset(design, ! is.na(", xvarname, ") & ! is.na(", yvarname, "))", sep = "")))
+  design <- eval(parse(text = paste("subset(design, ! is.na(", xvarname, ") & ! is.na(", yvarname, "))", sep = "")))
+  # design <- eval(str2expression(paste("subset(design, ! is.na(", xvarname, ") & ! is.na(", yvarname, "))", sep = "")))
 
   # Extract x and y values
   x <- design$variables[, xvarname]
@@ -277,8 +278,12 @@ tabmeans.svy <- function(formula, design,
       } else if (parenth == "t.ci") {
         ttests <- lapply(X = xvals, FUN = function(x) {
           svyttest(as.formula(paste(yvarname, "~ 1", sep = "")),
-                   design = eval(str2expression(paste("subset(design, ", xvarname, " == '", x, "')", sep = ""))))
+                   design = eval(parse(text = paste("subset(design, ", xvarname, " == '", x, "')", sep = ""))))
         })
+        # ttests <- lapply(X = xvals, FUN = function(x) {
+        #   svyttest(as.formula(paste(yvarname, "~ 1", sep = "")),
+        #            design = eval(str2expression(paste("subset(design, ", xvarname, " == '", x, "')", sep = ""))))
+        # })
         tcrits <- qt(p = 0.975, df = sapply(ttests, function(x) x$parameter))
         newcols <- paste(sprintf(spf, means), " (",
                          sprintf(spf, means - tcrits * ses), sep.char,

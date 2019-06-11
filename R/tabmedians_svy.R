@@ -135,7 +135,8 @@ tabmedians.svy <- function(formula, design,
   if (is.null(yname)) yname <- yvarname
 
   # Drop missing values
-  design <- eval(str2expression(paste("subset(design, ! is.na(", xvarname, ") & ! is.na(", yvarname, "))", sep = "")))
+  design <- eval(parse(text = paste("subset(design, ! is.na(", xvarname, ") & ! is.na(", yvarname, "))", sep = "")))
+  # design <- eval(str2expression(paste("subset(design, ! is.na(", xvarname, ") & ! is.na(", yvarname, "))", sep = "")))
 
   # Extract x and y values
   x <- design$variables[, xvarname]

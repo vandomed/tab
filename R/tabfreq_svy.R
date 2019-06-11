@@ -160,7 +160,8 @@ tabfreq.svy <- function(formula, design,
   if (is.null(yname)) yname <- yvarname
 
   # Drop missing values
-  design <- eval(str2expression(paste("subset(design, ! is.na(", xvarname, ") & ! is.na(", yvarname, "))", sep = "")))
+  #design <- eval(str2expression(paste("subset(design, ! is.na(", xvarname, ") & ! is.na(", yvarname, "))", sep = "")))
+  design <- eval(parse(text = paste("subset(design, ! is.na(", xvarname, ") & ! is.na(", yvarname, "))", sep = "")))
 
   # Extract x and y values
   x <- design$variables[, xvarname]
@@ -241,8 +242,12 @@ tabfreq.svy <- function(formula, design,
 
       svymeans <- lapply(X = xvals, FUN = function(x) {
         as.data.frame(svymean(as.formula(paste("~", yvarname, sep = "")),
-                              design = eval(str2expression(paste("subset(design, ", xvarname, " == '", x, "')", sep = "")))))
+                              design = eval(parse(text = paste("subset(design, ", xvarname, " == '", x, "')", sep = "")))))
       })
+      # svymeans <- lapply(X = xvals, FUN = function(x) {
+      #   as.data.frame(svymean(as.formula(paste("~", yvarname, sep = "")),
+      #           design = eval(str2expression(paste("subset(design, ", xvarname, " == '", x, "')", sep = "")))))
+      # })
       col.percents <- do.call(cbind, lapply(svymeans, function(x) x[[1]])) * 100
       ses <- do.call(cbind, lapply(svymeans, function(x) x[[2]])) * 100
 
