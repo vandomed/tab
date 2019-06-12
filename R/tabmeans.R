@@ -236,13 +236,9 @@ tabmeans <- function(formula = NULL,
     if (variance == "equal") {
       fit <- t.test(x = y[x == xvals[1]], y = y[x == xvals[2]],
                     var.equal = TRUE)
-      message(paste("Equal variance t-test was used to compare mean ",
-                    yname, " in the two groups.", sep = ""))
     } else if (variance == "unequal") {
       fit <- t.test(x = y[x == xvals[1]], y = y[x == xvals[2]],
                     var.equal = FALSE)
-      message(paste("Unequal variance t-test was used to compare mean ",
-                    yname, " in the two groups.", sep = ""))
     } else if (variance == "f") {
       f <- var.test(x = y[x == xvals[1]], y = y[x == xvals[2]])
       if (f$p.value < 0.05) {
@@ -267,7 +263,6 @@ tabmeans <- function(formula = NULL,
 
     # ANOVA
     fit <- anova(lm(y ~ as.factor(x)))
-    message(paste("ANOVA was used to compare means for ", yname, sep = ""))
     test.stat <- fit[["F value"]][1]
     test.label <- "F"
     p <- fit[["Pr(>F)"]][1]
@@ -420,10 +415,6 @@ tabmeans <- function(formula = NULL,
       align = paste("ll", paste(rep("r", ncol(df) - 1), collapse = ""), sep = "", collapse = "")
     )
     print(df.xtable, include.rownames = FALSE, type = "html", file = html.filename)
-    # print(df.xtable, include.rownames = FALSE, type = "html",
-    #       file = html.filename, sanitize.text.function = function(x) {
-    #         ifelse(substr(x, 1, 1) == " ", paste("&nbsp &nbsp", x), x)
-    #       })
 
   }
 

@@ -1,7 +1,7 @@
 Summary Tables with 'tab'
 ================
 Dane Van Domelen <br> <vandomed@gmail.com>
-2019-06-11
+2019-06-12
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 Installation
@@ -42,17 +42,17 @@ You can use `tabmulti` to compare characteristics across levels of a factor vari
 tabmulti(Age + Sex + Race ~ Group, data = tabdata) %>% kable()
 ```
 
-| Variable             | Control    | Treatment  | P         |
-|:---------------------|:-----------|:-----------|:----------|
-| Age, M (SD)          | 70.5 (5.3) | 69.5 (5.9) | 0.15      |
-| Sex, n (%)           |            |            | &lt;0.001 |
-|     Female           | 93 (68.4)  | 62 (38.5)  |           |
-|     Male             | 43 (31.6)  | 99 (61.5)  |           |
-| Race, n (%)          |            |            | 0.29      |
-|     White            | 46 (34.1)  | 65 (39.6)  |           |
-|     Black            | 36 (26.7)  | 52 (31.7)  |           |
-|     Mexican American | 21 (15.6)  | 19 (11.6)  |           |
-|     Other            | 32 (23.7)  | 28 (17.1)  |           |
+| Variable            | Control    | Treatment  | P         |
+|:--------------------|:-----------|:-----------|:----------|
+| Age, M (SD)         | 70.5 (5.3) | 69.5 (5.9) | 0.15      |
+| Sex, n (%)          |            |            | &lt;0.001 |
+|    Female           | 93 (68.4)  | 62 (38.5)  |           |
+|    Male             | 43 (31.6)  | 99 (61.5)  |           |
+| Race, n (%)         |            |            | 0.29      |
+|    White            | 46 (34.1)  | 65 (39.6)  |           |
+|    Black            | 36 (26.7)  | 52 (31.7)  |           |
+|    Mexican American | 21 (15.6)  | 19 (11.6)  |           |
+|    Other            | 32 (23.7)  | 28 (17.1)  |           |
 
 To illustrate some options, we can request `Age` and `Race` to print as `Age (years)` and `Race/ethnicity`, compare medians rather than means for age, and include the sample sizes in the column headings:
 
@@ -68,13 +68,13 @@ tabmulti(Age + Sex + Race ~ Group, data = tabdata,
 |:--------------------------|:------------------|:--------------------|:----------|
 | Age (years), Median (IQR) | 70.0 (9.8)        | 69.0 (11.0)         | 0.19      |
 | Sex, n (%)                |                   |                     | &lt;0.001 |
-|     Female                | 92 (68.7)         | 60 (38.0)           |           |
-|     Male                  | 42 (31.3)         | 98 (62.0)           |           |
+|    Female                 | 92 (68.7)         | 60 (38.0)           |           |
+|    Male                   | 42 (31.3)         | 98 (62.0)           |           |
 | Race/ethnicity, n (%)     |                   |                     | 0.26      |
-|     White                 | 46 (34.3)         | 64 (40.5)           |           |
-|     Black                 | 36 (26.9)         | 50 (31.6)           |           |
-|     Mexican American      | 21 (15.7)         | 17 (10.8)           |           |
-|     Other                 | 31 (23.1)         | 27 (17.1)           |           |
+|    White                  | 46 (34.3)         | 64 (40.5)           |           |
+|    Black                  | 36 (26.9)         | 50 (31.6)           |           |
+|    Mexican American       | 21 (15.7)         | 17 (10.8)           |           |
+|    Other                  | 31 (23.1)         | 27 (17.1)           |           |
 
 Regression tables
 -----------------
@@ -162,15 +162,15 @@ design <- svydesign(
 tabmulti.svy(Age + Race + BMI ~ Sex, design = design) %>% kable()
 ```
 
-| Variable               | Female      | Male        | P         |
-|:-----------------------|:------------|:------------|:----------|
-| Age, M (SD)            | 37.0 (22.5) | 34.8 (21.7) | &lt;0.001 |
-| Race, % (SE)           |             |             | 0.08      |
-|     Non-Hispanic White | 69.7 (3.7)  | 69.6 (3.8)  |           |
-|     Non-Hispanic Black | 13.2 (2.0)  | 11.9 (1.9)  |           |
-|     Mexican American   | 8.6 (2.1)   | 9.8 (2.2)   |           |
-|     Other              | 8.4 (1.0)   | 8.8 (1.3)   |           |
-| BMI, M (SD)            | 26.4 (7.5)  | 26.0 (6.4)  | 0.11      |
+| Variable              | Female      | Male        | P         |
+|:----------------------|:------------|:------------|:----------|
+| Age, M (SD)           | 37.0 (22.5) | 34.8 (21.7) | &lt;0.001 |
+| Race, % (SE)          |             |             | 0.08      |
+|    Non-Hispanic White | 69.7 (3.7)  | 69.6 (3.8)  |           |
+|    Non-Hispanic Black | 13.2 (2.0)  | 11.9 (1.9)  |           |
+|    Mexican American   | 8.6 (2.1)   | 9.8 (2.2)   |           |
+|    Other              | 8.4 (1.0)   | 8.8 (1.3)   |           |
+| BMI, M (SD)           | 26.4 (7.5)  | 26.0 (6.4)  | 0.11      |
 
 And here's a linear regression:
 

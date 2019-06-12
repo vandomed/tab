@@ -264,8 +264,6 @@ tabfreq <- function(formula = NULL,
   }
   if (test == "chi") {
     if (summary.counts$approx.ok) {
-      message(paste("Pearson's chi-square test was used to test whether the distribution of ",
-                    yname, " differed across groups.", sep = ""))
     } else {
       message(paste("Pearson's chi-square test was used to test whether the distribution of ",
                     yname, " differed across groups. Assumptions were violated, so you may want to switch to Fisher's exact test.", sep = ""))
@@ -275,21 +273,15 @@ tabfreq <- function(formula = NULL,
     p <- summary.counts$p.value
   } else if (test == "fisher") {
     fit <- fisher.test(x = x, y = y)
-    message(paste("Fisher's exact test was used to test whether the distribution of ",
-                  yname, " differed across groups.", sep = ""))
     test.stat <- "-"
     p <- fit$p.value
   } else if (test == "z") {
     fit <- prop.test(x = counts, correct = FALSE)
-    message(paste("A z-test (without continuity correction) was used to test whether proportions of ",
-                  yname, " differed in the two groups.", sep = ""))
     test.stat <- fit$statistic
     test.label <- "Chi-sq"
     p <- fit$p.value
   } else if (test == "z.continuity") {
     fit <- prop.test(x = counts)
-    message(paste("A z-test (with continuity correction) was used to test whether proportions of ",
-                  yname, " differed in the two groups.", sep = ""))
     test.stat <- fit$statistic
     test.label <- "Chi-sq"
     p <- fit$p.value

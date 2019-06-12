@@ -1,3 +1,9 @@
+June 12, 2019
+
+Revamped everything and all good to go. Sent out a tweetorial today. Should push to CRAN. 
+
+
+
 May 1, 2019
 
 Version on CRAN is 3.1.2, from 2016. Version on GitHub is 4.1.1. Looks like I 

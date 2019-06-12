@@ -131,9 +131,6 @@ tabglm <- function(fit,
   rownames.coefmat <- rownames(coefmat)
   betas <- coefmat[, "Estimate"]
   ses <- coefmat[, "Std. Error"]
-  confint.fit <- confint(fit)
-  lower <- confint.fit[, 1]
-  upper <- confint.fit[, 2]
   intercept <- attr(fit$terms, "intercept") == 1
 
   # If columns unspecified, figure out reasonable defaults
@@ -171,6 +168,8 @@ tabglm <- function(fit,
     } else if (column == "betaci") {
 
       confint.fit <- confint(fit)
+      lower <- confint.fit[, 1]
+      upper <- confint.fit[, 2]
       df$`95% CI` <- paste("(", sprintf(spf, lower), sep.char,
                                 sprintf(spf, upper), ")", sep = "")
       #if (intercept) df$`95% CI`[1] <- "-"
@@ -183,6 +182,8 @@ tabglm <- function(fit,
     } else if (column == "beta.ci") {
 
       confint.fit <- confint(fit)
+      lower <- confint.fit[, 1]
+      upper <- confint.fit[, 2]
       df$`Beta (95% CI)` <- paste(sprintf(spf, betas), " (",
                                   sprintf(spf, lower), sep.char,
                                   sprintf(spf, upper), ")", sep = "")
@@ -196,6 +197,8 @@ tabglm <- function(fit,
     } else if (column == "orci") {
 
       confint.fit <- confint(fit)
+      lower <- confint.fit[, 1]
+      upper <- confint.fit[, 2]
       df$`95% CI` <- paste("(", sprintf(spf, exp(lower)), sep.char,
                                 sprintf(spf, exp(upper)), ")", sep = "")
       if (intercept) df$`95% CI`[1] <- "-"
@@ -203,6 +206,8 @@ tabglm <- function(fit,
     } else if (column == "or.ci") {
 
       confint.fit <- confint(fit)
+      lower <- confint.fit[, 1]
+      upper <- confint.fit[, 2]
       df$`OR (95% CI)` <- paste(sprintf(spf, exp(betas)), " (",
                                 sprintf(spf, exp(lower)), sep.char,
                                 sprintf(spf, exp(upper)), ")", sep = "")
@@ -215,6 +220,8 @@ tabglm <- function(fit,
     } else if (column == "hrci") {
 
       confint.fit <- confint(fit)
+      lower <- confint.fit[, 1]
+      upper <- confint.fit[, 2]
       df$`95% CI` <- paste("(", sprintf(spf, exp(lower)), sep.char,
                            sprintf(spf, exp(upper)), ")", sep = "")
       if (intercept) df$`95% CI`[1] <- "-"
@@ -222,6 +229,8 @@ tabglm <- function(fit,
     } else if (column == "hr.ci") {
 
       confint.fit <- confint(fit)
+      lower <- confint.fit[, 1]
+      upper <- confint.fit[, 2]
       df$`HR (95% CI)` <- paste(sprintf(spf, exp(betas)), " (",
                                 sprintf(spf, exp(lower)), sep.char,
                                 sprintf(spf, exp(upper)), ")", sep = "")
