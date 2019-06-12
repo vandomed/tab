@@ -8,11 +8,11 @@ Variable (for Complex Survey Data)}
 tabmulti.svy(formula = NULL, design, xvarname = NULL,
   yvarnames = NULL, ymeasures = NULL, columns = c("xgroups", "p"),
   listwise.deletion = FALSE, sep.char = ", ", xlevels = NULL,
-  yvarlabels = NULL, ylevels = NULL, latex = TRUE, decimals = NULL,
-  formatp.list = NULL, n.headings = FALSE, N.headings = FALSE,
-  print.html = FALSE, html.filename = "table1.html",
-  tabmeans.svy.list = NULL, tabmedians.svy.list = NULL,
-  tabfreq.svy.list = NULL)
+  yvarlabels = NULL, ylevels = NULL, indent.spaces = 3,
+  latex = TRUE, decimals = NULL, formatp.list = NULL,
+  n.headings = FALSE, N.headings = FALSE, print.html = FALSE,
+  html.filename = "table1.html", tabmeans.svy.list = NULL,
+  tabmedians.svy.list = NULL, tabfreq.svy.list = NULL)
 }
 \arguments{
 \item{formula}{Formula, e.g. \code{Age + Race + BMI ~ Sex}.}
@@ -56,6 +56,9 @@ print as "Race/ethnicity" and "Age (years)", use
 \item{ylevels}{Character vector (if only 1 frequency comparison) or list of
 character vectors with labels for the levels of each categorical \code{y}
 variable.}
+
+\item{indent.spaces}{Integer value specifying how many spaces to indent
+factor levels.}
 
 \item{latex}{Logical value for whether to format table so it is
 ready for printing in LaTeX via \code{\link[xtable]{xtable}} or

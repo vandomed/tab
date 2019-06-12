@@ -264,7 +264,7 @@ tabgee <- function(fit,
   }
 
   # Clean up factor variables
-  spaces <- paste(rep(ifelse(latex, "\\ ", " "), indent.spaces), collapse = "")
+  spaces <- paste(rep(" ", indent.spaces), collapse = "")
   dataClasses <- attr(fit$terms, "dataClasses")
   factors <- names(dataClasses[dataClasses == "factor"])
   if (length(factors) > 0) {
@@ -394,14 +394,19 @@ tabgee <- function(fit,
       df,
       align = paste("ll", paste(rep("r", ncol(df) - 1), collapse = ""), sep = "", collapse = "")
     )
-    print(df.xtable, include.rownames = FALSE, type = "html", file = html.filename)
+    ampersands <- paste(rep("&nbsp ", indent.spaces), collapse = "")
+    print(df.xtable, include.rownames = FALSE, type = "html",
+          file = html.filename, sanitize.text.function = function(x) {
+            ifelse(substr(x, 1, 1) == " ", paste(ampersands, x), x)
+          })
 
   }
 
-  # # Reformat for latex if requested
-  # if (latex) {
-  #   df$Variable <- gsub(pattern = "   ", replacement = "\\ \\ \\ ", x = df$Variable, fixed = TRUE)
-  # }
+  # Reformat for latex if requested
+  if (latex) {
+    slashes <- paste(rep("\\ ", indent.spaces), collapse = "")
+    df$Variable <- gsub(pattern = spaces, replacement = slashes, x = df$Variable, fixed = TRUE)
+  }
 
   # Remove row names and return table
   rownames(df) <- NULL

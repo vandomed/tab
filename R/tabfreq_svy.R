@@ -316,8 +316,8 @@ tabfreq.svy <- function(formula,
 
   # Add yname row and indent ylevels if requested
   if (yname.row) {
+    spaces <- paste(rep(" ", indent.spaces), collapse = "")
     row1 <- df[1, , drop = FALSE]
-    spaces <- paste(rep(ifelse(latex, "\\ ", " "), indent.spaces), collapse = "")
     df[, 1] <- paste(spaces, df[, 1], sep = "")
     df <- rbind(c(yname, rep("", ncol(df) - 1)), df)
     summary.cols <- which(colnames(df) %in% c("n", "N", "P"))
@@ -367,8 +367,18 @@ tabfreq.svy <- function(formula,
       df,
       align = paste("ll", paste(rep("r", ncol(df) - 1), collapse = ""), sep = "", collapse = "")
     )
-    print(df.xtable, include.rownames = FALSE, type = "html", file = html.filename)
+    ampersands <- paste(rep("&nbsp ", indent.spaces), collapse = "")
+    print(df.xtable, include.rownames = FALSE, type = "html",
+          file = html.filename, sanitize.text.function = function(x) {
+            ifelse(substr(x, 1, 1) == " ", paste(ampersands, x), x)
+          })
 
+  }
+
+  # Reformat for latex if requested
+  if (latex && yname.row) {
+    slashes <- paste(rep("\\ ", indent.spaces), collapse = "")
+    df$Variable <- gsub(pattern = spaces, replacement = slashes, x = df$Variable, fixed = TRUE)
   }
 
   # Return table

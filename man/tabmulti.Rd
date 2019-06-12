@@ -8,11 +8,11 @@ Variable}
 tabmulti(formula = NULL, data, xvarname = NULL, yvarnames = NULL,
   ymeasures = NULL, columns = c("xgroups", "p"),
   listwise.deletion = FALSE, sep.char = ", ", xlevels = NULL,
-  yvarlabels = NULL, ylevels = NULL, quantiles = NULL,
-  quantile.vals = FALSE, latex = TRUE, decimals = NULL,
-  formatp.list = NULL, n.headings = FALSE, print.html = FALSE,
-  html.filename = "table1.html", tabmeans.list = NULL,
-  tabmedians.list = NULL, tabfreq.list = NULL)
+  yvarlabels = NULL, ylevels = NULL, indent.spaces = 3,
+  quantiles = NULL, quantile.vals = FALSE, latex = TRUE,
+  decimals = NULL, formatp.list = NULL, n.headings = FALSE,
+  print.html = FALSE, html.filename = "table1.html",
+  tabmeans.list = NULL, tabmedians.list = NULL, tabfreq.list = NULL)
 }
 \arguments{
 \item{formula}{Formula, e.g. \code{Age + Sex + Race + BMI ~ Group}.}
@@ -56,6 +56,9 @@ print as "Race/ethnicity" and "Age (years)", use
 \item{ylevels}{Character vector (if only 1 frequency comparison) or list of
 character vectors with labels for the levels of each categorical \code{y}
 variable.}
+
+\item{indent.spaces}{Integer value specifying how many spaces to indent
+factor levels.}
 
 \item{quantiles}{Numeric value. If specified, function compares \code{y}
 variables across quantiles of \code{x}. For example, if \code{x} contains BMI

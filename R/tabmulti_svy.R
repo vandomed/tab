@@ -39,6 +39,8 @@
 #' @param ylevels Character vector (if only 1 frequency comparison) or list of
 #' character vectors with labels for the levels of each categorical \code{y}
 #' variable.
+#' @param indent.spaces Integer value specifying how many spaces to indent
+#' factor levels.
 #' @param latex Logical value for whether to format table so it is
 #' ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
 #' \code{\link[knitr]{kable}}.
@@ -97,6 +99,7 @@ tabmulti.svy <- function(formula = NULL,
                          xlevels = NULL,
                          yvarlabels = NULL,
                          ylevels = NULL,
+                         indent.spaces = 3,
                          latex = TRUE,
                          decimals = NULL,
                          formatp.list = NULL,
@@ -138,6 +141,9 @@ tabmulti.svy <- function(formula = NULL,
   }
   if (! is.null(ylevels) && ! is.character(ylevels)) {
     stop("The input 'ylevels' must be a character vector.")
+  }
+  if (! is.null(indent.spaces) && ! (is.numeric(indent.spaces) && indent.spaces >= 0 && indent.spaces == as.integer(indent.spaces))) {
+    stop("The input 'indent.spaces' must be a non-negative integer.")
   }
   if (! is.logical(latex)) {
     stop("The input 'latex' must be a logical.")
@@ -266,7 +272,7 @@ tabmulti.svy <- function(formula = NULL,
                     xlevels = xlevels,
                     yname = ynames[ii],
                     ylevels = ylevels[[freqindex]],
-                    latex = latex,
+                    latex = FALSE,
                     decimals = ifelse(is.null(decimals[ii]), 1, decimals[ii]),
                     formatp.list = formatp.list,
                     n.headings = n.headings,
@@ -290,8 +296,19 @@ tabmulti.svy <- function(formula = NULL,
       df,
       align = paste("ll", paste(rep("r", ncol(df) - 1), collapse = ""), sep = "", collapse = "")
     )
-    print(df.xtable, include.rownames = FALSE, type = "html", file = html.filename)
+    ampersands <- paste(rep("&nbsp ", indent.spaces), collapse = "")
+    print(df.xtable, include.rownames = FALSE, type = "html",
+          file = html.filename, sanitize.text.function = function(x) {
+            ifelse(substr(x, 1, 1) == " ", paste(ampersands, x), x)
+          })
 
+  }
+
+  # Reformat for latex if requested
+  if (latex) {
+    spaces <- paste(rep(" ", indent.spaces), collapse = "")
+    slashes <- paste(rep("\\ ", indent.spaces), collapse = "")
+    df$Variable <- gsub(pattern = spaces, replacement = slashes, x = df$Variable, fixed = TRUE)
   }
 
   # Return table
