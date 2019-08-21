@@ -200,7 +200,7 @@ tabmulti <- function(formula = NULL,
   }
 
   # Create x vector
-  x <- data[, xvarname]
+  x <- data[[xvarname]]
 
   # Number of y variables
   num.yvars <- length(yvarnames)
@@ -235,7 +235,7 @@ tabmulti <- function(formula = NULL,
       # Means
       meansindex <- meansindex + 1
       args1 <- list(x = x,
-                    y = data[, yvarnames[ii]],
+                    y = data[[yvarnames[ii]]],
                     columns = columns,
                     sep.char = sep.char,
                     xlevels = xlevels,
@@ -252,7 +252,7 @@ tabmulti <- function(formula = NULL,
       # Medians
       mediansindex <- mediansindex + 1
       args1 <- list(x = x,
-                    y = data[, yvarnames[ii]],
+                    y = data[[yvarnames[ii]]],
                     columns = columns,
                     sep.char = sep.char,
                     xlevels = xlevels,
@@ -269,7 +269,7 @@ tabmulti <- function(formula = NULL,
       # Frequencies
       freqindex <- freqindex + 1
       args1 <- list(x = x,
-                    y = data[, yvarnames[ii]],
+                    y = data[[yvarnames[ii]]],
                     columns = columns,
                     sep.char = sep.char,
                     xlevels = xlevels,

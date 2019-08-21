@@ -155,8 +155,8 @@ tabmedians <- function(formula = NULL,
     varnames <- all.vars(formula)
     xvarname <- varnames[2]
     yvarname <- varnames[1]
-    x <- data[, xvarname]
-    y <- data[, yvarname]
+    x <- data[[xvarname]]
+    y <- data[[yvarname]]
     if (is.null(yname)) {
       yname <- yvarname
     }
