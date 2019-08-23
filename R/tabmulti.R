@@ -208,7 +208,7 @@ tabmulti <- function(formula = NULL,
   # If ymeasures is NULL, compare frequencies for factor/character variables and
   # means for numeric variables
   if (is.null(ymeasures)) {
-    ymeasures <- ifelse(sapply(data[, yvarnames], class) == "numeric", "mean", "freq")
+    ymeasures <- ifelse(sapply(data[, yvarnames, drop = FALSE], class) == "numeric", "mean", "freq")
   } else if (length(ymeasures) == 1) {
     ymeasures <- rep(ymeasures, num.yvars)
   }

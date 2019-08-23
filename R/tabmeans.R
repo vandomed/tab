@@ -106,7 +106,7 @@ tabmeans <- function(formula = NULL,
   if (! is.null(data) && ! is.data.frame(data)) {
     stop("The input 'data' must be a data frame.")
   }
-  if (! is.null(y) && ! is.numeric(y)) {
+  if (! is.null(y) && ! (class(y) %in% c("numeric", "difftime"))) {
     stop("The input 'y' must be a numeric vector.")
   }
   if (! all(columns %in% c("n", "overall", "xgroups", "diff", "test", "p"))) {

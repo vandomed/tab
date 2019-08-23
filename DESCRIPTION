@@ -2,7 +2,7 @@ Package: tab
 Type: Package
 Title: Create Summary Tables for Statistical Reports
 Version: 4.1.1
-Date: 2019-08-20
+Date: 2019-08-22
 Author: Dane R. Van Domelen
 Maintainer: Dane R. Van Domelen <vandomed@gmail.com>
 Description: Contains functions for creating various types of summary tables, e.g. comparing characteristics across levels of a categorical variable and summarizing fitted generalized linear models, generalized estimating equations, and Cox proportional hazards models. Functions are available to handle data from simple random samples as well as complex surveys.
