@@ -77,11 +77,11 @@ tabmulti(Age + Sex + Race ~ Group, data = tabdata) %>% kable()
 To illustrate some options, we can request `Age` and `Race` to print as `Age (years)` and `Race/ethnicity`, compare medians rather than means for age, and include the sample sizes in the column headings:
 
 ```{r}
-tabmulti(Age + Sex + Race ~ Group, data = tabdata, 
-         yvarlabels = list(Age = "Age (years)", Race = "Race/ethnicity"), 
-         ymeasures = c("median", "freq", "freq"), 
-         listwise.deletion = TRUE, 
-         n.headings = TRUE) %>% kable()
+tabmulti(Age + Sex + Race ~ Group, data = tabdata,
+         yvarlabels = list(Age = "Age (years)", Race = "Race/ethnicity"),
+         ymeasures = c("median", "freq", "freq"),
+         listwise.deletion = TRUE,
+         n.headings = TRUE) %>% kable(format = "html")
 ```
 
 
@@ -94,7 +94,7 @@ binary factor variables displayed in a "compressed" format:
 
 ```{r}
 fit <- glm(death_1yr ~ Age + Sex + Group, data = tabdata, family = binomial)
-fit %>% tabglm(factor.compression = 5) %>% kable()
+fit %>% tabglm(factor.compression = 5) %>% kable(format = "html")
 ```
 
 #### GEE's
@@ -109,7 +109,7 @@ tabdata2 <- reshape(data = tabdata,
 tabdata2 <- tabdata2[order(tabdata2$id), ]
 fit <- gee(highbp ~ poly(Age, 2, raw = TRUE) + Sex + Race + Race*Sex,
            id = id, data = tabdata2, family = "binomial", corstr = "unstructured")
-fit %>% tabgee(data = tabdata2) %>% kable()
+fit %>% tabgee(data = tabdata2) %>% kable(format = "html")
 ```
 
 ```{r include = FALSE}
@@ -122,7 +122,7 @@ fit <- gee(highbp ~ poly(Age, 2, raw = TRUE) + Sex + Race + Race*Sex,
 ```
 
 ```{r echo = FALSE}
-fit %>% tabgee(data = tabdata2) %>% kable()
+fit %>% tabgee(data = tabdata2) %>% kable(format = "html")
 ```
 
 Note that we had to set `data = tabdata2` here, because `gee` objects don't store all of the information on factor variables (unlike `glm` objects).
@@ -135,7 +135,7 @@ Survival model for mortality vs. predictors, again compressing the factor variab
 ```{r}
 library("survival")
 fit <- coxph(Surv(time = time, event = delta) ~ Age + Sex + Group, data = tabdata)
-fit %>% tabcoxph(factor.compression = 5, columns = c("beta", "hr.ci")) %>% kable()
+fit %>% tabcoxph(factor.compression = 5, columns = c("beta", "hr.ci")) %>% kable(format = "html")
 ```
 
 
@@ -152,14 +152,14 @@ design <- svydesign(
   weights = ~wtmec2yr,
   nest = TRUE
 )
-tabmulti.svy(Age + Race + BMI ~ Sex, design = design) %>% kable()
+tabmulti.svy(Age + Race + BMI ~ Sex, design = design) %>% kable(format = "html")
 ```
 
 And here's a linear regression:
 
 ```{r message=FALSE, warning=FALSE}
 fit <- svyglm(BMI ~ Age + Sex + Race, design = design)
-fit %>% tabglm(factor.compression = 3) %>% kable()
+fit %>% tabglm(factor.compression = 3) %>% kable(format = "html")
 ```
 
 
