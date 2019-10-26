@@ -333,8 +333,15 @@ tabcoxph <- function(fit,
 
   # Reformat for latex if requested
   if (latex) {
+
     slashes <- paste(rep("\\ ", indent.spaces), collapse = "")
     df$Variable <- gsub(pattern = spaces, replacement = slashes, x = df$Variable, fixed = TRUE)
+
+    df <- sapply(df, function(x) {
+      x[x == "-"] <- "--"
+      return(x)
+    })
+
   }
 
   # Remove row names and return table

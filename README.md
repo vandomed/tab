@@ -52,20 +52,280 @@ factor variable, e.g. here comparing age, sex, and race by treatment
 group in the toy dataset `tabdata`.
 
 ``` r
-tabmulti(Age + Sex + Race ~ Group, data = tabdata) %>% kable()
+tabmulti(Age + Sex + Race ~ Group, data = tabdata) %>% kable(format = "html")
 ```
 
-| Variable         | Control    | Treatment  | P       |
-| :--------------- | :--------- | :--------- | :------ |
-| Age, M (SD)      | 70.5 (5.3) | 69.5 (5.9) | 0.15    |
-| Sex, n (%)       |            |            | \<0.001 |
-| Female           | 93 (68.4)  | 62 (38.5)  |         |
-| Male             | 43 (31.6)  | 99 (61.5)  |         |
-| Race, n (%)      |            |            | 0.29    |
-| White            | 46 (34.1)  | 65 (39.6)  |         |
-| Black            | 36 (26.7)  | 52 (31.7)  |         |
-| Mexican American | 21 (15.6)  | 19 (11.6)  |         |
-| Other            | 32 (23.7)  | 28 (17.1)  |         |
+<table>
+
+<thead>
+
+<tr>
+
+<th style="text-align:left;">
+
+Variable
+
+</th>
+
+<th style="text-align:left;">
+
+Control
+
+</th>
+
+<th style="text-align:left;">
+
+Treatment
+
+</th>
+
+<th style="text-align:left;">
+
+P
+
+</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+
+<td style="text-align:left;">
+
+Age, M (SD)
+
+</td>
+
+<td style="text-align:left;">
+
+70.5 (5.3)
+
+</td>
+
+<td style="text-align:left;">
+
+69.5 (5.9)
+
+</td>
+
+<td style="text-align:left;">
+
+0.15
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+Sex, n (%)
+
+</td>
+
+<td style="text-align:left;">
+
+</td>
+
+<td style="text-align:left;">
+
+</td>
+
+<td style="text-align:left;">
+
+\<0.001
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+   Female
+
+</td>
+
+<td style="text-align:left;">
+
+93 (68.4)
+
+</td>
+
+<td style="text-align:left;">
+
+62 (38.5)
+
+</td>
+
+<td style="text-align:left;">
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+   Male
+
+</td>
+
+<td style="text-align:left;">
+
+43 (31.6)
+
+</td>
+
+<td style="text-align:left;">
+
+99 (61.5)
+
+</td>
+
+<td style="text-align:left;">
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+Race, n (%)
+
+</td>
+
+<td style="text-align:left;">
+
+</td>
+
+<td style="text-align:left;">
+
+</td>
+
+<td style="text-align:left;">
+
+0.29
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+   White
+
+</td>
+
+<td style="text-align:left;">
+
+46 (34.1)
+
+</td>
+
+<td style="text-align:left;">
+
+65 (39.6)
+
+</td>
+
+<td style="text-align:left;">
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+   Black
+
+</td>
+
+<td style="text-align:left;">
+
+36 (26.7)
+
+</td>
+
+<td style="text-align:left;">
+
+52 (31.7)
+
+</td>
+
+<td style="text-align:left;">
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+   Mexican American
+
+</td>
+
+<td style="text-align:left;">
+
+21 (15.6)
+
+</td>
+
+<td style="text-align:left;">
+
+19 (11.6)
+
+</td>
+
+<td style="text-align:left;">
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+   Other
+
+</td>
+
+<td style="text-align:left;">
+
+32 (23.7)
+
+</td>
+
+<td style="text-align:left;">
+
+28 (17.1)
+
+</td>
+
+<td style="text-align:left;">
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
 
 To illustrate some options, we can request `Age` and `Race` to print as
 `Age (years)` and `Race/ethnicity`, compare medians rather than means
@@ -415,105 +675,105 @@ Intercept
 
 <td style="text-align:left;">
 
-  - 
-    
-    </td>
-    
-    <td style="text-align:left;">
-    
-    0.25
-    
-    </td>
-    
-    </tr>
-    
-    <tr>
-    
-    <td style="text-align:left;">
-    
-    Age
-    
-    </td>
-    
-    <td style="text-align:left;">
-    
-    0.02 (0.02)
-    
-    </td>
-    
-    <td style="text-align:left;">
-    
-    1.02 (0.97, 1.07)
-    
-    </td>
-    
-    <td style="text-align:left;">
-    
-    0.50
-    
-    </td>
-    
-    </tr>
-    
-    <tr>
-    
-    <td style="text-align:left;">
-    
-    Male
-    
-    </td>
-    
-    <td style="text-align:left;">
-    
-    0.11 (0.29)
-    
-    </td>
-    
-    <td style="text-align:left;">
-    
-    1.12 (0.63, 1.97)
-    
-    </td>
-    
-    <td style="text-align:left;">
-    
-    0.70
-    
-    </td>
-    
-    </tr>
-    
-    <tr>
-    
-    <td style="text-align:left;">
-    
-    Treatment
-    
-    </td>
-    
-    <td style="text-align:left;">
-    
-    \-0.04 (0.29)
-    
-    </td>
-    
-    <td style="text-align:left;">
-    
-    0.96 (0.54, 1.69)
-    
-    </td>
-    
-    <td style="text-align:left;">
-    
-    0.88
-    
-    </td>
-    
-    </tr>
-    
-    </tbody>
-    
-    </table>
+–
+
+</td>
+
+<td style="text-align:left;">
+
+0.25
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+Age
+
+</td>
+
+<td style="text-align:left;">
+
+0.02 (0.02)
+
+</td>
+
+<td style="text-align:left;">
+
+1.02 (0.97, 1.07)
+
+</td>
+
+<td style="text-align:left;">
+
+0.50
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+Male
+
+</td>
+
+<td style="text-align:left;">
+
+0.11 (0.29)
+
+</td>
+
+<td style="text-align:left;">
+
+1.12 (0.63, 1.97)
+
+</td>
+
+<td style="text-align:left;">
+
+0.70
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+Treatment
+
+</td>
+
+<td style="text-align:left;">
+
+\-0.04 (0.29)
+
+</td>
+
+<td style="text-align:left;">
+
+0.96 (0.54, 1.69)
+
+</td>
+
+<td style="text-align:left;">
+
+0.88
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
 
 #### GEE’s
 
@@ -582,395 +842,395 @@ Intercept
 
 <td style="text-align:left;">
 
-  - 
-    
-    </td>
-    
-    <td style="text-align:left;">
-    
-    0.83
-    
-    </td>
-    
-    </tr>
-    
-    <tr>
-    
-    <td style="text-align:left;">
-    
-    Age
-    
-    </td>
-    
-    <td style="text-align:left;">
-    
-    0.06 (0.43)
-    
-    </td>
-    
-    <td style="text-align:left;">
-    
-    1.06 (0.46, 2.45)
-    
-    </td>
-    
-    <td style="text-align:left;">
-    
-    0.89
-    
-    </td>
-    
-    </tr>
-    
-    <tr>
-    
-    <td style="text-align:left;">
-    
-    Age squared
-    
-    </td>
-    
-    <td style="text-align:left;">
-    
-    \-0.00 (0.00)
-    
-    </td>
-    
-    <td style="text-align:left;">
-    
-    1.00 (0.99, 1.01)
-    
-    </td>
-    
-    <td style="text-align:left;">
-    
-    0.88
-    
-    </td>
-    
-    </tr>
-    
-    <tr>
-    
-    <td style="text-align:left;">
-    
-    Sex
-    
-    </td>
-    
-    <td style="text-align:left;">
-    
-    </td>
-    
-    <td style="text-align:left;">
-    
-    </td>
-    
-    <td style="text-align:left;">
-    
-    </td>
-    
-    </tr>
-    
-    <tr>
-    
-    <td style="text-align:left;">
-    
-       Female (ref)
-    
-    </td>
-    
-    <td style="text-align:left;">
-    
-      - 
-        
-        </td>
-        
-        <td style="text-align:left;">
-        
-          - 
-            
-            </td>
-            
-            <td style="text-align:left;">
-            
-              - 
-                
-                </td>
-                
-                </tr>
-                
-                <tr>
-                
-                <td style="text-align:left;">
-                
-                   Male
-                
-                </td>
-                
-                <td style="text-align:left;">
-                
-                0.48 (0.29)
-                
-                </td>
-                
-                <td style="text-align:left;">
-                
-                1.61 (0.91, 2.84)
-                
-                </td>
-                
-                <td style="text-align:left;">
-                
-                0.10
-                
-                </td>
-                
-                </tr>
-                
-                <tr>
-                
-                <td style="text-align:left;">
-                
-                Race
-                
-                </td>
-                
-                <td style="text-align:left;">
-                
-                </td>
-                
-                <td style="text-align:left;">
-                
-                </td>
-                
-                <td style="text-align:left;">
-                
-                </td>
-                
-                </tr>
-                
-                <tr>
-                
-                <td style="text-align:left;">
-                
-                   White (ref)
-                
-                </td>
-                
-                <td style="text-align:left;">
-                
-                  - 
-                    
-                    </td>
-                    
-                    <td style="text-align:left;">
-                    
-                      - 
-                        
-                        </td>
-                        
-                        <td style="text-align:left;">
-                        
-                          - 
-                            
-                            </td>
-                            
-                            </tr>
-                            
-                            <tr>
-                            
-                            <td style="text-align:left;">
-                            
-                               Black
-                            
-                            </td>
-                            
-                            <td style="text-align:left;">
-                            
-                            0.04 (0.32)
-                            
-                            </td>
-                            
-                            <td style="text-align:left;">
-                            
-                            1.04 (0.56, 1.95)
-                            
-                            </td>
-                            
-                            <td style="text-align:left;">
-                            
-                            0.90
-                            
-                            </td>
-                            
-                            </tr>
-                            
-                            <tr>
-                            
-                            <td style="text-align:left;">
-                            
-                               Mexican American
-                            
-                            </td>
-                            
-                            <td style="text-align:left;">
-                            
-                            0.13 (0.38)
-                            
-                            </td>
-                            
-                            <td style="text-align:left;">
-                            
-                            1.14 (0.55, 2.39)
-                            
-                            </td>
-                            
-                            <td style="text-align:left;">
-                            
-                            0.72
-                            
-                            </td>
-                            
-                            </tr>
-                            
-                            <tr>
-                            
-                            <td style="text-align:left;">
-                            
-                               Other
-                            
-                            </td>
-                            
-                            <td style="text-align:left;">
-                            
-                            \-0.83 (0.37)
-                            
-                            </td>
-                            
-                            <td style="text-align:left;">
-                            
-                            0.43 (0.21, 0.89)
-                            
-                            </td>
-                            
-                            <td style="text-align:left;">
-                            
-                            0.02
-                            
-                            </td>
-                            
-                            </tr>
-                            
-                            <tr>
-                            
-                            <td style="text-align:left;">
-                            
-                            Sex by Race
-                            
-                            </td>
-                            
-                            <td style="text-align:left;">
-                            
-                            </td>
-                            
-                            <td style="text-align:left;">
-                            
-                            </td>
-                            
-                            <td style="text-align:left;">
-                            
-                            </td>
-                            
-                            </tr>
-                            
-                            <tr>
-                            
-                            <td style="text-align:left;">
-                            
-                               Male, Black
-                            
-                            </td>
-                            
-                            <td style="text-align:left;">
-                            
-                            0.23 (0.42)
-                            
-                            </td>
-                            
-                            <td style="text-align:left;">
-                            
-                            1.26 (0.55, 2.87)
-                            
-                            </td>
-                            
-                            <td style="text-align:left;">
-                            
-                            0.58
-                            
-                            </td>
-                            
-                            </tr>
-                            
-                            <tr>
-                            
-                            <td style="text-align:left;">
-                            
-                               Male, Mexican American
-                            
-                            </td>
-                            
-                            <td style="text-align:left;">
-                            
-                            0.27 (0.54)
-                            
-                            </td>
-                            
-                            <td style="text-align:left;">
-                            
-                            1.31 (0.46, 3.75)
-                            
-                            </td>
-                            
-                            <td style="text-align:left;">
-                            
-                            0.61
-                            
-                            </td>
-                            
-                            </tr>
-                            
-                            <tr>
-                            
-                            <td style="text-align:left;">
-                            
-                               Male, Other
-                            
-                            </td>
-                            
-                            <td style="text-align:left;">
-                            
-                            1.11 (0.51)
-                            
-                            </td>
-                            
-                            <td style="text-align:left;">
-                            
-                            3.05 (1.12, 8.25)
-                            
-                            </td>
-                            
-                            <td style="text-align:left;">
-                            
-                            0.03
-                            
-                            </td>
-                            
-                            </tr>
-                            
-                            </tbody>
-                            
-                            </table>
+–
+
+</td>
+
+<td style="text-align:left;">
+
+0.83
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+Age
+
+</td>
+
+<td style="text-align:left;">
+
+0.06 (0.43)
+
+</td>
+
+<td style="text-align:left;">
+
+1.06 (0.46, 2.45)
+
+</td>
+
+<td style="text-align:left;">
+
+0.89
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+Age squared
+
+</td>
+
+<td style="text-align:left;">
+
+\-0.00 (0.00)
+
+</td>
+
+<td style="text-align:left;">
+
+1.00 (0.99, 1.01)
+
+</td>
+
+<td style="text-align:left;">
+
+0.88
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+Sex
+
+</td>
+
+<td style="text-align:left;">
+
+</td>
+
+<td style="text-align:left;">
+
+</td>
+
+<td style="text-align:left;">
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+   Female (ref)
+
+</td>
+
+<td style="text-align:left;">
+
+–
+
+</td>
+
+<td style="text-align:left;">
+
+–
+
+</td>
+
+<td style="text-align:left;">
+
+–
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+   Male
+
+</td>
+
+<td style="text-align:left;">
+
+0.48 (0.29)
+
+</td>
+
+<td style="text-align:left;">
+
+1.61 (0.91, 2.84)
+
+</td>
+
+<td style="text-align:left;">
+
+0.10
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+Race
+
+</td>
+
+<td style="text-align:left;">
+
+</td>
+
+<td style="text-align:left;">
+
+</td>
+
+<td style="text-align:left;">
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+   White (ref)
+
+</td>
+
+<td style="text-align:left;">
+
+–
+
+</td>
+
+<td style="text-align:left;">
+
+–
+
+</td>
+
+<td style="text-align:left;">
+
+–
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+   Black
+
+</td>
+
+<td style="text-align:left;">
+
+0.04 (0.32)
+
+</td>
+
+<td style="text-align:left;">
+
+1.04 (0.56, 1.95)
+
+</td>
+
+<td style="text-align:left;">
+
+0.90
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+   Mexican American
+
+</td>
+
+<td style="text-align:left;">
+
+0.13 (0.38)
+
+</td>
+
+<td style="text-align:left;">
+
+1.14 (0.55, 2.39)
+
+</td>
+
+<td style="text-align:left;">
+
+0.72
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+   Other
+
+</td>
+
+<td style="text-align:left;">
+
+\-0.83 (0.37)
+
+</td>
+
+<td style="text-align:left;">
+
+0.43 (0.21, 0.89)
+
+</td>
+
+<td style="text-align:left;">
+
+0.02
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+Sex by Race
+
+</td>
+
+<td style="text-align:left;">
+
+</td>
+
+<td style="text-align:left;">
+
+</td>
+
+<td style="text-align:left;">
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+   Male, Black
+
+</td>
+
+<td style="text-align:left;">
+
+0.23 (0.42)
+
+</td>
+
+<td style="text-align:left;">
+
+1.26 (0.55, 2.87)
+
+</td>
+
+<td style="text-align:left;">
+
+0.58
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+   Male, Mexican American
+
+</td>
+
+<td style="text-align:left;">
+
+0.27 (0.54)
+
+</td>
+
+<td style="text-align:left;">
+
+1.31 (0.46, 3.75)
+
+</td>
+
+<td style="text-align:left;">
+
+0.61
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+   Male, Other
+
+</td>
+
+<td style="text-align:left;">
+
+1.11 (0.51)
+
+</td>
+
+<td style="text-align:left;">
+
+3.05 (1.12, 8.25)
+
+</td>
+
+<td style="text-align:left;">
+
+0.03
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
 
 Note that we had to set `data = tabdata2` here, because `gee` objects
 don’t store all of the information on factor variables (unlike `glm`
@@ -1440,167 +1700,167 @@ Female (ref)
 
 <td style="text-align:left;">
 
-  - 
-    
-    </td>
-    
-    <td style="text-align:left;">
-    
-      - 
-        
-        </td>
-        
-        <td style="text-align:left;">
-        
-          - 
-            
-            </td>
-            
-            </tr>
-            
-            <tr>
-            
-            <td style="text-align:left;">
-            
-            Male
-            
-            </td>
-            
-            <td style="text-align:left;">
-            
-            \-0.07 (0.23)
-            
-            </td>
-            
-            <td style="text-align:left;">
-            
-            (-0.51, 0.37)
-            
-            </td>
-            
-            <td style="text-align:left;">
-            
-            0.76
-            
-            </td>
-            
-            </tr>
-            
-            <tr>
-            
-            <td style="text-align:left;">
-            
-            Non-Hispanic White (ref)
-            
-            </td>
-            
-            <td style="text-align:left;">
-            
-              - 
-                
-                </td>
-                
-                <td style="text-align:left;">
-                
-                  - 
-                    
-                    </td>
-                    
-                    <td style="text-align:left;">
-                    
-                      - 
-                        
-                        </td>
-                        
-                        </tr>
-                        
-                        <tr>
-                        
-                        <td style="text-align:left;">
-                        
-                        Non-Hispanic Black
-                        
-                        </td>
-                        
-                        <td style="text-align:left;">
-                        
-                        1.91 (0.23)
-                        
-                        </td>
-                        
-                        <td style="text-align:left;">
-                        
-                        (1.46, 2.35)
-                        
-                        </td>
-                        
-                        <td style="text-align:left;">
-                        
-                        \<0.001
-                        
-                        </td>
-                        
-                        </tr>
-                        
-                        <tr>
-                        
-                        <td style="text-align:left;">
-                        
-                        Mexican American
-                        
-                        </td>
-                        
-                        <td style="text-align:left;">
-                        
-                        1.06 (0.30)
-                        
-                        </td>
-                        
-                        <td style="text-align:left;">
-                        
-                        (0.47, 1.66)
-                        
-                        </td>
-                        
-                        <td style="text-align:left;">
-                        
-                        0.006
-                        
-                        </td>
-                        
-                        </tr>
-                        
-                        <tr>
-                        
-                        <td style="text-align:left;">
-                        
-                        Other
-                        
-                        </td>
-                        
-                        <td style="text-align:left;">
-                        
-                        \-1.09 (0.33)
-                        
-                        </td>
-                        
-                        <td style="text-align:left;">
-                        
-                        (-1.73, -0.45)
-                        
-                        </td>
-                        
-                        <td style="text-align:left;">
-                        
-                        0.007
-                        
-                        </td>
-                        
-                        </tr>
-                        
-                        </tbody>
-                        
-                        </table>
+–
+
+</td>
+
+<td style="text-align:left;">
+
+–
+
+</td>
+
+<td style="text-align:left;">
+
+–
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+Male
+
+</td>
+
+<td style="text-align:left;">
+
+\-0.07 (0.23)
+
+</td>
+
+<td style="text-align:left;">
+
+(-0.51, 0.37)
+
+</td>
+
+<td style="text-align:left;">
+
+0.76
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+Non-Hispanic White (ref)
+
+</td>
+
+<td style="text-align:left;">
+
+–
+
+</td>
+
+<td style="text-align:left;">
+
+–
+
+</td>
+
+<td style="text-align:left;">
+
+–
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+Non-Hispanic Black
+
+</td>
+
+<td style="text-align:left;">
+
+1.91 (0.23)
+
+</td>
+
+<td style="text-align:left;">
+
+(1.46, 2.35)
+
+</td>
+
+<td style="text-align:left;">
+
+\<0.001
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+Mexican American
+
+</td>
+
+<td style="text-align:left;">
+
+1.06 (0.30)
+
+</td>
+
+<td style="text-align:left;">
+
+(0.47, 1.66)
+
+</td>
+
+<td style="text-align:left;">
+
+0.006
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+Other
+
+</td>
+
+<td style="text-align:left;">
+
+\-1.09 (0.33)
+
+</td>
+
+<td style="text-align:left;">
+
+(-1.73, -0.45)
+
+</td>
+
+<td style="text-align:left;">
+
+0.007
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
 
 ## Exporting tables, e.g. to Word
 

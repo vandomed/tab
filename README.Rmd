@@ -71,7 +71,7 @@ The purpose of **tab** is to make it easier to create tables for papers, includi
 You can use `tabmulti` to compare characteristics across levels of a factor variable, e.g. here comparing age, sex, and race by treatment group in the toy dataset `tabdata`.
 
 ```{r}
-tabmulti(Age + Sex + Race ~ Group, data = tabdata) %>% kable()
+tabmulti(Age + Sex + Race ~ Group, data = tabdata) %>% kable(format = "html")
 ```
 
 To illustrate some options, we can request `Age` and `Race` to print as `Age (years)` and `Race/ethnicity`, compare medians rather than means for age, and include the sample sizes in the column headings:
