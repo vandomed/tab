@@ -136,8 +136,13 @@ tabmulti <- function(formula = NULL,
   if (! is.null(xlevels) && ! is.character(xlevels)) {
     stop("The input 'xlevels' must be a character vector.")
   }
-  if (! is.null(ylevels) && ! is.character(ylevels)) {
-    stop("The input 'ylevels' must be a character vector.")
+  if (! is.null(ylevels) && ! is.character(ylevels) &&
+      (is.list(ylevels) &&
+       (!all(vapply(ylevels, is.character, logical(1))) ||
+        length(ylevels) != sum(ymeasures == "freq")))) {
+    stop("The input 'ylevels' must be a character vector or ",
+         "list of character vectors with as much elements as ",
+         "'freq' in 'ymeasures'.")
   }
   if (! is.null(indent.spaces) && ! (is.numeric(indent.spaces) && indent.spaces >= 0 && indent.spaces == as.integer(indent.spaces))) {
     stop("The input 'indent.spaces' must be a non-negative integer.")
