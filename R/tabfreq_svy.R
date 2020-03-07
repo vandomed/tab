@@ -224,7 +224,7 @@ tabfreq.svy <- function(formula,
       } else if (cell == "N") {
         part1 <- rowsums.svycounts
       } else if (cell == "col.percent") {
-        part1 <- percents
+        part1 <- paste(sprintf(spf, percents), sep = "")
       }
       if (parenth == "none") {
         part2 <- NULL
@@ -235,7 +235,7 @@ tabfreq.svy <- function(formula,
       } else if (parenth == "col.percent") {
         part2 <- percents
       } else if (parenth == "se") {
-        part2 <- ses
+        part2 <- paste("(", sprintf(spf, ses), ")", sep = "")
       } else if (parenth == "ci") {
         zcrit <- qnorm(p = 0.975)
         lower <- percents - zcrit * ses
