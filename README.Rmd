@@ -71,8 +71,8 @@ The purpose of **tab** is to make it easier to create tables for papers, includi
 
 You can use `tabmulti` to compare characteristics across levels of a factor variable, e.g. here comparing age, sex, and race by treatment group in the toy dataset `tabdata`.
 
-```{r, results="asis"}
-tabmulti(Age + Sex + Race ~ Group, data = tabdata) %>% kable(format = "markdown")
+```{r}
+tabmulti(Age + Sex + Race ~ Group, data = tabdata, latex = TRUE) %>% kable(format = "html")
 ```
 
 To illustrate some options, we can request `Age` and `Race` to print as `Age (years)` and `Race/ethnicity`, compare medians rather than means for age, and include the sample sizes in the column headings:
@@ -82,7 +82,9 @@ tabmulti(Age + Sex + Race ~ Group, data = tabdata,
          yvarlabels = list(Age = "Age (years)", Race = "Race/ethnicity"),
          ymeasures = c("median", "freq", "freq"),
          listwise.deletion = TRUE,
-         n.headings = TRUE) %>% kable(format = "html")
+         n.headings = TRUE, 
+         latex = TRUE) %>%
+  kable(format = "html")
 ```
 
 
@@ -95,7 +97,7 @@ binary factor variables displayed in a "compressed" format:
 
 ```{r}
 fit <- glm(death_1yr ~ Age + Sex + Group, data = tabdata, family = binomial)
-fit %>% tabglm(factor.compression = 5) %>% kable(format = "html")
+fit %>% tabglm(factor.compression = 5, latex = TRUE) %>% kable(format = "html")
 ```
 
 #### GEE's
@@ -160,7 +162,7 @@ And here's a linear regression:
 
 ```{r message=FALSE, warning=FALSE}
 fit <- svyglm(BMI ~ Age + Sex + Race, design = design)
-fit %>% tabglm(factor.compression = 3) %>% kable(format = "html")
+fit %>% tabglm(factor.compression = 3, latex = TRUE) %>% kable(format = "html")
 ```
 
 
