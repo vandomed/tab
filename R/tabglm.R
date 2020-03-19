@@ -26,8 +26,6 @@
 #' are Level 2, ...
 #' @param sep.char Character string with separator to place between lower and
 #' upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.
-#' @param indent.spaces Integer value specifying how many spaces to indent
-#' factor levels.
 #' @param latex Logical value for whether to format table so it is
 #' ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
 #' \code{\link[knitr]{kable}}.
@@ -80,8 +78,7 @@ tabglm <- function(fit,
                    xvarlabels = NULL,
                    factor.compression = 1,
                    sep.char = ", ",
-                   indent.spaces = 3,
-                   latex = TRUE,
+                   latex = FALSE,
                    decimals = 2,
                    formatp.list = NULL,
                    print.html = FALSE,
@@ -102,9 +99,6 @@ tabglm <- function(fit,
   }
   if (! is.character(sep.char)) {
     stop("The input 'sep.char' must be a character string.")
-  }
-  if (! is.null(indent.spaces) && ! (is.numeric(indent.spaces) && indent.spaces >= 0 && indent.spaces == as.integer(indent.spaces))) {
-    stop("The input 'indent.spaces' must be a non-negative integer.")
   }
   if (! is.logical(latex)) {
     stop("The input 'latex' must be a logical.")
@@ -256,7 +250,7 @@ tabglm <- function(fit,
   if (intercept) df$Variable[1] <- "Intercept"
 
   # Clean up factor variables
-  spaces <- paste(rep(" ", indent.spaces), collapse = "")
+  spaces <- "   "
   xlevels <- fit$xlevels
   if (length(xlevels) > 0) {
     for (ii in 1: length(xlevels)) {
@@ -379,7 +373,7 @@ tabglm <- function(fit,
       df,
       align = paste("ll", paste(rep("r", ncol(df) - 1), collapse = ""), sep = "", collapse = "")
     )
-    ampersands <- paste(rep("&nbsp ", indent.spaces), collapse = "")
+    ampersands <- "&nbsp &nbsp &nbsp"
     print(df.xtable, include.rownames = FALSE, type = "html",
           file = html.filename, sanitize.text.function = function(x) {
             ifelse(substr(x, 1, 1) == " ", paste(ampersands, x), x)
@@ -390,7 +384,7 @@ tabglm <- function(fit,
   # Reformat for latex if requested
   if (latex) {
 
-    slashes <- paste(rep("\\ ", indent.spaces), collapse = "")
+    slashes <- "\\ \\ \\"
     df$Variable <- gsub(pattern = spaces, replacement = slashes, x = df$Variable, fixed = TRUE)
 
     df <- sapply(df, function(x) {

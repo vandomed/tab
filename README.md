@@ -1,7 +1,7 @@
 Summary Tables with ‘tab’
 ================
 Dane Van Domelen <br> <vandomed@gmail.com>
-2019-10-26
+2020-03-18
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -415,105 +415,105 @@ Intercept
 
 <td style="text-align:left;">
 
-–
-
-</td>
-
-<td style="text-align:left;">
-
-0.25
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Age
-
-</td>
-
-<td style="text-align:left;">
-
-0.02 (0.02)
-
-</td>
-
-<td style="text-align:left;">
-
-1.02 (0.97, 1.07)
-
-</td>
-
-<td style="text-align:left;">
-
-0.50
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Male
-
-</td>
-
-<td style="text-align:left;">
-
-0.11 (0.29)
-
-</td>
-
-<td style="text-align:left;">
-
-1.12 (0.63, 1.97)
-
-</td>
-
-<td style="text-align:left;">
-
-0.70
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Treatment
-
-</td>
-
-<td style="text-align:left;">
-
-\-0.04 (0.29)
-
-</td>
-
-<td style="text-align:left;">
-
-0.96 (0.54, 1.69)
-
-</td>
-
-<td style="text-align:left;">
-
-0.88
-
-</td>
-
-</tr>
-
-</tbody>
-
-</table>
+  - 
+    
+    </td>
+    
+    <td style="text-align:left;">
+    
+    0.25
+    
+    </td>
+    
+    </tr>
+    
+    <tr>
+    
+    <td style="text-align:left;">
+    
+    Age
+    
+    </td>
+    
+    <td style="text-align:left;">
+    
+    0.02 (0.02)
+    
+    </td>
+    
+    <td style="text-align:left;">
+    
+    1.02 (0.97, 1.07)
+    
+    </td>
+    
+    <td style="text-align:left;">
+    
+    0.50
+    
+    </td>
+    
+    </tr>
+    
+    <tr>
+    
+    <td style="text-align:left;">
+    
+    Male
+    
+    </td>
+    
+    <td style="text-align:left;">
+    
+    0.11 (0.29)
+    
+    </td>
+    
+    <td style="text-align:left;">
+    
+    1.12 (0.63, 1.97)
+    
+    </td>
+    
+    <td style="text-align:left;">
+    
+    0.70
+    
+    </td>
+    
+    </tr>
+    
+    <tr>
+    
+    <td style="text-align:left;">
+    
+    Treatment
+    
+    </td>
+    
+    <td style="text-align:left;">
+    
+    \-0.04 (0.29)
+    
+    </td>
+    
+    <td style="text-align:left;">
+    
+    0.96 (0.54, 1.69)
+    
+    </td>
+    
+    <td style="text-align:left;">
+    
+    0.88
+    
+    </td>
+    
+    </tr>
+    
+    </tbody>
+    
+    </table>
 
 #### GEE’s
 
@@ -1440,167 +1440,167 @@ Female (ref)
 
 <td style="text-align:left;">
 
-–
-
-</td>
-
-<td style="text-align:left;">
-
-–
-
-</td>
-
-<td style="text-align:left;">
-
-–
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Male
-
-</td>
-
-<td style="text-align:left;">
-
-\-0.07 (0.23)
-
-</td>
-
-<td style="text-align:left;">
-
-(-0.51, 0.37)
-
-</td>
-
-<td style="text-align:left;">
-
-0.76
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Non-Hispanic White (ref)
-
-</td>
-
-<td style="text-align:left;">
-
-–
-
-</td>
-
-<td style="text-align:left;">
-
-–
-
-</td>
-
-<td style="text-align:left;">
-
-–
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Non-Hispanic Black
-
-</td>
-
-<td style="text-align:left;">
-
-1.91 (0.23)
-
-</td>
-
-<td style="text-align:left;">
-
-(1.46, 2.35)
-
-</td>
-
-<td style="text-align:left;">
-
-\<0.001
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Mexican American
-
-</td>
-
-<td style="text-align:left;">
-
-1.06 (0.30)
-
-</td>
-
-<td style="text-align:left;">
-
-(0.47, 1.66)
-
-</td>
-
-<td style="text-align:left;">
-
-0.006
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Other
-
-</td>
-
-<td style="text-align:left;">
-
-\-1.09 (0.33)
-
-</td>
-
-<td style="text-align:left;">
-
-(-1.73, -0.45)
-
-</td>
-
-<td style="text-align:left;">
-
-0.007
-
-</td>
-
-</tr>
-
-</tbody>
-
-</table>
+  - 
+    
+    </td>
+    
+    <td style="text-align:left;">
+    
+      - 
+        
+        </td>
+        
+        <td style="text-align:left;">
+        
+          - 
+            
+            </td>
+            
+            </tr>
+            
+            <tr>
+            
+            <td style="text-align:left;">
+            
+            Male
+            
+            </td>
+            
+            <td style="text-align:left;">
+            
+            \-0.07 (0.23)
+            
+            </td>
+            
+            <td style="text-align:left;">
+            
+            (-0.51, 0.37)
+            
+            </td>
+            
+            <td style="text-align:left;">
+            
+            0.76
+            
+            </td>
+            
+            </tr>
+            
+            <tr>
+            
+            <td style="text-align:left;">
+            
+            Non-Hispanic White (ref)
+            
+            </td>
+            
+            <td style="text-align:left;">
+            
+              - 
+                
+                </td>
+                
+                <td style="text-align:left;">
+                
+                  - 
+                    
+                    </td>
+                    
+                    <td style="text-align:left;">
+                    
+                      - 
+                        
+                        </td>
+                        
+                        </tr>
+                        
+                        <tr>
+                        
+                        <td style="text-align:left;">
+                        
+                        Non-Hispanic Black
+                        
+                        </td>
+                        
+                        <td style="text-align:left;">
+                        
+                        1.91 (0.23)
+                        
+                        </td>
+                        
+                        <td style="text-align:left;">
+                        
+                        (1.46, 2.35)
+                        
+                        </td>
+                        
+                        <td style="text-align:left;">
+                        
+                        \<0.001
+                        
+                        </td>
+                        
+                        </tr>
+                        
+                        <tr>
+                        
+                        <td style="text-align:left;">
+                        
+                        Mexican American
+                        
+                        </td>
+                        
+                        <td style="text-align:left;">
+                        
+                        1.06 (0.30)
+                        
+                        </td>
+                        
+                        <td style="text-align:left;">
+                        
+                        (0.47, 1.66)
+                        
+                        </td>
+                        
+                        <td style="text-align:left;">
+                        
+                        0.006
+                        
+                        </td>
+                        
+                        </tr>
+                        
+                        <tr>
+                        
+                        <td style="text-align:left;">
+                        
+                        Other
+                        
+                        </td>
+                        
+                        <td style="text-align:left;">
+                        
+                        \-1.09 (0.33)
+                        
+                        </td>
+                        
+                        <td style="text-align:left;">
+                        
+                        (-1.73, -0.45)
+                        
+                        </td>
+                        
+                        <td style="text-align:left;">
+                        
+                        0.007
+                        
+                        </td>
+                        
+                        </tr>
+                        
+                        </tbody>
+                        
+                        </table>
 
 ## Exporting tables, e.g. to Word
 
