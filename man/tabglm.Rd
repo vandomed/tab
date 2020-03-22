@@ -34,7 +34,7 @@ rows are Variable (ref = Level 1), Level 2, ...; if 3, rows are Level 1
 are Level 2, ...}
 
 \item{sep.char}{Character string with separator to place between lower and
-upper bound of confidence intervals. Typically \code{"--"} or \code{", "}.
+upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.
 \code{\link[knitr]{kable}}.}
 
 \item{decimals}{Numeric value specifying number of decimal places for numbers

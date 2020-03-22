@@ -24,7 +24,7 @@
 #' (ref), Level 2, ...; if 4, rows are Level 2 (ref = Level 1), ...; if 5, rows
 #' are Level 2, ...
 #' @param sep.char Character string with separator to place between lower and
-#' upper bound of confidence intervals. Typically \code{"--"} or \code{", "}.
+#' upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.
 #' \code{\link[knitr]{kable}}.
 #' @param decimals Numeric value specifying number of decimal places for numbers
 #' other than p-values.
@@ -165,7 +165,7 @@ tabglm <- function(fit,
     } else if (column == "or") {
 
       df$`OR` <- sprintf(spf, exp(betas))
-      if (intercept) df$`OR`[1] <- "--"
+      if (intercept) df$`OR`[1] <- "&ndash;"
 
     } else if (column == "orci") {
 
@@ -174,7 +174,7 @@ tabglm <- function(fit,
       upper <- confint.fit[, 2]
       df$`95% CI` <- paste("(", sprintf(spf, exp(lower)), sep.char,
                                 sprintf(spf, exp(upper)), ")", sep = "")
-      if (intercept) df$`95% CI`[1] <- "--"
+      if (intercept) df$`95% CI`[1] <- "&ndash;"
 
     } else if (column == "or.ci") {
 
@@ -184,7 +184,7 @@ tabglm <- function(fit,
       df$`OR (95% CI)` <- paste(sprintf(spf, exp(betas)), " (",
                                 sprintf(spf, exp(lower)), sep.char,
                                 sprintf(spf, exp(upper)), ")", sep = "")
-      if (intercept) df$`OR (95% CI)`[1] <- "--"
+      if (intercept) df$`OR (95% CI)`[1] <- "&ndash;"
 
     } else if (column == "hr") {
 
@@ -197,7 +197,7 @@ tabglm <- function(fit,
       upper <- confint.fit[, 2]
       df$`95% CI` <- paste("(", sprintf(spf, exp(lower)), sep.char,
                            sprintf(spf, exp(upper)), ")", sep = "")
-      if (intercept) df$`95% CI`[1] <- "--"
+      if (intercept) df$`95% CI`[1] <- "&ndash;"
 
     } else if (column == "hr.ci") {
 
@@ -207,7 +207,7 @@ tabglm <- function(fit,
       df$`HR (95% CI)` <- paste(sprintf(spf, exp(betas)), " (",
                                 sprintf(spf, exp(lower)), sep.char,
                                 sprintf(spf, exp(upper)), ")", sep = "")
-      if (intercept) df$`HR (95% CI)`[1] <- "--"
+      if (intercept) df$`HR (95% CI)`[1] <- "&ndash;"
 
     } else if (column == "test") {
 
@@ -242,7 +242,7 @@ tabglm <- function(fit,
         df$Variable[locs] <- gsub(pattern = varname.ii, replacement = spaces,
                                   x = df$Variable[locs], fixed = TRUE)
         newrows <- matrix("", nrow = 2, ncol = ncol(df), dimnames = list(NULL, names(df)))
-        newrows[2, ] <- "--"
+        newrows[2, ] <- "&ndash;"
         newrows[1, 1] <- ifelse(varname.ii %in% names(xvarlabels), xvarlabels[[varname.ii]], varname.ii)
         newrows[2, 1] <- paste(spaces, paste(levels.ii[1], " (ref)", sep = ""), sep = "")
         df <- rbind(df[setdiff(1: locs[1], locs[1]), ], newrows, df[locs[1]: nrow(df), ])
@@ -262,7 +262,7 @@ tabglm <- function(fit,
 
         # Rows are Level 1 (ref), Level 2, ...
         df$Variable[locs] <- gsub(pattern = varname.ii, replacement = "", x = df$Variable[locs])
-        newrow <- matrix("--", nrow = 1, ncol = ncol(df), dimnames = list(NULL, names(df)))
+        newrow <- matrix("&ndash;", nrow = 1, ncol = ncol(df), dimnames = list(NULL, names(df)))
         newrow[1, 1] <- paste(levels.ii[1], " (ref)", sep = "")
         df <- rbind(df[setdiff(1: locs[1], locs[1]), ], newrow, df[locs[1]: nrow(df), ])
 
@@ -326,7 +326,7 @@ tabglm <- function(fit,
     } else if (poly.order == 3) {
       df$Variable[locs] <- c(varname.ii, paste(varname.ii, c("squared", "cubed")))
     } else {
-      df$Variable[locs] <- c(varname.ii, paste(varname.ii, 2: poly.order, sep = "^"))
+      df$Variable[locs] <- c(varname.ii, paste(varname.ii, "<sup>", 2: poly.order, "</sup>", sep = ""))
     }
   }
 

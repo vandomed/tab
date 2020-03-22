@@ -31,7 +31,7 @@ for papers and presentations. The following functions are included:
   - `tabmulti.svy` does the same thing as `tabmulti` but for complex
     survey data.
 
-## Regression summaries in 2 extra keystrokes
+## Regression summaries with 2 extra keystrokes
 
 ### GLM’s
 
@@ -48,7 +48,7 @@ Here’s a linear regression of BMI on age, sex, and race. Once you call
 glm_v(BMI ~ Age + Sex + Race, data = tabdata)
 ```
 
-![Figure](README-figures/linear.png)
+![Figure](vignettes/linear.png)
 
 From here, you can “snip” the summary table and save it as a figure (as
 I did for this README) or copy directly from the Viewer and paste
@@ -65,7 +65,7 @@ higher-order terms:
 glm_v(death_1yr ~ poly(Age, 2, raw = TRUE) + Sex * BMI, data = tabdata, family = binomial)
 ```
 
-![Figure](README-figures/logistic.png)
+![Figure](vignettes/logistic.png)
 
 <!-- ## Exporting tables, e.g. to Word -->
 
@@ -86,43 +86,6 @@ glm_v(death_1yr ~ poly(Age, 2, raw = TRUE) + Sex * BMI, data = tabdata, family =
 <!-- ## References -->
 
 <div id="refs" class="references">
-
-<div id="ref-survey">
-
-Lumley, Thomas. 2019. *Survey: Analysis of Complex Survey Samples*.
-<https://CRAN.R-project.org/package=survey>.
-
-</div>
-
-<div id="ref-survey-paper">
-
-Lumley, Thomas, and others. 2004. “Analysis of Complex Survey Samples.”
-*Journal of Statistical Software* 9 (1): 1–19.
-
-</div>
-
-<div id="ref-gee">
-
-R by Thomas Lumley, Vincent J Carey. Ported to, and Brian Ripley. Note
-that maintainers are not available to give advice on using a package
-they did not author. 2015. *Gee: Generalized Estimation Equation
-Solver*. <https://CRAN.R-project.org/package=gee>.
-
-</div>
-
-<div id="ref-survival-book">
-
-Terry M. Therneau, and Patricia M. Grambsch. 2000. *Modeling Survival
-Data: Extending the Cox Model*. New York: Springer.
-
-</div>
-
-<div id="ref-survival-package">
-
-Therneau, Terry M. 2015. *A Package for Survival Analysis in S*.
-<https://CRAN.R-project.org/package=survival>.
-
-</div>
 
 <div id="ref-knitr3">
 
