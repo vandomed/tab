@@ -41,12 +41,6 @@ upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.
 other than p-values.}
 
 \item{formatp.list}{List of arguments to pass to \code{\link[tab]{formatp}}.}
-
-\item{print.html}{Logical value for whether to write a .html file with the
-table to the current working directory.}
-
-\item{html.filename}{Character string specifying the name of the .html file
-that gets written if \code{print.html = TRUE}.}
 }
 \value{
 kable

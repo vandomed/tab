@@ -29,10 +29,6 @@
 #' @param decimals Numeric value specifying number of decimal places for numbers
 #' other than p-values.
 #' @param formatp.list List of arguments to pass to \code{\link[tab]{formatp}}.
-#' @param print.html Logical value for whether to write a .html file with the
-#' table to the current working directory.
-#' @param html.filename Character string specifying the name of the .html file
-#' that gets written if \code{print.html = TRUE}.
 #'
 #'
 #' @return kable

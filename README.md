@@ -48,7 +48,7 @@ Here’s a linear regression of BMI on age, sex, and race. Once you call
 glm_v(BMI ~ Age + Sex + Race, data = tabdata)
 ```
 
-![Figure](linear.PNG)
+![Figure](vignettes/linear.PNG)
 
 From here, you can “snip” the summary table and save it as a figure (as
 I did for this README) or copy directly from the Viewer and paste
@@ -65,7 +65,7 @@ higher-order terms:
 glm_v(death_1yr ~ poly(Age, 2, raw = TRUE) + Sex * BMI, data = tabdata, family = binomial)
 ```
 
-![Figure](logistic.PNG)
+![Figure](vignettes/logistic.PNG)
 
 <!-- ## Exporting tables, e.g. to Word -->
 
