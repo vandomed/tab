@@ -74,7 +74,7 @@ Here's a linear regression of BMI on age, sex, and race. Once you call `glm_v`, 
 glm_v(BMI ~ Age + Sex + Race, data = tabdata)
 ```
 
-![Figure](linear.png)
+![Figure](linear.PNG)
 
 From here, you can "snip" the summary table and save it as a figure (as I did for this README) or copy directly from the Viewer and paste outside of R.
 
@@ -86,7 +86,7 @@ Of course `glm` supports all sorts of regression models, and `glm_v` should play
 glm_v(death_1yr ~ poly(Age, 2, raw = TRUE) + Sex * BMI, data = tabdata, family = binomial)
 ```
 
-![Figure](logistic.png)
+![Figure](logistic.PNG)
 
 
 

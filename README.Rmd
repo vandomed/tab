@@ -85,7 +85,7 @@ Of course `glm` supports all sorts of regression models, and `glm_v` should play
 glm_v(death_1yr ~ poly(Age, 2, raw = TRUE) + Sex * BMI, data = tabdata, family = binomial)
 ```
 
-![Figure](logistic.png)
+![Figure](logistic.PNG)
 
 
 <!-- ## Exporting tables, e.g. to Word -->
