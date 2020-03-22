@@ -12,6 +12,7 @@ Encoding: UTF-8
 Depends: dplyr, knitr
 Imports: 
     gee, 
+    kableExtra, 
     MASS, 
     stats, 
     survey, 

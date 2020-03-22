@@ -49,135 +49,57 @@ library("tab")
 
 ## Functions
 
-The purpose of **tab** is to make it easier to create tables for papers, including Table 1's showing characteristics of the sample and summary tables for fitted regression models. Currently, the following functions are included:
+The main purpose of **tab** is to create neatly formatted summary tables for papers and presentations. The following functions are included:
 
-* `tabmeans` compares means in two or more groups.
-* `tabmedians` compares medians in two or more groups.
-* `tabfreq` compares frequencies in two or more groups. 
-* `tabmulti` compares multiple variables in two or more groups.
-* `tabmeans.svy`, `tabmedians.svy`, `tabfreq.svy`, and `tabmulti.svy` serve the same purposes as the above functions, but for complex survey data.
+* `glm_v` Print a GLM summary table to the RStudio Viewer.
 * `tabglm` summarizes generalized linear models (GLM's) fit via `glm` or `survey::svyglm`. 
 * `tabgee` summarizes generalized estimating equation models (GEE's) fit via `gee::gee`. 
 * `tabcoxph` summarizes Cox Proportional Hazards models fit via `survival::coxph` or `survey::svycoxph`.
+* `tabmulti` compares variables across two or more groups, e.g. to create a "Table 1."
+* `tabmulti.svy` does the same thing as `tabmulti` but for complex survey data.
 
-## Table 1's
 
-<!-- A toy dataset called `tabdata` is included in **tab** package. It is a data frame with 15 variables and 300 observations. Let's take a look: -->
+## Regression summaries in 2 extra keystrokes
 
-<!-- ```{r toydata} -->
-<!-- library("tab") -->
-<!-- head(tabdata) -->
-<!-- ``` -->
+### GLM's
 
-You can use `tabmulti` to compare characteristics across levels of a factor variable, e.g. here comparing age, sex, and race by treatment group in the toy dataset `tabdata`.
+To summarize a fitted generalized linear model, simply call `glm_v` as you would `glm`. The result will be a formatted summary table printed to the RStudio Viewer.
 
-```{r}
-tabmulti(Age + Sex + Race ~ Group, data = tabdata, latex = TRUE) %>% kable(format = "html")
+#### Linear regression
+
+Here's a linear regression of BMI on age, sex, and race. Once you call `glm_v`, a summary table will pop up in the RStudio Viewer.
+
+```{r eval = FALSE}
+glm_v(BMI ~ Age + Sex + Race, data = tabdata)
 ```
 
-To illustrate some options, we can request `Age` and `Race` to print as `Age (years)` and `Race/ethnicity`, compare medians rather than means for age, and include the sample sizes in the column headings:
+![Figure](README-figures/linear.png)
 
-```{r}
-tabmulti(Age + Sex + Race ~ Group, data = tabdata,
-         yvarlabels = list(Age = "Age (years)", Race = "Race/ethnicity"),
-         ymeasures = c("median", "freq", "freq"),
-         listwise.deletion = TRUE,
-         n.headings = TRUE, 
-         latex = TRUE) %>%
-  kable(format = "html")
+From here, you can "snip" the summary table and save it as a figure (as I did for this README) or copy directly from the Viewer and paste outside of R.
+
+#### Logistic regression
+
+Of course `glm` supports all sorts of regression models, and `glm_v` should play nice at least with the more common ones. Here's a logistic regression for 1-year mortality vs. age, BMI, and sex, with some higher-order terms:
+
+```{r eval = FALSE}
+glm_v(death_1yr ~ poly(Age, 2, raw = TRUE) + Sex * BMI, data = tabdata, family = binomial)
 ```
 
-
-## Regression tables
-
-#### GLM's
-
-Logistic regression for 1-year mortality vs. age, sex, and treatment, with the 
-binary factor variables displayed in a "compressed" format:
-
-```{r}
-fit <- glm(death_1yr ~ Age + Sex + Group, data = tabdata, family = binomial)
-fit %>% tabglm(factor.compression = 5, latex = TRUE) %>% kable(format = "html")
-```
-
-#### GEE's
-
-GEE for high blood pressure (measured at 3 time points longitudinally) vs. 
-various predictors, with some higher-order terms:
-
-```{r echo = TRUE, eval = FALSE}
-tabdata2 <- reshape(data = tabdata,
-                    varying = c("bp.1", "bp.2", "bp.3", "highbp.1", "highbp.2", "highbp.3"),
-                    timevar = "bp.visit", direction = "long")
-tabdata2 <- tabdata2[order(tabdata2$id), ]
-fit <- gee(highbp ~ poly(Age, 2, raw = TRUE) + Sex + Race + Race*Sex,
-           id = id, data = tabdata2, family = "binomial", corstr = "unstructured")
-fit %>% tabgee(data = tabdata2) %>% kable(format = "html")
-```
-
-```{r include = FALSE}
-tabdata2 <- reshape(data = tabdata,
-                    varying = c("bp.1", "bp.2", "bp.3", "highbp.1", "highbp.2", "highbp.3"),
-                    timevar = "bp.visit", direction = "long")
-tabdata2 <- tabdata2[order(tabdata2$id), ]
-fit <- gee(highbp ~ poly(Age, 2, raw = TRUE) + Sex + Race + Race*Sex,
-           id = id, data = tabdata2, family = "binomial", corstr = "unstructured")
-```
-
-```{r echo = FALSE}
-fit %>% tabgee(data = tabdata2) %>% kable(format = "html")
-```
-
-Note that we had to set `data = tabdata2` here, because `gee` objects don't store all of the information on factor variables (unlike `glm` objects).
+![Figure](README-figures/logistic.png)
 
 
-#### Cox proportional hazards
+<!-- ## Exporting tables, e.g. to Word -->
 
-Survival model for mortality vs. predictors, again compressing the factor variables, and requesting slightly differnet columns (i.e. no p-values):
-
-```{r}
-library("survival")
-fit <- coxph(Surv(time = time, event = delta) ~ Age + Sex + Group, data = tabdata)
-fit %>% tabcoxph(factor.compression = 5, columns = c("beta", "hr.ci")) %>% kable(format = "html")
-```
+<!-- All of the functions in **tab** have an argument called `print.html` which can  -->
+<!-- be used to export tables to word processors. Setting `print.html = TRUE` will  -->
+<!-- result in a HTML table being output to your current working directory. You can  -->
+<!-- open the table (e.g. in Chrome) and copy/paste into your report. -->
 
 
-## Complex survey data
+<!-- ## Options for printing in R -->
 
-The functions in **tab** can also accommodate complex survey data. To illustrate with the included dataset `tabsvydata` (which is data from NHANES 2003-2004, except for the made-up variables `time` and `event`), here's a Table 1:
-
-```{r message=FALSE, warning=FALSE}
-library("survey")
-design <- svydesign(
-  data = tabsvydata,
-  ids = ~sdmvpsu,
-  strata = ~sdmvstra,
-  weights = ~wtmec2yr,
-  nest = TRUE
-)
-tabmulti.svy(Age + Race + BMI ~ Sex, design = design) %>% kable(format = "html")
-```
-
-And here's a linear regression:
-
-```{r message=FALSE, warning=FALSE}
-fit <- svyglm(BMI ~ Age + Sex + Race, design = design)
-fit %>% tabglm(factor.compression = 3, latex = TRUE) %>% kable(format = "html")
-```
+<!-- I used **knitr**'s `kable` function for the examples here, but other approaches  -->
+<!-- should also work (e.g. **xtable**'s `xtable` or **pandoc**'s `pandoc.table`). -->
 
 
-## Exporting tables, e.g. to Word
-
-All of the functions in **tab** have an argument called `print.html` which can 
-be used to export tables to word processors. Setting `print.html = TRUE` will 
-result in a HTML table being output to your current working directory. You can 
-open the table (e.g. in Chrome) and copy/paste into your report.
-
-
-## Options for printing in R
-
-I used **knitr**'s `kable` function for the examples here, but other approaches 
-should also work (e.g. **xtable**'s `xtable` or **pandoc**'s `pandoc.table`).
-
-
-## References
+<!-- ## References -->

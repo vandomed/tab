@@ -1,7 +1,6 @@
 #' Create Summary Table for Fitted Generalized Linear Model
 #'
-#' Creates a table summarizing a GLM fit using the \code{\link[stats]{glm}}
-#' function.
+#' Creates a table summarizing a GLM fit using \code{\link[stats]{glm}}.
 #'
 #'
 #' @param fit Fitted \code{\link[stats]{glm}} object.
@@ -25,9 +24,7 @@
 #' (ref), Level 2, ...; if 4, rows are Level 2 (ref = Level 1), ...; if 5, rows
 #' are Level 2, ...
 #' @param sep.char Character string with separator to place between lower and
-#' upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.
-#' @param latex Logical value for whether to format table so it is
-#' ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
+#' upper bound of confidence intervals. Typically \code{"--"} or \code{", "}.
 #' \code{\link[knitr]{kable}}.
 #' @param decimals Numeric value specifying number of decimal places for numbers
 #' other than p-values.
@@ -38,38 +35,32 @@
 #' that gets written if \code{print.html = TRUE}.
 #'
 #'
-#' @return Data frame which you can print in R (e.g. with \strong{xtable}'s
-#' \code{\link[xtable]{xtable}} or \strong{knitr}'s \code{\link[knitr]{kable}})
-#' or export to Word, Excel, or some other program. To export the table, set
-#' \code{print.html = TRUE}. This will result in a .html file being written to
-#' your current working directory, which you can open and copy/paste into your
-#' document.
+#' @return kable
 #'
 #'
 #' @examples
 #' # Linear regression: BMI vs. age, sex, race, and treatment
 #' fit <- glm(BMI ~ Age + Sex + Race + Group, data = tabdata)
-#' kable(tabglm(fit))
+#' tabglm(fit)
 #'
 #' # Can also use piping
-#' fit %>% tabglm() %>% kable()
+#' fit %>% tabglm()
 #'
 #' # Logistic regression: 1-year mortality vs. age, sex, race, and treatment
 #' fit <- glm(death_1yr ~ Age + Sex + Race + Group, data = tabdata,
 #'            family = binomial)
-#' fit %>% tabglm() %>% kable()
+#' fit %>% tabglm()
 #'
 #' # Same as previous, but with custom labels for Age and Race and factors
 #' # displayed in slightly more compressed format
 #' fit %>%
 #'   tabglm(xvarlabels = list(Age = "Age (years)", Race = "Race/ethnicity"),
-#'          factor.compression = 2) %>%
-#'   kable()
+#'          factor.compression = 2)
 #'
 #' # Logistic regression model with some higher-order terms
 #' fit <- glm(death_1yr ~ poly(Age, 2, raw = TRUE) + Sex + BMI + Sex * BMI,
 #'            data = tabdata, family = "binomial")
-#' fit %>% tabglm() %>% kable()
+#' fit %>% tabglm()
 #'
 #'
 #' @export
@@ -78,11 +69,8 @@ tabglm <- function(fit,
                    xvarlabels = NULL,
                    factor.compression = 1,
                    sep.char = ", ",
-                   latex = FALSE,
                    decimals = 2,
-                   formatp.list = NULL,
-                   print.html = FALSE,
-                   html.filename = "table1.html") {
+                   formatp.list = NULL) {
 
   # Error checking
   if (! "glm" %in% class(fit)) {
@@ -100,9 +88,6 @@ tabglm <- function(fit,
   if (! is.character(sep.char)) {
     stop("The input 'sep.char' must be a character string.")
   }
-  if (! is.logical(latex)) {
-    stop("The input 'latex' must be a logical.")
-  }
   if (! (is.numeric(decimals) && decimals >= 0 &&
          decimals == as.integer(decimals))) {
     stop("The input 'decimals' must be a non-negative integer.")
@@ -111,12 +96,6 @@ tabglm <- function(fit,
       ! (is.list(formatp.list) && all(names(formatp.list) %in%
                                       names(as.list(args(formatp)))))) {
     stop("The input 'format.p' must be a named list of arguments to pass to 'formatp'.")
-  }
-  if (! is.logical(print.html)) {
-    stop("The input 'print.html' must be a logical.")
-  }
-  if (! is.character("html.filename")) {
-    stop("The input 'html.filename' must be a character string.")
   }
 
   # Extract info from fit
@@ -166,7 +145,7 @@ tabglm <- function(fit,
       upper <- confint.fit[, 2]
       df$`95% CI` <- paste("(", sprintf(spf, lower), sep.char,
                                 sprintf(spf, upper), ")", sep = "")
-      #if (intercept) df$`95% CI`[1] <- "-"
+      #if (intercept) df$`95% CI`[1] <- "--"
 
     } else if (column == "beta.se") {
 
@@ -181,12 +160,12 @@ tabglm <- function(fit,
       df$`Beta (95% CI)` <- paste(sprintf(spf, betas), " (",
                                   sprintf(spf, lower), sep.char,
                                   sprintf(spf, upper), ")", sep = "")
-      #if (intercept) df$`Beta (95% CI)`[1] <- "-"
+      #if (intercept) df$`Beta (95% CI)`[1] <- "--"
 
     } else if (column == "or") {
 
       df$`OR` <- sprintf(spf, exp(betas))
-      if (intercept) df$`OR`[1] <- "-"
+      if (intercept) df$`OR`[1] <- "--"
 
     } else if (column == "orci") {
 
@@ -195,7 +174,7 @@ tabglm <- function(fit,
       upper <- confint.fit[, 2]
       df$`95% CI` <- paste("(", sprintf(spf, exp(lower)), sep.char,
                                 sprintf(spf, exp(upper)), ")", sep = "")
-      if (intercept) df$`95% CI`[1] <- "-"
+      if (intercept) df$`95% CI`[1] <- "--"
 
     } else if (column == "or.ci") {
 
@@ -205,7 +184,7 @@ tabglm <- function(fit,
       df$`OR (95% CI)` <- paste(sprintf(spf, exp(betas)), " (",
                                 sprintf(spf, exp(lower)), sep.char,
                                 sprintf(spf, exp(upper)), ")", sep = "")
-      if (intercept) df$`OR (95% CI)`[1] <- "-"
+      if (intercept) df$`OR (95% CI)`[1] <- "--"
 
     } else if (column == "hr") {
 
@@ -218,7 +197,7 @@ tabglm <- function(fit,
       upper <- confint.fit[, 2]
       df$`95% CI` <- paste("(", sprintf(spf, exp(lower)), sep.char,
                            sprintf(spf, exp(upper)), ")", sep = "")
-      if (intercept) df$`95% CI`[1] <- "-"
+      if (intercept) df$`95% CI`[1] <- "--"
 
     } else if (column == "hr.ci") {
 
@@ -228,7 +207,7 @@ tabglm <- function(fit,
       df$`HR (95% CI)` <- paste(sprintf(spf, exp(betas)), " (",
                                 sprintf(spf, exp(lower)), sep.char,
                                 sprintf(spf, exp(upper)), ")", sep = "")
-      if (intercept) df$`HR (95% CI)`[1] <- "-"
+      if (intercept) df$`HR (95% CI)`[1] <- "--"
 
     } else if (column == "test") {
 
@@ -250,7 +229,7 @@ tabglm <- function(fit,
   if (intercept) df$Variable[1] <- "Intercept"
 
   # Clean up factor variables
-  spaces <- "   "
+  spaces <- "&nbsp; &nbsp; &nbsp;"
   xlevels <- fit$xlevels
   if (length(xlevels) > 0) {
     for (ii in 1: length(xlevels)) {
@@ -263,7 +242,7 @@ tabglm <- function(fit,
         df$Variable[locs] <- gsub(pattern = varname.ii, replacement = spaces,
                                   x = df$Variable[locs], fixed = TRUE)
         newrows <- matrix("", nrow = 2, ncol = ncol(df), dimnames = list(NULL, names(df)))
-        newrows[2, ] <- "-"
+        newrows[2, ] <- "--"
         newrows[1, 1] <- ifelse(varname.ii %in% names(xvarlabels), xvarlabels[[varname.ii]], varname.ii)
         newrows[2, 1] <- paste(spaces, paste(levels.ii[1], " (ref)", sep = ""), sep = "")
         df <- rbind(df[setdiff(1: locs[1], locs[1]), ], newrows, df[locs[1]: nrow(df), ])
@@ -283,7 +262,7 @@ tabglm <- function(fit,
 
         # Rows are Level 1 (ref), Level 2, ...
         df$Variable[locs] <- gsub(pattern = varname.ii, replacement = "", x = df$Variable[locs])
-        newrow <- matrix("-", nrow = 1, ncol = ncol(df), dimnames = list(NULL, names(df)))
+        newrow <- matrix("--", nrow = 1, ncol = ncol(df), dimnames = list(NULL, names(df)))
         newrow[1, 1] <- paste(levels.ii[1], " (ref)", sep = "")
         df <- rbind(df[setdiff(1: locs[1], locs[1]), ], newrow, df[locs[1]: nrow(df), ])
 
@@ -366,36 +345,24 @@ tabglm <- function(fit,
     }
   }
 
-  # Print html version of table if requested
-  if (print.html) {
-
-    df.xtable <- xtable(
-      df,
-      align = paste("ll", paste(rep("r", ncol(df) - 1), collapse = ""), sep = "", collapse = "")
-    )
-    ampersands <- "&nbsp &nbsp &nbsp"
-    print(df.xtable, include.rownames = FALSE, type = "html",
-          file = html.filename, sanitize.text.function = function(x) {
-            ifelse(substr(x, 1, 1) == " ", paste(ampersands, x), x)
-          })
-
-  }
-
-  # Reformat for latex if requested
-  if (latex) {
-
-    slashes <- "\\ \\ \\"
-    df$Variable <- gsub(pattern = spaces, replacement = slashes, x = df$Variable, fixed = TRUE)
-
-    df <- sapply(df, function(x) {
-      x[x == "-"] <- "--"
-      return(x)
-    })
-
-  }
+  # x$Variable <- gsub("   ", "&nbsp; &nbsp; &nbsp;", x$Variable, fixed = TRUE)
+  # x %>% kable(row.names = FALSE, escape = FALSE) %>% kable_styling(full_width = FALSE)
+  #
+  # # Reformat for latex if requested
+  # if (latex) {
+  #
+  #   slashes <- "\\ \\ \\"
+  #   df$Variable <- gsub(pattern = spaces, replacement = slashes, x = df$Variable, fixed = TRUE)
+  #
+  #   df <- sapply(df, function(x) {
+  #     x[x == "-"] <- "--"
+  #     return(x)
+  #   })
+  #
+  # }
 
   # Remove row names and return table
   rownames(df) <- NULL
-  return(df)
+  return(df %>% kable(escape = FALSE) %>% kable_styling(full_width = FALSE))
 
 }

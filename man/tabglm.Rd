@@ -5,9 +5,8 @@
 \title{Create Summary Table for Fitted Generalized Linear Model}
 \usage{
 tabglm(fit, columns = NULL, xvarlabels = NULL,
-  factor.compression = 1, sep.char = ", ", latex = FALSE,
-  decimals = 2, formatp.list = NULL, print.html = FALSE,
-  html.filename = "table1.html")
+  factor.compression = 1, sep.char = ", ", decimals = 2,
+  formatp.list = NULL)
 }
 \arguments{
 \item{fit}{Fitted \code{\link[stats]{glm}} object.}
@@ -35,10 +34,7 @@ rows are Variable (ref = Level 1), Level 2, ...; if 3, rows are Level 1
 are Level 2, ...}
 
 \item{sep.char}{Character string with separator to place between lower and
-upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.}
-
-\item{latex}{Logical value for whether to format table so it is
-ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
+upper bound of confidence intervals. Typically \code{"--"} or \code{", "}.
 \code{\link[knitr]{kable}}.}
 
 \item{decimals}{Numeric value specifying number of decimal places for numbers
@@ -53,41 +49,34 @@ table to the current working directory.}
 that gets written if \code{print.html = TRUE}.}
 }
 \value{
-Data frame which you can print in R (e.g. with \strong{xtable}'s
-\code{\link[xtable]{xtable}} or \strong{knitr}'s \code{\link[knitr]{kable}})
-or export to Word, Excel, or some other program. To export the table, set
-\code{print.html = TRUE}. This will result in a .html file being written to
-your current working directory, which you can open and copy/paste into your
-document.
+kable
 }
 \description{
-Creates a table summarizing a GLM fit using the \code{\link[stats]{glm}}
-function.
+Creates a table summarizing a GLM fit using \code{\link[stats]{glm}}.
 }
 \examples{
 # Linear regression: BMI vs. age, sex, race, and treatment
 fit <- glm(BMI ~ Age + Sex + Race + Group, data = tabdata)
-kable(tabglm(fit))
+tabglm(fit)
 
 # Can also use piping
-fit \%>\% tabglm() \%>\% kable()
+fit \%>\% tabglm()
 
 # Logistic regression: 1-year mortality vs. age, sex, race, and treatment
 fit <- glm(death_1yr ~ Age + Sex + Race + Group, data = tabdata,
            family = binomial)
-fit \%>\% tabglm() \%>\% kable()
+fit \%>\% tabglm()
 
 # Same as previous, but with custom labels for Age and Race and factors
 # displayed in slightly more compressed format
 fit \%>\%
   tabglm(xvarlabels = list(Age = "Age (years)", Race = "Race/ethnicity"),
-         factor.compression = 2) \%>\%
-  kable()
+         factor.compression = 2)
 
 # Logistic regression model with some higher-order terms
 fit <- glm(death_1yr ~ poly(Age, 2, raw = TRUE) + Sex + BMI + Sex * BMI,
            data = tabdata, family = "binomial")
-fit \%>\% tabglm() \%>\% kable()
+fit \%>\% tabglm()
 
 
 }

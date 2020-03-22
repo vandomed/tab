@@ -26,6 +26,7 @@
 #'
 #' @docType package
 #' @importFrom dplyr %>%
+#' @importFrom kableExtra kable_styling
 #' @importFrom knitr kable
 #' @import MASS
 #' @import stats
