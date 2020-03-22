@@ -4,6 +4,7 @@
 ^LICENSE$
 ^README.*$
 ^Thumbs.db$
+^marketing$
 ^misc$
 ^R\archived$
 ^R-development$

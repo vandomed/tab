@@ -75,7 +75,6 @@ glm_v(BMI ~ Age + Sex + Race, data = tabdata)
 ```
 
 ![Figure](linear.png)
-<!-- ![Figure](README-figures/linear.png) -->
 
 From here, you can "snip" the summary table and save it as a figure (as I did for this README) or copy directly from the Viewer and paste outside of R.
 
@@ -88,22 +87,6 @@ glm_v(death_1yr ~ poly(Age, 2, raw = TRUE) + Sex * BMI, data = tabdata, family =
 ```
 
 ![Figure](logistic.png)
-<!-- ![Figure](README-figures/logistic.png) -->
 
 
-<!-- ## Exporting tables, e.g. to Word -->
-
-<!-- All of the functions in **tab** have an argument called `print.html` which can  -->
-<!-- be used to export tables to word processors. Setting `print.html = TRUE` will  -->
-<!-- result in a HTML table being output to your current working directory. You can  -->
-<!-- open the table (e.g. in Chrome) and copy/paste into your report. -->
-
-
-<!-- ## Options for printing in R -->
-
-<!-- I used **knitr**'s `kable` function for the examples here, but other approaches  -->
-<!-- should also work (e.g. **xtable**'s `xtable` or **pandoc**'s `pandoc.table`). -->
-
-
-<!-- ## References -->
 
