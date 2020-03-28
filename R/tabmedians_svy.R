@@ -33,18 +33,11 @@
 #' parentheses in column headings.
 #' @param N.headings Logical value for whether to display weighted sample sizes
 #' in parentheses in column headings.
-#' @param print.html Logical value for whether to write a .html file with the
-#' table to the current working directory.
-#' @param html.filename Character string specifying the name of the .html file
-#' that gets written if \code{print.html = TRUE}.
+#' @param kable Logical value for whether to return a
+#' \code{\link[knitr]{kable}}.
 #'
 #'
-#' @return Data frame which you can print in R (e.g. with \strong{xtable}'s
-#' \code{\link[xtable]{xtable}} or \strong{knitr}'s \code{\link[knitr]{kable}})
-#' or export to Word, Excel, or some other program. To export the table, set
-#' \code{print.html = TRUE}. This will result in a .html file being written to
-#' your current working directory, which you can open and copy/paste into your
-#' document.
+#' @return \code{\link[knitr]{kable}} or character matrix.
 #'
 #'
 #' @examples
@@ -76,8 +69,7 @@ tabmedians.svy <- function(formula,
                            formatp.list = NULL,
                            n.headings = FALSE,
                            N.headings = FALSE,
-                           print.html = FALSE,
-                           html.filename = "table1.html") {
+                           kable = TRUE) {
 
   # Error checking
   if (class(formula) != "formula") {
@@ -117,11 +109,8 @@ tabmedians.svy <- function(formula,
   if (! is.logical(n.headings)) {
     stop("The input 'n.headings' must be a logical.")
   }
-  if (! is.logical(print.html)) {
-    stop("The input 'print.html' must be a logical.")
-  }
-  if (! is.character("html.filename")) {
-    stop("The input 'html.filename' must be a character string.")
+  if (! is.logical(kable)) {
+    stop("The input 'kable' must be a logical.")
   }
 
   # Get variable names etc.
@@ -318,18 +307,8 @@ tabmedians.svy <- function(formula,
     names(df)[names(df) %in% xlevels] <- paste(xlevels, " (N = ", Ns, ")", sep = "")
   }
 
-  # Print html version of table if requested
-  if (print.html) {
-
-    df.xtable <- xtable(
-      df,
-      align = paste("ll", paste(rep("r", ncol(df) - 1), collapse = ""), sep = "", collapse = "")
-    )
-    print(df.xtable, include.rownames = FALSE, type = "html", file = html.filename)
-
-  }
-
   # Return table
-  return(df)
+  if (! kable) return(df)
+  return(df %>% kable(escape = FALSE) %>% kable_styling(full_width = FALSE))
 
 }

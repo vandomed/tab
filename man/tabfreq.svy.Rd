@@ -7,11 +7,9 @@
 tabfreq.svy(formula, design, columns = c("xgroups", "p"),
   cell = "col.percent", parenth = "se", sep.char = ", ",
   xlevels = NULL, yname = NULL, ylevels = NULL,
-  compress.binary = FALSE, yname.row = TRUE, indent.spaces = 3,
-  text.label = NULL, latex = TRUE, decimals = 1,
-  svychisq.list = NULL, formatp.list = NULL, n.headings = FALSE,
-  N.headings = FALSE, print.html = FALSE,
-  html.filename = "table1.html")
+  compress.binary = FALSE, yname.row = TRUE, text.label = NULL,
+  decimals = 1, svychisq.list = NULL, formatp.list = NULL,
+  n.headings = FALSE, N.headings = FALSE, kable = TRUE)
 }
 \arguments{
 \item{formula}{Formula, e.g. \code{Race ~ Sex}.}
@@ -49,15 +47,8 @@ variable to a single row, excluding the first level rather than showing both.}
 \item{yname.row}{Logical value for whether to include a row displaying the
 name of the \code{y} variable.}
 
-\item{indent.spaces}{Integer value specifying how many spaces to indent
-factor levels. Only used if \code{yname.row = TRUE}.}
-
 \item{text.label}{Character string with text to put after the \code{y}
 variable name, identifying what cell values and parentheses represent.}
-
-\item{latex}{Logical value for whether to format table so it is
-ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
-\code{\link[knitr]{kable}}.}
 
 \item{decimals}{Numeric value specifying number of decimal places for numbers
 other than p-values.}
@@ -73,11 +64,11 @@ sizes in parentheses in column headings.}
 \item{N.headings}{Logical value for whether to display weighted sample sizes
 in parentheses in column headings.}
 
-\item{print.html}{Logical value for whether to write a .html file with the
-table to the current working directory.}
-
-\item{html.filename}{Character string specifying the name of the .html file
-that gets written if \code{print.html = TRUE}.}
+\item{kable}{Logical value for whether to return a
+\code{\link[knitr]{kable}}.}
+}
+\value{
+\code{\link[knitr]{kable}} or character matrix.
 }
 \description{
 Creates an I-by-J frequency table comparing the distribution of \code{y}

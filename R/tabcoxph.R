@@ -22,26 +22,12 @@
 #' are Level 2, ...
 #' @param sep.char Character string with separator to place between lower and
 #' upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.
-#' @param indent.spaces Integer value specifying how many spaces to indent
-#' factor levels.
-#' @param latex Logical value for whether to format table so it is
-#' ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
-#' \code{\link[knitr]{kable}}.
 #' @param decimals Numeric value specifying number of decimal places for numbers
 #' other than p-values.
 #' @param formatp.list List of arguments to pass to \code{\link[tab]{formatp}}.
-#' @param print.html Logical value for whether to write a .html file with the
-#' table to the current working directory.
-#' @param html.filename Character string specifying the name of the .html file
-#' that gets written if \code{print.html = TRUE}.
 #'
 #'
-#' @return Data frame which you can print in R (e.g. with \strong{xtable}'s
-#' \code{\link[xtable]{xtable}} or \strong{knitr}'s \code{\link[knitr]{kable}})
-#' or export to Word, Excel, or some other program. To export the table, set
-#' \code{print.html = TRUE}. This will result in a .html file being written to
-#' your current working directory, which you can open and copy/paste into your
-#' document.
+#' @return \code{\link[knitr]{kable}}.
 #'
 #'
 #' @examples
@@ -49,23 +35,22 @@
 #' library("survival")
 #' fit <- coxph(Surv(time = time, event = delta) ~ Age + Sex + Race + Group,
 #'              data = tabdata)
-#' kable(tabcoxph(fit))
+#' tabcoxph(fit)
 #'
 #' # Can also use piping
-#' fit %>% tabcoxph() %>% kable()
+#' fit %>% tabcoxph()
 #'
 #' # Same as previous, but with custom labels for Age and Race and factors
 #' # displayed in slightly more compressed format
 #' fit %>%
 #'   tabcoxph(var.labels = list(Age = "Age (years)", Race = "Race/ethnicity"),
-#'            factor.compression = 2) %>%
-#'            kable()
+#'            factor.compression = 2)
 #'
 #' # Cox PH model with some higher-order terms
 #' fit <- coxph(Surv(time = time, event = delta) ~
 #'              poly(Age, 2, raw = TRUE) + Sex + Race + Group + Race*Group,
 #'              data = tabdata)
-#' fit %>% tabcoxph() %>% kable()
+#' fit %>% tabcoxph()
 #'
 #'
 #' @references
@@ -82,12 +67,8 @@ tabcoxph <- function(fit,
                      var.labels = NULL,
                      factor.compression = 1,
                      sep.char = ", ",
-                     indent.spaces = 3,
-                     latex = TRUE,
                      decimals = 2,
-                     formatp.list = NULL,
-                     print.html = FALSE,
-                     html.filename = "table1.html") {
+                     formatp.list = NULL) {
 
   # Error checking
   if (! "coxph" %in% class(fit)) {
@@ -104,12 +85,6 @@ tabcoxph <- function(fit,
   if (! is.character(sep.char)) {
     stop("The input 'sep.char' must be a character string.")
   }
-  if (! is.null(indent.spaces) && ! (is.numeric(indent.spaces) && indent.spaces >= 0 && indent.spaces == as.integer(indent.spaces))) {
-    stop("The input 'indent.spaces' must be a non-negative integer.")
-  }
-  if (! is.logical(latex)) {
-    stop("The input 'latex' must be a logical.")
-  }
   if (! (is.numeric(decimals) && decimals >= 0 &&
          decimals == as.integer(decimals))) {
     stop("The input 'decimals' must be a non-negative integer.")
@@ -118,12 +93,6 @@ tabcoxph <- function(fit,
       ! (is.list(formatp.list) && all(names(formatp.list) %in%
                                       names(as.list(args(formatp)))))) {
     stop("The input 'format.p' must be a named list of arguments to pass to 'formatp'.")
-  }
-  if (! is.logical(print.html)) {
-    stop("The input 'print.html' must be a logical.")
-  }
-  if (! is.character("html.filename")) {
-    stop("The input 'html.filename' must be a character string.")
   }
 
   # Extract info from fit
@@ -200,7 +169,7 @@ tabcoxph <- function(fit,
   }
 
   # Clean up factor variables
-  spaces <- paste(rep(" ", indent.spaces), collapse = "")
+  spaces <- "&nbsp; &nbsp; &nbsp;"
   xlevels <- fit$xlevels
   if (length(xlevels) > 0) {
     for (ii in 1: length(xlevels)) {
@@ -316,36 +285,8 @@ tabcoxph <- function(fit,
     }
   }
 
-  # Print html version of table if requested
-  if (print.html) {
-
-    df.xtable <- xtable(
-      df,
-      align = paste("ll", paste(rep("r", ncol(df) - 1), collapse = ""), sep = "", collapse = "")
-    )
-    ampersands <- paste(rep("&nbsp ", indent.spaces), collapse = "")
-    print(df.xtable, include.rownames = FALSE, type = "html",
-          file = html.filename, sanitize.text.function = function(x) {
-            ifelse(substr(x, 1, 1) == " ", paste(ampersands, x), x)
-          })
-
-  }
-
-  # Reformat for latex if requested
-  if (latex) {
-
-    slashes <- paste(rep("\\ ", indent.spaces), collapse = "")
-    df$Variable <- gsub(pattern = spaces, replacement = slashes, x = df$Variable, fixed = TRUE)
-
-    df <- sapply(df, function(x) {
-      x[x == "-"] <- "--"
-      return(x)
-    })
-
-  }
-
   # Remove row names and return table
   rownames(df) <- NULL
-  return(df)
+  return(df %>% kable(escape = FALSE) %>% kable_styling(full_width = FALSE))
 
 }

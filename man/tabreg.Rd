@@ -6,7 +6,7 @@
 \usage{
 tabreg(betas, ses = NULL, varcov = NULL, columns = c("beta.se", "p"),
   sep.char = ", ", decimals = NULL, formatp.list = NULL,
-  labels = NULL, print.html = FALSE, html.filename = "table1.html")
+  labels = NULL)
 }
 \arguments{
 \item{betas}{Numeric vector.}
@@ -28,15 +28,9 @@ other than p-values.}
 \item{formatp.list}{List of arguments to pass to \code{\link[tab]{formatp}}.}
 
 \item{labels}{Character vector.}
-
-\item{print.html}{Logical value for whether to write a .html file with the
-table to the current working directory.}
-
-\item{html.filename}{Character string specifying the name of the .html file
-that gets written if \code{print.html = TRUE}.}
 }
 \value{
-Data frame.
+\code{\link[knitr]{kable}}.
 }
 \description{
 Useful for quickly creating a summary table.

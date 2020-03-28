@@ -6,9 +6,7 @@
 \usage{
 tabgee(fit, data = NULL, columns = NULL, robust = TRUE,
   var.labels = NULL, factor.compression = 1, sep.char = ", ",
-  indent.spaces = 3, latex = TRUE, decimals = 2,
-  formatp.list = NULL, print.html = FALSE,
-  html.filename = "table1.html")
+  decimals = 2, formatp.list = NULL)
 }
 \arguments{
 \item{fit}{Fitted \code{\link[gee]{gee}} object.}
@@ -44,31 +42,13 @@ are Level 2, ...}
 \item{sep.char}{Character string with separator to place between lower and
 upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.}
 
-\item{indent.spaces}{Integer value specifying how many spaces to indent
-factor levels.}
-
-\item{latex}{Logical value for whether to format table so it is
-ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
-\code{\link[knitr]{kable}}.}
-
 \item{decimals}{Numeric value specifying number of decimal places for numbers
 other than p-values.}
 
 \item{formatp.list}{List of arguments to pass to \code{\link[tab]{formatp}}.}
-
-\item{print.html}{Logical value for whether to write a .html file with the
-table to the current working directory.}
-
-\item{html.filename}{Character string specifying the name of the .html file
-that gets written if \code{print.html = TRUE}.}
 }
 \value{
-Data frame which you can print in R (e.g. with \strong{xtable}'s
-\code{\link[xtable]{xtable}} or \strong{knitr}'s \code{\link[knitr]{kable}})
-or export to Word, Excel, or some other program. To export the table, set
-\code{print.html = TRUE}. This will result in a .html file being written to
-your current working directory, which you can open and copy/paste into your
-document.
+\code{\link[knitr]{kable}}.
 }
 \description{
 Creates a table summarizing a GEE fit using the \code{\link[gee]{gee}}
@@ -87,24 +67,23 @@ tabdata2 <- tabdata2[order(tabdata2$id), ]
 library("gee")
 fit <- gee(bp ~ Age + Sex + Race + Group, id = id, data = tabdata2,
            corstr = "unstructured")
-kable(tabgee(fit, data = tabdata2))
+tabgee(fit)
 
 # Can also use piping
-fit \%>\% tabgee(data = tabdata2) \%>\% kable()
+fit \%>\% tabgee(data = tabdata2)
 
 # Same as previous, but with custom labels for Age and Race and factors
 # displayed in slightly more compressed format
 fit \%>\%
   tabgee(data = tabdata2,
          var.labels = list(Age = "Age (years)", Race = "Race/ethnicity"),
-         factor.compression = 2) \%>\%
-  kable()
+         factor.compression = 2)
 
 # GEE with some higher-order terms
 # higher-order terms
 fit <- gee(highbp ~ poly(Age, 2, raw = TRUE) + Sex + Race + Group + Race*Group,
            id = id, data = tabdata2, family = "binomial", corstr = "unstructured")
-fit \%>\% tabgee(data = tabdata2) \%>\% kable()
+fit \%>\% tabgee(data = tabdata2)
 
 
 }

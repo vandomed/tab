@@ -8,7 +8,7 @@ tabmedians.svy(formula, design, columns = c("xgroups", "p"),
   parenth = "iqr", sep.char = ", ", xlevels = NULL, yname = NULL,
   text.label = NULL, decimals = NULL, svyranktest.list = NULL,
   formatp.list = NULL, n.headings = FALSE, N.headings = FALSE,
-  print.html = FALSE, html.filename = "table1.html")
+  kable = TRUE)
 }
 \arguments{
 \item{formula}{Formula, e.g. \code{BMI ~ Sex}.}
@@ -51,19 +51,11 @@ parentheses in column headings.}
 \item{N.headings}{Logical value for whether to display weighted sample sizes
 in parentheses in column headings.}
 
-\item{print.html}{Logical value for whether to write a .html file with the
-table to the current working directory.}
-
-\item{html.filename}{Character string specifying the name of the .html file
-that gets written if \code{print.html = TRUE}.}
+\item{kable}{Logical value for whether to return a
+\code{\link[knitr]{kable}}.}
 }
 \value{
-Data frame which you can print in R (e.g. with \strong{xtable}'s
-\code{\link[xtable]{xtable}} or \strong{knitr}'s \code{\link[knitr]{kable}})
-or export to Word, Excel, or some other program. To export the table, set
-\code{print.html = TRUE}. This will result in a .html file being written to
-your current working directory, which you can open and copy/paste into your
-document.
+\code{\link[knitr]{kable}} or character matrix.
 }
 \description{
 Creates a table comparing the median of \code{y} across levels of \code{x}.

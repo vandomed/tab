@@ -43,7 +43,7 @@ other than p-values.}
 \item{formatp.list}{List of arguments to pass to \code{\link[tab]{formatp}}.}
 }
 \value{
-kable
+\code{\link[knitr]{kable}}.
 }
 \description{
 Creates a table summarizing a GLM fit using \code{\link[stats]{glm}}.

@@ -15,13 +15,9 @@
 #' other than p-values.
 #' @param formatp.list List of arguments to pass to \code{\link[tab]{formatp}}.
 #' @param labels Character vector.
-#' @param print.html Logical value for whether to write a .html file with the
-#' table to the current working directory.
-#' @param html.filename Character string specifying the name of the .html file
-#' that gets written if \code{print.html = TRUE}.
 #'
 #'
-#' @return Data frame.
+#' @return \code{\link[knitr]{kable}}.
 #'
 #'
 #' @examples
@@ -39,9 +35,7 @@ tabreg <- function(betas,
                    sep.char = ", ",
                    decimals = NULL,
                    formatp.list = NULL,
-                   labels = NULL,
-                   print.html = FALSE,
-                   html.filename = "table1.html") {
+                   labels = NULL) {
 
   # Error checking
   if (! is.numeric(betas)) {
@@ -71,12 +65,6 @@ tabreg <- function(betas,
   }
   if (! is.null(labels) && ! is.character(labels)) {
     stop("The input 'labels' must be a character vector.")
-  }
-  if (! is.logical(print.html)) {
-    stop("The input 'print.html' must be a logical.")
-  }
-  if (! is.character("html.filename")) {
-    stop("The input 'html.filename' must be a character string.")
   }
 
   # If decimals is unspecified, set to appropriate value
@@ -201,19 +189,8 @@ tabreg <- function(betas,
   # Remove parentheses around intercept
   if (df$Variable[1] == "(Intercept)") df$Variable[1] <- "Intercept"
 
-  # Print html version of table if requested
-  if (print.html) {
-
-    df.xtable <- xtable(
-      df,
-      align = paste("ll", paste(rep("r", ncol(df) - 1), collapse = ""), sep = "", collapse = "")
-    )
-    print(df.xtable, include.rownames = FALSE, type = "html", file = html.filename)
-
-  }
-
   # Remove row names and return table
   rownames(df) <- NULL
-  return(df)
+  return(df %>% kable(escape = FALSE) %>% kable_styling(full_width = FALSE))
 
 }

@@ -30,26 +30,12 @@
 #' are Level 2, ...
 #' @param sep.char Character string with separator to place between lower and
 #' upper bound of confidence intervals. Typically \code{"-"} or \code{", "}.
-#' @param indent.spaces Integer value specifying how many spaces to indent
-#' factor levels.
-#' @param latex Logical value for whether to format table so it is
-#' ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
-#' \code{\link[knitr]{kable}}.
 #' @param decimals Numeric value specifying number of decimal places for numbers
 #' other than p-values.
 #' @param formatp.list List of arguments to pass to \code{\link[tab]{formatp}}.
-#' @param print.html Logical value for whether to write a .html file with the
-#' table to the current working directory.
-#' @param html.filename Character string specifying the name of the .html file
-#' that gets written if \code{print.html = TRUE}.
 #'
 #'
-#' @return Data frame which you can print in R (e.g. with \strong{xtable}'s
-#' \code{\link[xtable]{xtable}} or \strong{knitr}'s \code{\link[knitr]{kable}})
-#' or export to Word, Excel, or some other program. To export the table, set
-#' \code{print.html = TRUE}. This will result in a .html file being written to
-#' your current working directory, which you can open and copy/paste into your
-#' document.
+#' @return \code{\link[knitr]{kable}}.
 #'
 #'
 #' @examples
@@ -65,24 +51,23 @@
 #' library("gee")
 #' fit <- gee(bp ~ Age + Sex + Race + Group, id = id, data = tabdata2,
 #'            corstr = "unstructured")
-#' kable(tabgee(fit, data = tabdata2))
+#' tabgee(fit)
 #'
 #' # Can also use piping
-#' fit %>% tabgee(data = tabdata2) %>% kable()
+#' fit %>% tabgee(data = tabdata2)
 #'
 #' # Same as previous, but with custom labels for Age and Race and factors
 #' # displayed in slightly more compressed format
 #' fit %>%
 #'   tabgee(data = tabdata2,
 #'          var.labels = list(Age = "Age (years)", Race = "Race/ethnicity"),
-#'          factor.compression = 2) %>%
-#'   kable()
+#'          factor.compression = 2)
 #'
 #' # GEE with some higher-order terms
 #' # higher-order terms
 #' fit <- gee(highbp ~ poly(Age, 2, raw = TRUE) + Sex + Race + Group + Race*Group,
 #'            id = id, data = tabdata2, family = "binomial", corstr = "unstructured")
-#' fit %>% tabgee(data = tabdata2) %>% kable()
+#' fit %>% tabgee(data = tabdata2)
 #'
 #'
 #'@export
@@ -93,12 +78,8 @@ tabgee <- function(fit,
                    var.labels = NULL,
                    factor.compression = 1,
                    sep.char = ", ",
-                   indent.spaces = 3,
-                   latex = TRUE,
                    decimals = 2,
-                   formatp.list = NULL,
-                   print.html = FALSE,
-                   html.filename = "table1.html") {
+                   formatp.list = NULL) {
 
   # Error checking
   if (! "gee" %in% class(fit)) {
@@ -119,12 +100,6 @@ tabgee <- function(fit,
   if (! is.character(sep.char)) {
     stop("The input 'sep.char' must be a character string.")
   }
-  if (! is.null(indent.spaces) && ! (is.numeric(indent.spaces) && indent.spaces >= 0 && indent.spaces == as.integer(indent.spaces))) {
-    stop("The input 'indent.spaces' must be a non-negative integer.")
-  }
-  if (! is.logical(latex)) {
-    stop("The input 'latex' must be a logical.")
-  }
   if (! (is.numeric(decimals) && decimals >= 0 &&
          decimals == as.integer(decimals))) {
     stop("The input 'decimals' must be a non-negative integer.")
@@ -133,12 +108,6 @@ tabgee <- function(fit,
       ! (is.list(formatp.list) && all(names(formatp.list) %in%
                                       names(as.list(args(formatp)))))) {
     stop("The input 'format.p' must be a named list of arguments to pass to 'formatp'.")
-  }
-  if (! is.logical(print.html)) {
-    stop("The input 'print.html' must be a logical.")
-  }
-  if (! is.character("html.filename")) {
-    stop("The input 'html.filename' must be a character string.")
   }
 
   # Extract info from fit
@@ -264,7 +233,7 @@ tabgee <- function(fit,
   }
 
   # Clean up factor variables
-  spaces <- paste(rep(" ", indent.spaces), collapse = "")
+  spaces <- "&nbsp; &nbsp; &nbsp;"
   dataClasses <- attr(fit$terms, "dataClasses")
   factors <- names(dataClasses[dataClasses == "factor"])
   if (length(factors) > 0) {
@@ -387,36 +356,8 @@ tabgee <- function(fit,
     }
   }
 
-  # Print html version of table if requested
-  if (print.html) {
-
-    df.xtable <- xtable(
-      df,
-      align = paste("ll", paste(rep("r", ncol(df) - 1), collapse = ""), sep = "", collapse = "")
-    )
-    ampersands <- paste(rep("&nbsp ", indent.spaces), collapse = "")
-    print(df.xtable, include.rownames = FALSE, type = "html",
-          file = html.filename, sanitize.text.function = function(x) {
-            ifelse(substr(x, 1, 1) == " ", paste(ampersands, x), x)
-          })
-
-  }
-
-  # Reformat for latex if requested
-  if (latex) {
-
-    slashes <- paste(rep("\\ ", indent.spaces), collapse = "")
-    df$Variable <- gsub(pattern = spaces, replacement = slashes, x = df$Variable, fixed = TRUE)
-
-    df <- sapply(df, function(x) {
-      x[x == "-"] <- "--"
-      return(x)
-    })
-
-  }
-
   # Remove row names and return table
   rownames(df) <- NULL
-  return(df)
+  return(df %>% kable(escape = FALSE) %>% kable_styling(full_width = FALSE))
 
 }

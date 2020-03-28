@@ -39,11 +39,6 @@
 #' @param ylevels Character vector (if only 1 frequency comparison) or list of
 #' character vectors with labels for the levels of each categorical \code{y}
 #' variable.
-#' @param indent.spaces Integer value specifying how many spaces to indent
-#' factor levels.
-#' @param latex Logical value for whether to format table so it is
-#' ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
-#' \code{\link[knitr]{kable}}.
 #' @param decimals Numeric vector specifying number of decimal places for
 #' numbers other than p-values for each \code{y} variable. Can be a single value
 #' to use for all \code{y} variables.
@@ -52,10 +47,8 @@
 #' sizes in parentheses in column headings.
 #' @param N.headings Logical value for whether to display weighted sample sizes
 #' in parentheses in column headings.
-#' @param print.html Logical value for whether to write a .html file with the
-#' table to the current working directory.
-#' @param html.filename Character string specifying the name of the .html file
-#' that gets written if \code{print.html = TRUE}.
+#' @param kable Logical value for whether to return a
+#' \code{\link[knitr]{kable}}.
 #' @param tabmeans.svy.list List of arguments to pass to
 #' \code{\link{tabmeans.svy}}.
 #' @param tabmedians.svy.list List of arguments to pass to
@@ -64,12 +57,7 @@
 #' \code{\link{tabfreq.svy}}.
 #'
 #'
-#' @return Data frame which you can print in R (e.g. with \strong{xtable}'s
-#' \code{\link[xtable]{xtable}} or \strong{knitr}'s \code{\link[knitr]{kable}})
-#' or export to Word, Excel, or some other program. To export the table, set
-#' \code{print.html = TRUE}. This will result in a .html file being written to
-#' your current working directory, which you can open and copy/paste into your
-#' document.
+#' @return \code{\link[knitr]{kable}} or character matrix.
 #'
 #'
 #' @examples
@@ -99,14 +87,11 @@ tabmulti.svy <- function(formula = NULL,
                          xlevels = NULL,
                          yvarlabels = NULL,
                          ylevels = NULL,
-                         indent.spaces = 3,
-                         latex = TRUE,
                          decimals = NULL,
                          formatp.list = NULL,
                          n.headings = FALSE,
                          N.headings = FALSE,
-                         print.html = FALSE,
-                         html.filename = "table1.html",
+                         kable = TRUE,
                          tabmeans.svy.list = NULL,
                          tabmedians.svy.list = NULL,
                          tabfreq.svy.list = NULL) {
@@ -142,12 +127,6 @@ tabmulti.svy <- function(formula = NULL,
   if (! is.null(ylevels) && ! is.character(ylevels)) {
     stop("The input 'ylevels' must be a character vector.")
   }
-  if (! is.null(indent.spaces) && ! (is.numeric(indent.spaces) && indent.spaces >= 0 && indent.spaces == as.integer(indent.spaces))) {
-    stop("The input 'indent.spaces' must be a non-negative integer.")
-  }
-  if (! is.logical(latex)) {
-    stop("The input 'latex' must be a logical.")
-  }
   if (! is.null(decimals) && ! (is.numeric(decimals) && decimals >= 0 &&
                                 decimals == as.integer(decimals))) {
     stop("The input 'decimals' must be a non-negative integer.")
@@ -162,11 +141,8 @@ tabmulti.svy <- function(formula = NULL,
   if (! is.logical(N.headings)) {
     stop("The input 'N.headings' must be a logical.")
   }
-  if (! is.logical(print.html)) {
-    stop("The input 'print.html' must be a logical.")
-  }
-  if (! is.character("html.filename")) {
-    stop("The input 'html.filename' must be a character string.")
+  if (! is.logical(kable)) {
+    stop("The input 'kable' must be a logical.")
   }
   if (! is.null(tabmeans.svy.list) &&
       ! (is.list(tabmeans.svy.list) && all(names(tabmeans.svy.list) %in%
@@ -242,7 +218,8 @@ tabmulti.svy <- function(formula = NULL,
                     decimals = decimals[ii],
                     formatp.list = formatp.list,
                     n.headings = n.headings,
-                    N.headings = N.headings)
+                    N.headings = N.headings,
+                    kable = FALSE)
       current <- do.call(tabmeans.svy, c(args1, tabmeans.svy.list))
 
     } else if (ymeasures.ii == "median") {
@@ -258,7 +235,8 @@ tabmulti.svy <- function(formula = NULL,
                     decimals = decimals[ii],
                     formatp.list = formatp.list,
                     n.headings = n.headings,
-                    N.headings = N.headings)
+                    N.headings = N.headings,
+                    kable = FALSE)
       current <- do.call(tabmedians.svy, c(args1, tabmedians.svy.list))
 
     } else if (ymeasures.ii == "freq") {
@@ -272,11 +250,11 @@ tabmulti.svy <- function(formula = NULL,
                     xlevels = xlevels,
                     yname = ynames[ii],
                     ylevels = ylevels[[freqindex]],
-                    latex = FALSE,
                     decimals = ifelse(is.null(decimals[ii]), 1, decimals[ii]),
                     formatp.list = formatp.list,
                     n.headings = n.headings,
-                    N.headings = N.headings)
+                    N.headings = N.headings,
+                    kable = FALSE)
       current <- do.call(tabfreq.svy, c(args1, tabfreq.svy.list))
 
     }
@@ -289,29 +267,8 @@ tabmulti.svy <- function(formula = NULL,
     }
   }
 
-  # Print html version of table if requested
-  if (print.html) {
-
-    df.xtable <- xtable(
-      df,
-      align = paste("ll", paste(rep("r", ncol(df) - 1), collapse = ""), sep = "", collapse = "")
-    )
-    ampersands <- paste(rep("&nbsp ", indent.spaces), collapse = "")
-    print(df.xtable, include.rownames = FALSE, type = "html",
-          file = html.filename, sanitize.text.function = function(x) {
-            ifelse(substr(x, 1, 1) == " ", paste(ampersands, x), x)
-          })
-
-  }
-
-  # Reformat for latex if requested
-  if (latex) {
-    spaces <- paste(rep(" ", indent.spaces), collapse = "")
-    slashes <- paste(rep("\\ ", indent.spaces), collapse = "")
-    df$Variable <- gsub(pattern = spaces, replacement = slashes, x = df$Variable, fixed = TRUE)
-  }
-
   # Return table
-  return(df)
+  if (! kable) return(df)
+  return(df %>% kable(escape = FALSE) %>% kable_styling(full_width = FALSE))
 
 }

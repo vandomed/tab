@@ -8,11 +8,10 @@ Variable (for Complex Survey Data)}
 tabmulti.svy(formula = NULL, design, xvarname = NULL,
   yvarnames = NULL, ymeasures = NULL, columns = c("xgroups", "p"),
   listwise.deletion = FALSE, sep.char = ", ", xlevels = NULL,
-  yvarlabels = NULL, ylevels = NULL, indent.spaces = 3,
-  latex = TRUE, decimals = NULL, formatp.list = NULL,
-  n.headings = FALSE, N.headings = FALSE, print.html = FALSE,
-  html.filename = "table1.html", tabmeans.svy.list = NULL,
-  tabmedians.svy.list = NULL, tabfreq.svy.list = NULL)
+  yvarlabels = NULL, ylevels = NULL, decimals = NULL,
+  formatp.list = NULL, n.headings = FALSE, N.headings = FALSE,
+  kable = TRUE, tabmeans.svy.list = NULL, tabmedians.svy.list = NULL,
+  tabfreq.svy.list = NULL)
 }
 \arguments{
 \item{formula}{Formula, e.g. \code{Age + Race + BMI ~ Sex}.}
@@ -57,13 +56,6 @@ print as "Race/ethnicity" and "Age (years)", use
 character vectors with labels for the levels of each categorical \code{y}
 variable.}
 
-\item{indent.spaces}{Integer value specifying how many spaces to indent
-factor levels.}
-
-\item{latex}{Logical value for whether to format table so it is
-ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
-\code{\link[knitr]{kable}}.}
-
 \item{decimals}{Numeric vector specifying number of decimal places for
 numbers other than p-values for each \code{y} variable. Can be a single value
 to use for all \code{y} variables.}
@@ -76,11 +68,8 @@ sizes in parentheses in column headings.}
 \item{N.headings}{Logical value for whether to display weighted sample sizes
 in parentheses in column headings.}
 
-\item{print.html}{Logical value for whether to write a .html file with the
-table to the current working directory.}
-
-\item{html.filename}{Character string specifying the name of the .html file
-that gets written if \code{print.html = TRUE}.}
+\item{kable}{Logical value for whether to return a
+\code{\link[knitr]{kable}}.}
 
 \item{tabmeans.svy.list}{List of arguments to pass to
 \code{\link{tabmeans.svy}}.}
@@ -92,12 +81,7 @@ that gets written if \code{print.html = TRUE}.}
 \code{\link{tabfreq.svy}}.}
 }
 \value{
-Data frame which you can print in R (e.g. with \strong{xtable}'s
-\code{\link[xtable]{xtable}} or \strong{knitr}'s \code{\link[knitr]{kable}})
-or export to Word, Excel, or some other program. To export the table, set
-\code{print.html = TRUE}. This will result in a .html file being written to
-your current working directory, which you can open and copy/paste into your
-document.
+\code{\link[knitr]{kable}} or character matrix.
 }
 \description{
 Creates a table comparing multiple characteristics (e.g. median age, mean

@@ -31,7 +31,7 @@
 #' @param formatp.list List of arguments to pass to \code{\link[tab]{formatp}}.
 #'
 #'
-#' @return kable
+#' @return \code{\link[knitr]{kable}}.
 #'
 #'
 #' @examples
