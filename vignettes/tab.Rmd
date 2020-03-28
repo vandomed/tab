@@ -74,7 +74,7 @@ glm_v(
 ```
 
 ```{r out.width = "100%", echo = FALSE}
-include_graphics("C:/Users/vando/Google Drive/github/tab/vignettes/logistic.png")
+include_graphics("C:/Users/vando/Google Drive/github/tab/vignettes/logistic.PNG")
 ```
 
 From here, you can "snip" the summary table and save it as a figure (as I did for this README) or copy directly from the Viewer and paste outside of R. 
@@ -91,7 +91,7 @@ tabmulti(Age + Sex + Race + BMI ~ Group, data = tabdata)
 ```
 
 ```{r out.width = "100%", echo = FALSE}
-include_graphics("C:/Users/vando/Google Drive/github/tab/vignettes/tabmulti.png")
+include_graphics("C:/Users/vando/Google Drive/github/tab/vignettes/tabmulti.PNG")
 ```
 
 
