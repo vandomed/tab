@@ -103,7 +103,7 @@ design <- svydesign(
 )
 
 # Compare age, race, and BMI by sex
-tabmulti.svy(Age + Race + BMI ~ Sex, design = design) \%>\% kable()
+tabmulti.svy(Age + Race + BMI ~ Sex, design)
 
 
 }

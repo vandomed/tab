@@ -90,7 +90,7 @@ design <- svydesign(
 )
 
 # Compare race distribution by sex
-tabfreq.svy(Race ~ Sex, design = design) \%>\% kable()
+tabfreq.svy(Race ~ Sex, design)
 
 
 }

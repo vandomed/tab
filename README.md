@@ -1,7 +1,7 @@
 Summary Tables with ‘tab’
 ================
 Dane Van Domelen <br> <vandomed@gmail.com>
-2020-03-22
+2020-03-28
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -19,53 +19,57 @@ library("tab")
 The main purpose of **tab** is to create neatly formatted summary tables
 for papers and presentations. The following functions are included:
 
-  - `glm_v` Print a GLM summary table to the RStudio Viewer.
+  - `glm_v` prints a GLM summary table to the RStudio Viewer
   - `tabglm` summarizes generalized linear models (GLM’s) fit via `glm`
-    or `survey::svyglm`.
+    or `survey::svyglm`
   - `tabgee` summarizes generalized estimating equation models (GEE’s)
-    fit via `gee::gee`.
+    fit via `gee::gee`
   - `tabcoxph` summarizes Cox Proportional Hazards models fit via
-    `survival::coxph` or `survey::svycoxph`.
+    `survival::coxph` or `survey::svycoxph`
   - `tabmulti` compares variables across two or more groups, e.g. to
-    create a “Table 1.”
+    create a “Table 1”
   - `tabmulti.svy` does the same thing as `tabmulti` but for complex
-    survey data.
+    survey data
 
-## Regression summaries with 2 extra keystrokes
-
-### GLM’s
+## Regression summaries with just 2 extra keystrokes
 
 To summarize a fitted generalized linear model, simply call `glm_v` as
 you would `glm`. The result will be a formatted summary table printed to
-the RStudio Viewer.
-
-#### Linear regression
-
-Here’s a linear regression of BMI on age, sex, and race. Once you call
-`glm_v`, a summary table will pop up in the RStudio Viewer.
+the RStudio Viewer. Here’s an example for logistic regression:
 
 ``` r
-glm_v(BMI ~ Age + Sex + Race, data = tabdata)
+glm_v(
+  death_1yr ~ poly(Age, 2, raw = TRUE) + Sex * BMI, 
+  data = tabdata, 
+  family = binomial
+)
 ```
 
-![Figure](vignettes/linear.PNG)
+![Figure](vignettes/logistic.PNG)
 
 From here, you can “snip” the summary table and save it as a figure (as
 I did for this README) or copy directly from the Viewer and paste
 outside of R.
 
-#### Logistic regression
+For more flexibility, see `tabglm`. That function lets you control
+things like what columns to present, how categorical predictors are
+presented, and so on.
 
-Of course `glm` supports all sorts of regression models, and `glm_v`
-should play nice at least with the more common ones. Here’s a logistic
-regression for 1-year mortality vs. age, BMI, and sex, with some
-higher-order terms:
+## Summary tables for continuous and categorical variables
+
+You can use `tabmulti` to summarize variables across two or more groups,
+using a formula interface. Here’s an example:
 
 ``` r
-glm_v(death_1yr ~ poly(Age, 2, raw = TRUE) + Sex * BMI, data = tabdata, family = binomial)
+tabmulti(Age + Sex + Race + BMI ~ Group, data = tabdata)
 ```
 
-![Figure](vignettes/logistic.PNG)
+![Figure](vignettes/tabmulti.PNG)
+
+## Compatibility with Markdown/Knitr
+
+The functions all return `kable` objects, so they should work perfectly
+well in R Markdown and knitr documents.
 
 <!-- ## Exporting tables, e.g. to Word -->
 
@@ -83,7 +87,7 @@ glm_v(death_1yr ~ poly(Age, 2, raw = TRUE) + Sex * BMI, data = tabdata, family =
 
 <!-- should also work (e.g. **xtable**'s `xtable` or **pandoc**'s `pandoc.table`). -->
 
-<!-- ## References -->
+## References
 
 <div id="refs" class="references">
 
