@@ -183,20 +183,20 @@ tabgee <- function(fit,
     } else if (column == "or") {
 
       df$`OR` <- sprintf(spf, exp(betas))
-      if (intercept) df$`OR`[1] <- "-"
+      if (intercept) df$`OR`[1] <- "&ndash;"
 
     } else if (column == "orci") {
 
       df$`95% CI` <- paste("(", sprintf(spf, exp(lower)), sep.char,
                            sprintf(spf, exp(upper)), ")", sep = "")
-      if (intercept) df$`95% CI`[1] <- "-"
+      if (intercept) df$`95% CI`[1] <- "&ndash;"
 
     } else if (column == "or.ci") {
 
       df$`OR (95% CI)` <- paste(sprintf(spf, exp(betas)), " (",
                                 sprintf(spf, exp(lower)), sep.char,
                                 sprintf(spf, exp(upper)), ")", sep = "")
-      if (intercept) df$`OR (95% CI)`[1] <- "-"
+      if (intercept) df$`OR (95% CI)`[1] <- "&ndash;"
 
     } else if (column == "hr") {
 
@@ -206,14 +206,14 @@ tabgee <- function(fit,
 
       df$`95% CI` <- paste("(", sprintf(spf, exp(lower)), sep.char,
                            sprintf(spf, exp(upper)), ")", sep = "")
-      if (intercept) df$`95% CI`[1] <- "-"
+      if (intercept) df$`95% CI`[1] <- "&ndash;"
 
     } else if (column == "hr.ci") {
 
       df$`HR (95% CI)` <- paste(sprintf(spf, exp(betas)), " (",
                                 sprintf(spf, exp(lower)), sep.char,
                                 sprintf(spf, exp(upper)), ")", sep = "")
-      if (intercept) df$`HR (95% CI)`[1] <- "-"
+      if (intercept) df$`HR (95% CI)`[1] <- "&ndash;"
 
     } else if (column == "z") {
 
@@ -253,7 +253,7 @@ tabgee <- function(fit,
         df$Variable[locs] <- gsub(pattern = varname.ii, replacement = spaces,
                                   x = df$Variable[locs], fixed = TRUE)
         newrows <- matrix("", nrow = 2, ncol = ncol(df), dimnames = list(NULL, names(df)))
-        newrows[2, ] <- "-"
+        newrows[2, ] <- "&ndash;"
         newrows[1, 1] <- ifelse(varname.ii %in% names(var.labels), var.labels[[varname.ii]], varname.ii)
         newrows[2, 1] <- paste(spaces, paste(levels.ii[1], " (ref)", sep = ""), sep = "")
         df <- rbind(df[setdiff(1: locs[1], locs[1]), ], newrows, df[locs[1]: nrow(df), ])
@@ -277,7 +277,7 @@ tabgee <- function(fit,
         levels.ii <- levels(data[, varname.ii])
         locs <- which(df$Variable %in% paste(varname.ii, levels.ii, sep = ""))
         df$Variable[locs] <- gsub(pattern = varname.ii, replacement = "", x = df$Variable[locs])
-        newrow <- matrix("-", nrow = 1, ncol = ncol(df), dimnames = list(NULL, names(df)))
+        newrow <- matrix("&ndash;", nrow = 1, ncol = ncol(df), dimnames = list(NULL, names(df)))
         newrow[1, 1] <- paste(levels.ii[1], " (ref)", sep = "")
         df <- rbind(df[setdiff(1: locs[1], locs[1]), ], newrow, df[locs[1]: nrow(df), ])
 

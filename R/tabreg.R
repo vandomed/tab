@@ -147,38 +147,38 @@ tabreg <- function(betas,
     } else if (column == "or") {
 
       df$`OR` <- sprintf(spf, exp(betas))
-      if (labels[1] %in% c("(Intercept)", "b0")) df$`OR`[1] <- "-"
+      if (labels[1] %in% c("(Intercept)", "b0")) df$`OR`[1] <- "&ndash;"
 
     } else if (column == "orci") {
 
       df$`95% CI` <- paste("(", sprintf(spf, exp(lower)), sep.char,
                            sprintf(spf, exp(upper)), ")", sep = "")
-      if (labels[1] %in% c("(Intercept)", "b0")) df$`95% CI`[1] <- "-"
+      if (labels[1] %in% c("(Intercept)", "b0")) df$`95% CI`[1] <- "&ndash;"
 
     } else if (column == "or.ci") {
 
       df$`OR (95% CI)` <- paste(sprintf(spf, exp(betas)), " (",
                                 sprintf(spf, exp(lower)), sep.char,
                                 sprintf(spf, exp(upper)), ")", sep = "")
-      if (labels[1] %in% c("(Intercept)", "b0")) df$`OR (95% CI)`[1] <- "-"
+      if (labels[1] %in% c("(Intercept)", "b0")) df$`OR (95% CI)`[1] <- "&ndash;"
 
     } else if (column == "hr") {
 
       df$`HR` <- sprintf(spf, exp(betas))
-      if (labels[1] %in% c("(Intercept)", "b0")) df$`HR`[1] <- "-"
+      if (labels[1] %in% c("(Intercept)", "b0")) df$`HR`[1] <- "&ndash;"
 
     } else if (column == "hrci") {
 
       df$`95% CI` <- paste("(", sprintf(spf, exp(lower)), sep.char,
                            sprintf(spf, exp(upper)), ")", sep = "")
-      if (labels[1] %in% c("(Intercept)", "b0")) df$`95% CI`[1] <- "-"
+      if (labels[1] %in% c("(Intercept)", "b0")) df$`95% CI`[1] <- "&ndash;"
 
     } else if (column == "hr.ci") {
 
       df$`HR (95% CI)` <- paste(sprintf(spf, exp(betas)), " (",
                                 sprintf(spf, exp(lower)), sep.char,
                                 sprintf(spf, exp(upper)), ")", sep = "")
-      if (labels[1] %in% c("(Intercept)", "b0")) df$`HR (95% CI)`[1] <- "-"
+      if (labels[1] %in% c("(Intercept)", "b0")) df$`HR (95% CI)`[1] <- "&ndash;"
 
     } else if (column == "p") {
 

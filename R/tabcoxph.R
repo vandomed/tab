@@ -188,7 +188,7 @@ tabcoxph <- function(fit,
         df$Variable[locs] <- gsub(pattern = varname.ii, replacement = spaces,
                                   x = df$Variable[locs], fixed = TRUE)
         newrows <- matrix("", nrow = 2, ncol = ncol(df), dimnames = list(NULL, names(df)))
-        newrows[2, ] <- "-"
+        newrows[2, ] <- "&ndash;"
         newrows[1, 1] <- ifelse(varname.ii %in% names(var.labels), var.labels[[varname.ii]], varname.ii)
         newrows[2, 1] <- paste(spaces, paste(levels.ii[1], " (ref)", sep = ""), sep = "")
         df <- rbind(df[setdiff(1: locs[1], locs[1]), ], newrows, df[locs[1]: nrow(df), ])
@@ -208,7 +208,7 @@ tabcoxph <- function(fit,
 
         # Rows are Level 1 (ref), Level 2, ...
         df$Variable[locs] <- gsub(pattern = varname.ii, replacement = "", x = df$Variable[locs])
-        newrow <- matrix("-", nrow = 1, ncol = ncol(df), dimnames = list(NULL, names(df)))
+        newrow <- matrix("&ndash;", nrow = 1, ncol = ncol(df), dimnames = list(NULL, names(df)))
         newrow[1, 1] <- paste(levels.ii[1], " (ref)", sep = "")
         df <- rbind(df[setdiff(1: locs[1], locs[1]), ], newrow, df[locs[1]: nrow(df), ])
 
