@@ -23,8 +23,11 @@
 #' @examples
 #' # Create summary table for mtcars regression
 #' fit <- lm(mpg ~ wt + hp + drat, data = mtcars)
-#' tabreg(betas = fit$coef, varcov = vcov(fit),
-#'        labels = c("Intercept", "Weight", "HP", "Rear axle ratio")) %>% kable()
+#' tabreg(
+#'   betas = fit$coef,
+#'   varcov = vcov(fit),
+#'   labels = c("Intercept", "Weight", "HP", "Rear axle ratio")
+#' )
 #'
 #'
 #' @export

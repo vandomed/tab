@@ -40,7 +40,6 @@
 #'
 #' @examples
 #' # Load in sample dataset and convert to long format
-#' data(tabdata)
 #' tabdata2 <- reshape(data = tabdata,
 #'                     varying = c("bp.1", "bp.2", "bp.3", "highbp.1",
 #'                                 "highbp.2", "highbp.3"),
@@ -59,14 +58,21 @@
 #' # Same as previous, but with custom labels for Age and Race and factors
 #' # displayed in slightly more compressed format
 #' fit %>%
-#'   tabgee(data = tabdata2,
-#'          var.labels = list(Age = "Age (years)", Race = "Race/ethnicity"),
-#'          factor.compression = 2)
+#'   tabgee(
+#'     data = tabdata2,
+#'     var.labels = list(Age = "Age (years)", Race = "Race/ethnicity"),
+#'     factor.compression = 2
+#'   )
 #'
 #' # GEE with some higher-order terms
 #' # higher-order terms
-#' fit <- gee(highbp ~ poly(Age, 2, raw = TRUE) + Sex + Race + Group + Race*Group,
-#'            id = id, data = tabdata2, family = "binomial", corstr = "unstructured")
+#' fit <- gee(
+#'   highbp ~ poly(Age, 2, raw = TRUE) + Sex + Race + Group + Race*Group,
+#'   id = id,
+#'   data = tabdata2,
+#'   family = "binomial",
+#'   corstr = "unstructured"
+#' )
 #' fit %>% tabgee(data = tabdata2)
 #'
 #'
@@ -288,6 +294,8 @@ tabgee <- function(fit,
       } else if (factor.compression == 5) {
 
         # Rows are Level 2, ...
+        levels.ii <- levels(data[, varname.ii])
+        locs <- which(df$Variable %in% paste(varname.ii, levels.ii, sep = ""))
         df$Variable[locs] <- gsub(pattern = varname.ii, replacement = "", x = df$Variable[locs])
 
       }

@@ -31,7 +31,7 @@ for papers and presentations. The following functions are included:
   - `tabmulti.svy` does the same thing as `tabmulti` but for complex
     survey data
 
-## Regression summaries with just 2 extra keystrokes
+## Regressions
 
 To summarize a fitted generalized linear model, simply call `glm_v` as
 you would `glm`. The result will be a formatted summary table printed to
