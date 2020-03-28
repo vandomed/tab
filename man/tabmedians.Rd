@@ -8,8 +8,7 @@ tabmedians(formula = NULL, data = NULL, x = NULL, y = NULL,
   columns = c("xgroups", "p"), parenth = "iqr", sep.char = ", ",
   xlevels = NULL, yname = NULL, text.label = NULL,
   quantiles = NULL, quantile.vals = FALSE, decimals = NULL,
-  formatp.list = NULL, n.headings = TRUE, print.html = FALSE,
-  html.filename = "table1.html")
+  formatp.list = NULL, n.headings = TRUE, kable = TRUE)
 }
 \arguments{
 \item{formula}{Formula, e.g. \code{BMI ~ Group}.}
@@ -58,19 +57,11 @@ other than p-values.}
 \item{n.headings}{Logical value for whether to display group sample sizes in
 parentheses in column headings.}
 
-\item{print.html}{Logical value for whether to write a .html file with the
-table to the current working directory.}
-
-\item{html.filename}{Character string specifying the name of the .html file
-that gets written if \code{print.html = TRUE}.}
+\item{kable}{Logical value for whether to return a
+\code{\link[knitr]{kable}}.}
 }
 \value{
-Data frame which you can print in R (e.g. with \strong{xtable}'s
-\code{\link[xtable]{xtable}} or \strong{knitr}'s \code{\link[knitr]{kable}})
-or export to Word, Excel, or some other program. To export the table, set
-\code{print.html = TRUE}. This will result in a .html file being written to
-your current working directory, which you can open and copy/paste into your
-document.
+\code{\link[knitr]{kable}}.
 }
 \description{
 Creates a table comparing the median of \code{y} across levels of \code{x}.
@@ -87,22 +78,9 @@ least two of the groups. Observations with missing values for \code{x} and/or
 # Compare median BMI in control group vs. treatment group in sample dataset
 (medtable1 <- tabmedians(BMI ~ Group, data = tabdata))
 
-# Same as previous, but specifying input vectors rather than formula
-(medtable2 <- tabmedians(x = tabdata$Group, y = tabdata$BMI))
-
 # Compare median baseline systolic BP across tertiles of BMI
-(medtable3 <- tabmedians(bp.1 ~ BMI, data = tabdata,
+(medtable2 <- tabmedians(bp.1 ~ BMI, data = tabdata,
                          quantiles = 3, yname = "Systolic BP"))
-
-# Create single table comparing mean BMI and mean age in control vs.
-# treatment group. Drop missing observations first
-tabdata2 <- subset(tabdata, ! is.na(BMI) & ! is.na(Age))
-(medtable4 <- rbind(tabmeans(BMI ~ Group, data = tabdata2),
-                    tabmeans(Age ~ Group, data = tabdata2)))
-
-# Same as previous, but using tabmulti for convenience
-(medtable5 <- tabmulti(data = tabdata, xvarname = "Group",
-                       yvarnames = c("BMI", "Age"), ymeasures = "median"))
 
 
 }

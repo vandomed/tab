@@ -44,40 +44,20 @@
 #' @param formatp.list List of arguments to pass to \code{\link[tab]{formatp}}.
 #' @param n.headings Logical value for whether to display group sample sizes in
 #' parentheses in column headings.
-#' @param print.html Logical value for whether to write a .html file with the
-#' table to the current working directory.
-#' @param html.filename Character string specifying the name of the .html file
-#' that gets written if \code{print.html = TRUE}.
+#' @param kable Logical value for whether to return a
+#' \code{\link[knitr]{kable}}.
 #'
 #'
-#' @return Data frame which you can print in R (e.g. with \strong{xtable}'s
-#' \code{\link[xtable]{xtable}} or \strong{knitr}'s \code{\link[knitr]{kable}})
-#' or export to Word, Excel, or some other program. To export the table, set
-#' \code{print.html = TRUE}. This will result in a .html file being written to
-#' your current working directory, which you can open and copy/paste into your
-#' document.
+#' @return \code{\link[knitr]{kable}} or character matrix.
 #'
 #'
 #' @examples
 #' # Compare mean BMI in control vs. treatment group in sample dataset
 #' (meanstable1 <- tabmeans(BMI ~ Group, data = tabdata))
 #'
-#' # Same as previous, but specifying input vectors rather than formula
-#' (meanstable2 <- tabmeans(x = tabdata$Group, y = tabdata$BMI))
-#'
 #' # Compare mean baseline systolic BP across tertiles of BMI
-#' (meanstable3 <- tabmeans(bp.1 ~ BMI, data = tabdata,
+#' (meanstable2 <- tabmeans(bp.1 ~ BMI, data = tabdata,
 #'                          quantiles = 3, yname = "Systolic BP"))
-#'
-#' # Create single table comparing mean BMI and mean age in control vs.
-#' # treatment group. Drop missing observations first.
-#' tabdata2 <- subset(tabdata, ! is.na(BMI) & ! is.na(Age))
-#' (meanstable4 <- rbind(tabmeans(BMI ~ Group, data = tabdata2),
-#'                       tabmeans(Age ~ Group, data = tabdata2)))
-#'
-#' # Same as previous, but using tabmulti for convenience
-#' (meanstable5 <- tabmulti(BMI + Age ~ Group, data = tabdata))
-#'
 #'
 #' @export
 tabmeans <- function(formula = NULL,
@@ -96,8 +76,7 @@ tabmeans <- function(formula = NULL,
                      decimals = NULL,
                      formatp.list = NULL,
                      n.headings = TRUE,
-                     print.html = FALSE,
-                     html.filename = "table1.html") {
+                     kable = TRUE) {
 
   # Error checking
   if (! is.null(formula) && class(formula) != "formula") {
@@ -149,11 +128,8 @@ tabmeans <- function(formula = NULL,
   if (! is.logical(n.headings)) {
     stop("The input 'n.headings' must be a logical.")
   }
-  if (! is.logical(print.html)) {
-    stop("The input 'print.html' must be a logical.")
-  }
-  if (! is.character("html.filename")) {
-    stop("The input 'html.filename' must be a character string.")
+  if (! is.logical(kable)) {
+    stop("The input 'kable' must be a logical.")
   }
 
   # If formula specified, figure out x and y
@@ -407,19 +383,9 @@ tabmeans <- function(formula = NULL,
 
   }
 
-  # Print html version of table if requested
-  if (print.html) {
-
-    df.xtable <- xtable(
-      df,
-      align = paste("ll", paste(rep("r", ncol(df) - 1), collapse = ""), sep = "", collapse = "")
-    )
-    print(df.xtable, include.rownames = FALSE, type = "html", file = html.filename)
-
-  }
-
   # Return table
-  return(df)
+  if (! kable) return(df)
+  return(df %>% kable(escape = FALSE) %>% kable_styling(full_width = FALSE))
 
 }
 

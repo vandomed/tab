@@ -51,41 +51,35 @@ library("tab")
 
 The main purpose of **tab** is to create neatly formatted summary tables for papers and presentations. The following functions are included:
 
-* `glm_v` Print a GLM summary table to the RStudio Viewer.
-* `tabglm` summarizes generalized linear models (GLM's) fit via `glm` or `survey::svyglm`. 
-* `tabgee` summarizes generalized estimating equation models (GEE's) fit via `gee::gee`. 
-* `tabcoxph` summarizes Cox Proportional Hazards models fit via `survival::coxph` or `survey::svycoxph`.
-* `tabmulti` compares variables across two or more groups, e.g. to create a "Table 1."
-* `tabmulti.svy` does the same thing as `tabmulti` but for complex survey data.
+* `glm_v` prints a GLM summary table to the RStudio Viewer
+* `tabglm` summarizes generalized linear models (GLM's) fit via `glm` or `survey::svyglm`
+* `tabgee` summarizes generalized estimating equation models (GEE's) fit via `gee::gee`
+* `tabcoxph` summarizes Cox Proportional Hazards models fit via `survival::coxph` or `survey::svycoxph`
+* `tabmulti` compares variables across two or more groups, e.g. to create a "Table 1"
+* `tabmulti.svy` does the same thing as `tabmulti` but for complex survey data
 
 
 ## Regression summaries with 2 extra keystrokes
 
-### GLM's
-
-To summarize a fitted generalized linear model, simply call `glm_v` as you would `glm`. The result will be a formatted summary table printed to the RStudio Viewer.
-
-#### Linear regression
-
-Here's a linear regression of BMI on age, sex, and race. Once you call `glm_v`, a summary table will pop up in the RStudio Viewer.
-
-```{r eval = FALSE}
-glm_v(BMI ~ Age + Sex + Race, data = tabdata)
-```
-
-![Figure](vignettes/linear.PNG)
-
-From here, you can "snip" the summary table and save it as a figure (as I did for this README) or copy directly from the Viewer and paste outside of R.
-
-#### Logistic regression
-
-Of course `glm` supports all sorts of regression models, and `glm_v` should play nice at least with the more common ones. Here's a logistic regression for 1-year mortality vs. age, BMI, and sex, with some higher-order terms:
+To summarize a fitted generalized linear model, simply call `glm_v` as you would `glm`. The result will be a formatted summary table printed to the RStudio Viewer. Here's an example for logistic regression:
 
 ```{r eval = FALSE}
 glm_v(death_1yr ~ poly(Age, 2, raw = TRUE) + Sex * BMI, data = tabdata, family = binomial)
 ```
 
 ![Figure](vignettes/logistic.PNG)
+
+From here, you can "snip" the summary table and save it as a figure (as I did for this README) or copy directly from the Viewer and paste outside of R.
+
+If you want more flexibility, see `tabglm`. You can specify what columns you want to present, how categorical predictors are presented, etc.
+
+
+## Summary tables for continuous and categorical variables
+
+```{r eval = FALSE}
+tabmulti(Age + Sex + Race + BMI ~ Group, data = tabdata) %>%
+  kable()
+```
 
 
 <!-- ## Exporting tables, e.g. to Word -->

@@ -341,22 +341,6 @@ tabglm <- function(fit,
     }
   }
 
-  # x$Variable <- gsub("   ", "&nbsp; &nbsp; &nbsp;", x$Variable, fixed = TRUE)
-  # x %>% kable(row.names = FALSE, escape = FALSE) %>% kable_styling(full_width = FALSE)
-  #
-  # # Reformat for latex if requested
-  # if (latex) {
-  #
-  #   slashes <- "\\ \\ \\"
-  #   df$Variable <- gsub(pattern = spaces, replacement = slashes, x = df$Variable, fixed = TRUE)
-  #
-  #   df <- sapply(df, function(x) {
-  #     x[x == "-"] <- "--"
-  #     return(x)
-  #   })
-  #
-  # }
-
   # Remove row names and return table
   rownames(df) <- NULL
   return(df %>% kable(escape = FALSE) %>% kable_styling(full_width = FALSE))

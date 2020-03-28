@@ -9,8 +9,8 @@
 #' \tabular{ll}{
 #' Package: \tab tab \cr
 #' Type: \tab Package \cr
-#' Version: \tab 4.1.1 \cr
-#' Date: \tab 2019-10-26 \cr
+#' Version: \tab 5.1.1 \cr
+#' Date: \tab 2020-03-28 \cr
 #' License: \tab GPL-3 \cr
 #' }
 #'
@@ -32,6 +32,5 @@
 #' @import stats
 #' @importFrom survey svyby svychisq svyglm svymean svyquantile svyranktest svytable svyttest svyvar
 #' @importFrom utils capture.output
-#' @importFrom xtable xtable
 #' @name tab
 NULL

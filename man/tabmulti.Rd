@@ -8,11 +8,10 @@ Variable}
 tabmulti(formula = NULL, data, xvarname = NULL, yvarnames = NULL,
   ymeasures = NULL, columns = c("xgroups", "p"),
   listwise.deletion = FALSE, sep.char = ", ", xlevels = NULL,
-  yvarlabels = NULL, ylevels = NULL, indent.spaces = 3,
-  quantiles = NULL, quantile.vals = FALSE, latex = TRUE,
-  decimals = NULL, formatp.list = NULL, n.headings = FALSE,
-  print.html = FALSE, html.filename = "table1.html",
-  tabmeans.list = NULL, tabmedians.list = NULL, tabfreq.list = NULL)
+  yvarlabels = NULL, ylevels = NULL, quantiles = NULL,
+  quantile.vals = FALSE, decimals = NULL, formatp.list = NULL,
+  n.headings = FALSE, tabmeans.list = NULL, tabmedians.list = NULL,
+  tabfreq.list = NULL, kable = TRUE)
 }
 \arguments{
 \item{formula}{Formula, e.g. \code{Age + Sex + Race + BMI ~ Group}.}
@@ -57,9 +56,6 @@ print as "Race/ethnicity" and "Age (years)", use
 character vectors with labels for the levels of each categorical \code{y}
 variable.}
 
-\item{indent.spaces}{Integer value specifying how many spaces to indent
-factor levels.}
-
 \item{quantiles}{Numeric value. If specified, function compares \code{y}
 variables across quantiles of \code{x}. For example, if \code{x} contains BMI
 values and \code{yvarnames} includes HDL and race, setting
@@ -70,10 +66,6 @@ tertiles.}
 should show quantile number and corresponding range, e.g. Q1 [0.00, 0.25),
 rather than just the quantile number.}
 
-\item{latex}{Logical value for whether to format table so it is
-ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
-\code{\link[knitr]{kable}}.}
-
 \item{decimals}{Numeric vector specifying number of decimal places for
 numbers other than p-values for each \code{y} variable. Can be a single value
 to use for all \code{y} variables.}
@@ -83,25 +75,17 @@ to use for all \code{y} variables.}
 \item{n.headings}{Logical value for whether to display group sample sizes in
 parentheses in column headings.}
 
-\item{print.html}{Logical value for whether to write a .html file with the
-table to the current working directory.}
-
-\item{html.filename}{Character string specifying the name of the .html file
-that gets written if \code{print.html = TRUE}.}
-
 \item{tabmeans.list}{List of arguments to pass to \code{\link{tabmeans}}.}
 
 \item{tabmedians.list}{List of arguments to pass to \code{\link{tabmedians}}.}
 
 \item{tabfreq.list}{List of arguments to pass to \code{\link{tabfreq}}.}
+
+\item{kable}{Logical value for whether to return a
+\code{\link[knitr]{kable}}.}
 }
 \value{
-Data frame which you can print in R (e.g. with \strong{xtable}'s
-\code{\link[xtable]{xtable}} or \strong{knitr}'s \code{\link[knitr]{kable}})
-or export to Word, Excel, or some other program. To export the table, set
-\code{print.html = TRUE}. This will result in a .html file being written to
-your current working directory, which you can open and copy/paste into your
-document.
+\code{\link[knitr]{kable}} or character matrix.
 }
 \description{
 Creates a table comparing multiple characteristics (e.g. median age, mean
@@ -109,13 +93,11 @@ BMI, and race/ethnicity distribution) across levels of \code{x}.
 }
 \examples{
 # Compare age, sex, race, and BMI in control vs. treatment group
-tabmulti(Age + Sex + Race + BMI ~ Group, data = tabdata) \%>\%
-  kable()
+tabmulti(Age + Sex + Race + BMI ~ Group, data = tabdata)
 
 # Same as previous, but compare medians rather than means for BMI
 tabmulti(Age + Sex + Race + BMI ~ Group, data = tabdata,
-         ymeasures = c("mean", "freq", "freq", "median")) \%>\%
-  kable()
+         ymeasures = c("mean", "freq", "freq", "median"))
 
 
 }

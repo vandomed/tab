@@ -36,8 +36,6 @@
 #' @param ylevels Character vector (if only 1 frequency comparison) or list of
 #' character vectors with labels for the levels of each categorical \code{y}
 #' variable.
-#' @param indent.spaces Integer value specifying how many spaces to indent
-#' factor levels.
 #' @param quantiles Numeric value. If specified, function compares \code{y}
 #' variables across quantiles of \code{x}. For example, if \code{x} contains BMI
 #' values and \code{yvarnames} includes HDL and race, setting
@@ -46,41 +44,29 @@
 #' @param quantile.vals Logical value for whether labels for \code{x} quantiles
 #' should show quantile number and corresponding range, e.g. Q1 [0.00, 0.25),
 #' rather than just the quantile number.
-#' @param latex Logical value for whether to format table so it is
-#' ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
-#' \code{\link[knitr]{kable}}.
 #' @param decimals Numeric vector specifying number of decimal places for
 #' numbers other than p-values for each \code{y} variable. Can be a single value
 #' to use for all \code{y} variables.
 #' @param formatp.list List of arguments to pass to \code{\link[tab]{formatp}}.
 #' @param n.headings Logical value for whether to display group sample sizes in
 #' parentheses in column headings.
-#' @param print.html Logical value for whether to write a .html file with the
-#' table to the current working directory.
-#' @param html.filename Character string specifying the name of the .html file
-#' that gets written if \code{print.html = TRUE}.
+#' @param kable Logical value for whether to return a
+#' \code{\link[knitr]{kable}}.
 #' @param tabmeans.list List of arguments to pass to \code{\link{tabmeans}}.
 #' @param tabmedians.list List of arguments to pass to \code{\link{tabmedians}}.
 #' @param tabfreq.list List of arguments to pass to \code{\link{tabfreq}}.
 #'
 #'
-#' @return Data frame which you can print in R (e.g. with \strong{xtable}'s
-#' \code{\link[xtable]{xtable}} or \strong{knitr}'s \code{\link[knitr]{kable}})
-#' or export to Word, Excel, or some other program. To export the table, set
-#' \code{print.html = TRUE}. This will result in a .html file being written to
-#' your current working directory, which you can open and copy/paste into your
-#' document.
+#' @return \code{\link[knitr]{kable}} or character matrix.
 #'
 #'
 #' @examples
 #' # Compare age, sex, race, and BMI in control vs. treatment group
-#' tabmulti(Age + Sex + Race + BMI ~ Group, data = tabdata) %>%
-#'   kable()
+#' tabmulti(Age + Sex + Race + BMI ~ Group, data = tabdata)
 #'
 #' # Same as previous, but compare medians rather than means for BMI
 #' tabmulti(Age + Sex + Race + BMI ~ Group, data = tabdata,
-#'          ymeasures = c("mean", "freq", "freq", "median")) %>%
-#'   kable()
+#'          ymeasures = c("mean", "freq", "freq", "median"))
 #'
 #'
 #' @export
@@ -95,18 +81,15 @@ tabmulti <- function(formula = NULL,
                      xlevels = NULL,
                      yvarlabels = NULL,
                      ylevels = NULL,
-                     indent.spaces = 3,
                      quantiles = NULL,
                      quantile.vals = FALSE,
-                     latex = TRUE,
                      decimals = NULL,
                      formatp.list = NULL,
                      n.headings = FALSE,
-                     print.html = FALSE,
-                     html.filename = "table1.html",
                      tabmeans.list = NULL,
                      tabmedians.list = NULL,
-                     tabfreq.list = NULL) {
+                     tabfreq.list = NULL,
+                     kable = TRUE) {
 
   # Error checking
   if (! is.null(formula) && class(formula) != "formula") {
@@ -144,18 +127,12 @@ tabmulti <- function(formula = NULL,
          "list of character vectors with as much elements as ",
          "'freq' in 'ymeasures'.")
   }
-  if (! is.null(indent.spaces) && ! (is.numeric(indent.spaces) && indent.spaces >= 0 && indent.spaces == as.integer(indent.spaces))) {
-    stop("The input 'indent.spaces' must be a non-negative integer.")
-  }
   if (! is.null(quantiles) && ! (is.numeric(quantiles) && quantiles > 1 &&
                                  quantiles == as.integer(quantiles))) {
     stop("The input 'quantiles' must be an integer greater than 1.")
   }
   if ( ! is.logical(quantile.vals)) {
     stop("The input 'quantile.vals' must be a logical.")
-  }
-  if (! is.logical(latex)) {
-    stop("The input 'latex' must be a logical.")
   }
   if (! is.null(decimals) && ! (is.numeric(decimals) && decimals >= 0 &&
                                 decimals == as.integer(decimals))) {
@@ -167,12 +144,6 @@ tabmulti <- function(formula = NULL,
   }
   if (! is.logical(n.headings)) {
     stop("The input 'n.headings' must be a logical.")
-  }
-  if (! is.logical(print.html)) {
-    stop("The input 'print.html' must be a logical.")
-  }
-  if (! is.character("html.filename")) {
-    stop("The input 'html.filename' must be a character string.")
   }
   if (! is.null(tabmeans.list) &&
       ! (is.list(tabmeans.list) && all(names(tabmeans.list) %in%
@@ -249,7 +220,8 @@ tabmulti <- function(formula = NULL,
                     quantile.vals = quantile.vals,
                     decimals = decimals[ii],
                     formatp.list = formatp.list,
-                    n.headings = n.headings)
+                    n.headings = n.headings,
+                    kable = FALSE)
       current <- do.call(tabmeans, c(args1, tabmeans.list))
 
     } else if (ymeasures.ii == "median") {
@@ -266,7 +238,8 @@ tabmulti <- function(formula = NULL,
                     quantile.vals = quantile.vals,
                     decimals = decimals[ii],
                     formatp.list = formatp.list,
-                    n.headings = n.headings)
+                    n.headings = n.headings,
+                    kable = FALSE)
       current <- do.call(tabmedians, c(args1, tabmedians.list))
 
     } else if (ymeasures.ii == "freq") {
@@ -282,10 +255,10 @@ tabmulti <- function(formula = NULL,
                     ylevels = ylevels[[freqindex]],
                     quantiles = quantiles,
                     quantile.vals = quantile.vals,
-                    latex = FALSE,
                     decimals = ifelse(is.null(decimals[ii]), 1, decimals[ii]),
                     formatp.list = formatp.list,
-                    n.headings = n.headings)
+                    n.headings = n.headings,
+                    kable = FALSE)
       current <- do.call(tabfreq, c(args1, tabfreq.list))
 
     }
@@ -298,29 +271,8 @@ tabmulti <- function(formula = NULL,
     }
   }
 
-  # Print html version of table if requested
-  if (print.html) {
-
-    df.xtable <- xtable(
-      df,
-      align = paste("ll", paste(rep("r", ncol(df) - 1), collapse = ""), sep = "", collapse = "")
-    )
-    ampersands <- paste(rep("&nbsp ", indent.spaces), collapse = "")
-    print(df.xtable, include.rownames = FALSE, type = "html",
-          file = html.filename, sanitize.text.function = function(x) {
-            ifelse(substr(x, 1, 1) == " ", paste(ampersands, x), x)
-          })
-
-  }
-
-  # Reformat for latex if requested
-  if (latex) {
-    spaces <- paste(rep(" ", indent.spaces), collapse = "")
-    slashes <- paste(rep("\\ ", indent.spaces), collapse = "")
-    df$Variable <- gsub(pattern = spaces, replacement = slashes, x = df$Variable, fixed = TRUE)
-  }
-
   # Return table
-  return(df)
+  if (! kable) return(df)
+  return(df %>% kable(escape = FALSE) %>% kable_styling(full_width = FALSE))
 
 }

@@ -11,8 +11,7 @@ tabfreq(formula = NULL, data = NULL, x = NULL, y = NULL,
   compress.binary = FALSE, yname.row = TRUE, indent.spaces = 3,
   text.label = NULL, quantiles = NULL, quantile.vals = FALSE,
   latex = TRUE, decimals = 1, formatp.list = NULL,
-  n.headings = FALSE, print.html = FALSE,
-  html.filename = "table1.html")
+  n.headings = FALSE, kable = TRUE)
 }
 \arguments{
 \item{formula}{Formula, e.g. \code{Sex ~ Group}.}
@@ -76,10 +75,6 @@ quantiles of \code{x} created on the fly.}
 should show quantile number and corresponding range, e.g. Q1 [0.00, 0.25),
 rather than just the quantile number.}
 
-\item{latex}{Logical value for whether to format table so it is
-ready for printing in LaTeX via \code{\link[xtable]{xtable}} or
-\code{\link[knitr]{kable}}.}
-
 \item{decimals}{Numeric value specifying number of decimal places for numbers
 other than p-values.}
 
@@ -88,19 +83,11 @@ other than p-values.}
 \item{n.headings}{Logical value for whether to display group sample sizes in
 parentheses in column headings.}
 
-\item{print.html}{Logical value for whether to write a .html file with the
-table to the current working directory.}
-
-\item{html.filename}{Character string specifying the name of the .html file
-that gets written if \code{print.html = TRUE}.}
+\item{kable}{Logical value for whether to return a
+\code{\link[knitr]{kable}}.}
 }
 \value{
-Data frame which you can print in R (e.g. with \strong{xtable}'s
-\code{\link[xtable]{xtable}} or \strong{knitr}'s \code{\link[knitr]{kable}})
-or export to Word, Excel, or some other program. To export the table, set
-\code{print.html = TRUE}. This will result in a .html file being written to
-your current working directory, which you can open and copy/paste into your
-document.
+\code{\link[knitr]{kable}}.
 }
 \description{
 Creates an I-by-J frequency table comparing the distribution of \code{y}
@@ -110,24 +97,10 @@ across levels of \code{x}.
 # Compare sex distribution by group
 (freqtable1 <- tabfreq(Sex ~ Group, data = tabdata))
 
-# Same as previous, but specifying input vectors rather than formula
-(freqtable2 <- tabfreq(x = tabdata$Group, y = tabdata$Sex))
-
-# Same as previous, but showing male row only and percent (SE) rather than n
-# (percent)
-(freqtable3 <- tabfreq(Sex ~ Group, data = tabdata,
+# Same as previous, but showing male row only and \% (SE) rather than n (\%)
+(freqtable2 <- tabfreq(Sex ~ Group, data = tabdata,
                        cell = "col.percent", parenth = "se",
                        compress.binary = TRUE))
-
-# Create single table comparing sex and race in control vs. treatment group.
-# Drop missing observations first.
-tabdata2 <- subset(tabdata, ! is.na(Sex) & ! is.na(Race))
-(freqtable4 <- rbind(tabfreq(Sex ~ Group, data = tabdata2),
-                     tabfreq(Race ~ Group, data = tabdata2)))
-
-# Same as previous, but using tabmulti for convenience
-#(freqtable5 <- tabmulti(data = d, xvarname = "Group",
-#                        yvarnames = c("Sex", "Race")))
 
 
 }
