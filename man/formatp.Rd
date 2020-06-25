@@ -4,8 +4,14 @@
 \alias{formatp}
 \title{Format P-values for Functions in the \pkg{tab} Package}
 \usage{
-formatp(p, decimals = c(2, 3), cuts = 0.01, lowerbound = 0.001,
-  leading0 = TRUE, avoid1 = FALSE)
+formatp(
+  p,
+  decimals = c(2, 3),
+  cuts = 0.01,
+  lowerbound = 0.001,
+  leading0 = TRUE,
+  avoid1 = FALSE
+)
 }
 \arguments{
 \item{p}{Numeric vector of p-values.}

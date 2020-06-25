@@ -4,11 +4,22 @@
 \alias{tabmeans.svy}
 \title{Create Table Comparing Group Means (for Complex Survey Data)}
 \usage{
-tabmeans.svy(formula, design, columns = c("xgroups", "p"),
-  parenth = "sd", sep.char = ", ", xlevels = NULL, yname = NULL,
-  text.label = NULL, decimals = 1, anova.svyglm.list = NULL,
-  formatp.list = NULL, n.headings = FALSE, N.headings = FALSE,
-  kable = TRUE)
+tabmeans.svy(
+  formula,
+  design,
+  columns = c("xgroups", "p"),
+  parenth = "sd",
+  sep.char = ", ",
+  xlevels = NULL,
+  yname = NULL,
+  text.label = NULL,
+  decimals = 1,
+  anova.svyglm.list = NULL,
+  formatp.list = NULL,
+  n.headings = FALSE,
+  N.headings = FALSE,
+  kable = TRUE
+)
 }
 \arguments{
 \item{formula}{Formula, e.g. \code{BMI ~ Sex}.}

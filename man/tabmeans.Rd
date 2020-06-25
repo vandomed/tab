@@ -4,12 +4,25 @@
 \alias{tabmeans}
 \title{Create Table Comparing Group Means}
 \usage{
-tabmeans(formula = NULL, data = NULL, x = NULL, y = NULL,
-  columns = c("xgroups", "p"), parenth = "sd", sep.char = ", ",
-  variance = "unequal", xlevels = NULL, yname = NULL,
-  text.label = NULL, quantiles = NULL, quantile.vals = FALSE,
-  decimals = NULL, formatp.list = NULL, n.headings = TRUE,
-  kable = TRUE)
+tabmeans(
+  formula = NULL,
+  data = NULL,
+  x = NULL,
+  y = NULL,
+  columns = c("xgroups", "p"),
+  parenth = "sd",
+  sep.char = ", ",
+  variance = "unequal",
+  xlevels = NULL,
+  yname = NULL,
+  text.label = NULL,
+  quantiles = NULL,
+  quantile.vals = FALSE,
+  decimals = NULL,
+  formatp.list = NULL,
+  n.headings = TRUE,
+  kable = TRUE
+)
 }
 \arguments{
 \item{formula}{Formula, e.g. \code{BMI ~ Group}.}

@@ -4,11 +4,22 @@
 \alias{tabmedians.svy}
 \title{Create Table Comparing Group Medians (for Complex Survey Data)}
 \usage{
-tabmedians.svy(formula, design, columns = c("xgroups", "p"),
-  parenth = "iqr", sep.char = ", ", xlevels = NULL, yname = NULL,
-  text.label = NULL, decimals = NULL, svyranktest.list = NULL,
-  formatp.list = NULL, n.headings = FALSE, N.headings = FALSE,
-  kable = TRUE)
+tabmedians.svy(
+  formula,
+  design,
+  columns = c("xgroups", "p"),
+  parenth = "iqr",
+  sep.char = ", ",
+  xlevels = NULL,
+  yname = NULL,
+  text.label = NULL,
+  decimals = NULL,
+  svyranktest.list = NULL,
+  formatp.list = NULL,
+  n.headings = FALSE,
+  N.headings = FALSE,
+  kable = TRUE
+)
 }
 \arguments{
 \item{formula}{Formula, e.g. \code{BMI ~ Sex}.}

@@ -4,9 +4,15 @@
 \alias{tabglm}
 \title{Create Summary Table for Fitted Generalized Linear Model}
 \usage{
-tabglm(fit, columns = NULL, xvarlabels = NULL,
-  factor.compression = 1, sep.char = ", ", decimals = 2,
-  formatp.list = NULL)
+tabglm(
+  fit,
+  columns = NULL,
+  xvarlabels = NULL,
+  factor.compression = 1,
+  sep.char = ", ",
+  decimals = 2,
+  formatp.list = NULL
+)
 }
 \arguments{
 \item{fit}{Fitted \code{\link[stats]{glm}} object.}

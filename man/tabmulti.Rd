@@ -5,13 +5,28 @@
 \title{Create Table Comparing Characteristics Across Levels of a Categorical
 Variable}
 \usage{
-tabmulti(formula = NULL, data, xvarname = NULL, yvarnames = NULL,
-  ymeasures = NULL, columns = c("xgroups", "p"),
-  listwise.deletion = FALSE, sep.char = ", ", xlevels = NULL,
-  yvarlabels = NULL, ylevels = NULL, quantiles = NULL,
-  quantile.vals = FALSE, decimals = NULL, formatp.list = NULL,
-  n.headings = FALSE, tabmeans.list = NULL, tabmedians.list = NULL,
-  tabfreq.list = NULL, kable = TRUE)
+tabmulti(
+  formula = NULL,
+  data,
+  xvarname = NULL,
+  yvarnames = NULL,
+  ymeasures = NULL,
+  columns = c("xgroups", "p"),
+  listwise.deletion = FALSE,
+  sep.char = ", ",
+  xlevels = NULL,
+  yvarlabels = NULL,
+  ylevels = NULL,
+  quantiles = NULL,
+  quantile.vals = FALSE,
+  decimals = NULL,
+  formatp.list = NULL,
+  n.headings = FALSE,
+  tabmeans.list = NULL,
+  tabmedians.list = NULL,
+  tabfreq.list = NULL,
+  kable = TRUE
+)
 }
 \arguments{
 \item{formula}{Formula, e.g. \code{Age + Sex + Race + BMI ~ Group}.}

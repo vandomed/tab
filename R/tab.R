@@ -10,7 +10,7 @@
 #' Package: \tab tab \cr
 #' Type: \tab Package \cr
 #' Version: \tab 5.1.1 \cr
-#' Date: \tab 2020-03-28 \cr
+#' Date: \tab 2020-06-25 \cr
 #' License: \tab GPL-3 \cr
 #' }
 #'

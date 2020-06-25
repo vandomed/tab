@@ -268,7 +268,7 @@ tabfreq <- function(formula = NULL,
       if (cell == "counts") {
         part1 <- rowsums.counts
       } else if (cell %in% c("tot.percent", "col.percent")) {
-        part1 <- sprintf(spf, rowsums.counts / n)
+        part1 <- sprintf(spf, rowsums.counts / n * 100)
       }
       if (parenth == "none") {
         part2 <- NULL

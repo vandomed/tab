@@ -4,9 +4,15 @@
 \alias{tabcoxph}
 \title{Create Summary Table for Fitted Cox Proportional Hazards Model}
 \usage{
-tabcoxph(fit, columns = c("beta.se", "hr.ci", "p"), var.labels = NULL,
-  factor.compression = 1, sep.char = ", ", decimals = 2,
-  formatp.list = NULL)
+tabcoxph(
+  fit,
+  columns = c("beta.se", "hr.ci", "p"),
+  var.labels = NULL,
+  factor.compression = 1,
+  sep.char = ", ",
+  decimals = 2,
+  formatp.list = NULL
+)
 }
 \arguments{
 \item{fit}{Fitted \code{\link[survival]{coxph}} object.}

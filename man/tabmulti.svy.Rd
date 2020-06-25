@@ -5,13 +5,27 @@
 \title{Create Table Comparing Characteristics Across Levels of a Categorical
 Variable (for Complex Survey Data)}
 \usage{
-tabmulti.svy(formula = NULL, design, xvarname = NULL,
-  yvarnames = NULL, ymeasures = NULL, columns = c("xgroups", "p"),
-  listwise.deletion = FALSE, sep.char = ", ", xlevels = NULL,
-  yvarlabels = NULL, ylevels = NULL, decimals = NULL,
-  formatp.list = NULL, n.headings = FALSE, N.headings = FALSE,
-  kable = TRUE, tabmeans.svy.list = NULL, tabmedians.svy.list = NULL,
-  tabfreq.svy.list = NULL)
+tabmulti.svy(
+  formula = NULL,
+  design,
+  xvarname = NULL,
+  yvarnames = NULL,
+  ymeasures = NULL,
+  columns = c("xgroups", "p"),
+  listwise.deletion = FALSE,
+  sep.char = ", ",
+  xlevels = NULL,
+  yvarlabels = NULL,
+  ylevels = NULL,
+  decimals = NULL,
+  formatp.list = NULL,
+  n.headings = FALSE,
+  N.headings = FALSE,
+  kable = TRUE,
+  tabmeans.svy.list = NULL,
+  tabmedians.svy.list = NULL,
+  tabfreq.svy.list = NULL
+)
 }
 \arguments{
 \item{formula}{Formula, e.g. \code{Age + Race + BMI ~ Sex}.}
