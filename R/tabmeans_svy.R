@@ -176,8 +176,8 @@ tabmeans.svy <- function(formula,
     diffmeans.ci <- -rev(as.numeric(fit$conf.int))
     p <- fit$p.value
   } else {
-    fit1 <- svyglm(Age ~ 1, design = design)
-    fit2 <- svyglm(Age ~ Sex, design = design)
+    fit1 <- svyglm(as.formula(paste0(yvarname, "~ 1")), design = design)
+    fit2 <- svyglm(formula, design = design)
     fit <- do.call(anova, c(list(object = fit1, object2 = fit2), anova.svyglm.list))
     p <- as.numeric(fit$p)
   }

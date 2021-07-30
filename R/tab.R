@@ -10,7 +10,7 @@
 #' Package: \tab tab \cr
 #' Type: \tab Package \cr
 #' Version: \tab 5.1.1 \cr
-#' Date: \tab 2020-06-25 \cr
+#' Date: \tab 2021-07-29 \cr
 #' License: \tab GPL-3 \cr
 #' }
 #'
@@ -30,7 +30,7 @@
 #' @importFrom knitr kable
 #' @import MASS
 #' @import stats
-#' @importFrom survey svyby svychisq svyglm svymean svyquantile svyranktest svytable svyttest svyvar
+#' @importFrom survey svyby svychisq svyglm svymean oldsvyquantile svyranktest svytable svyttest svyvar
 #' @importFrom utils capture.output
 #' @name tab
 NULL

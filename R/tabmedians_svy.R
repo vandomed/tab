@@ -131,7 +131,7 @@ tabmedians.svy <- function(formula,
   # Calculate various statistics
   svyby.svyquantile <- svyby(as.formula(paste("~", yvarname, sep = "")),
                              by = as.formula(paste("~", xvarname, sep = "")),
-                             design = design, FUN = svyquantile, quantiles = 0.5,
+                             design = design, FUN = oldsvyquantile, quantiles = 0.5,
                              keep.var = FALSE, ci = TRUE)
   medians <- unlist(svyby.svyquantile$statistic.quantiles)
   lower <- sapply(svyby.svyquantile$statistic.CIs, function(x) x[1])
@@ -201,7 +201,7 @@ tabmedians.svy <- function(formula,
 
     } else if (column == "overall") {
 
-      svyquantile.q2 <- svyquantile(
+      svyquantile.q2 <- oldsvyquantile(
         as.formula(paste("~", yvarname, sep = "")),
         design = design, quantiles = 0.5, keep.var = FALSE, ci = TRUE
       )
@@ -210,7 +210,7 @@ tabmedians.svy <- function(formula,
       if (parenth == "none") {
         df$Overall <- sprintf(spf, median.y)
       } else if (parenth == "iqr") {
-        svyquantile.q1q3 <- svyquantile(
+        svyquantile.q1q3 <- oldsvyquantile(
           as.formula(paste("~", yvarname, sep = "")),
           design = design, quantiles = c(0.25, 0.75), keep.var = FALSE, ci = FALSE
         )
@@ -218,7 +218,7 @@ tabmedians.svy <- function(formula,
                             sprintf(spf, diff(as.numeric(svyquantile.q1q3))),
                             ")", sep = "")
       } else if (parenth == "q1q3") {
-        svyquantile.q1q3 <- svyquantile(
+        svyquantile.q1q3 <- oldsvyquantile(
           as.formula(paste("~", yvarname, sep = "")),
           design = design, quantiles = c(0.25, 0.75), keep.var = FALSE, ci = FALSE
         )
@@ -246,7 +246,7 @@ tabmedians.svy <- function(formula,
         svyby.svyquantile.q1q3 <- svyby(
           as.formula(paste("~", yvarname, sep = "")),
           by = as.formula(paste("~", xvarname, sep = "")),
-          design = design, FUN = svyquantile, quantiles = c(0.25, 0.75),
+          design = design, FUN = oldsvyquantile, quantiles = c(0.25, 0.75),
           keep.var = FALSE
         )
         iqrs <- svyby.svyquantile.q1q3$statistic2 - svyby.svyquantile.q1q3$statistic1
@@ -256,7 +256,7 @@ tabmedians.svy <- function(formula,
         svyby.svyquantile.q1q3 <- svyby(
           as.formula(paste("~", yvarname, sep = "")),
           by = as.formula(paste("~", xvarname, sep = "")),
-          design = design, FUN = svyquantile, quantiles = c(0.25, 0.75),
+          design = design, FUN = oldsvyquantile, quantiles = c(0.25, 0.75),
           keep.var = FALSE
         )
         q1s <- svyby.svyquantile.q1q3$statistic1
