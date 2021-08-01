@@ -1,7 +1,7 @@
 Summary Tables with ‘tab’
 ================
 Dane Van Domelen <br> <vandomed@gmail.com>
-2020-03-28
+2021-08-01
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -102,15 +102,15 @@ Hall/CRC. <http://www.crcpress.com/product/isbn/9781466561595>.
 
 <div id="ref-knitr2">
 
-———. 2015. *Dynamic Documents with R and Knitr*. 2nd ed. Boca Raton,
-Florida: Chapman; Hall/CRC. <https://yihui.name/knitr/>.
+———. 2015. *Dynamic Documents with R and Knitr*. 2nd ed. Chapman;
+Hall/CRC.
 
 </div>
 
 <div id="ref-knitr1">
 
-———. 2018. *Knitr: A General-Purpose Package for Dynamic Report
-Generation in R*. <https://yihui.name/knitr/>.
+———. 2021. *Knitr: A General-Purpose Package for Dynamic Report
+Generation in R*.
 
 </div>
 

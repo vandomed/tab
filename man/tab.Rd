@@ -16,7 +16,7 @@ handle data from simple random samples as well as complex surveys.
 Package: \tab tab \cr
 Type: \tab Package \cr
 Version: \tab 5.1.1 \cr
-Date: \tab 2021-07-29 \cr
+Date: \tab 2021-08-01 \cr
 License: \tab GPL-3 \cr
 }
 
