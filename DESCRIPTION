@@ -11,13 +11,13 @@ LazyData: true
 Encoding: UTF-8
 Depends: dplyr, knitr
 Imports: 
-    gee, 
     kableExtra, 
     MASS, 
     stats, 
-    survey (>= 4.1), 
-    survival
+    survey (>= 4.1)
 RoxygenNote: 7.1.1
 Suggests: 
-    rmarkdown
+    gee, 
+    rmarkdown, 
+    survival
 VignetteBuilder: knitr
