@@ -3,7 +3,6 @@
 \docType{package}
 \name{tab}
 \alias{tab}
-\alias{tab-package}
 \title{Create Summary Tables for Statistical Reports}
 \description{
 Contains functions for creating various types of summary tables, e.g.

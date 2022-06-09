@@ -4,14 +4,29 @@
 \alias{tabfreq.svy}
 \title{Create Frequency Table (for Complex Survey Data)}
 \usage{
-tabfreq.svy(formula, design, columns = c("xgroups", "p"),
-  cell = "col.percent", parenth = "se", sep.char = ", ",
-  xlevels = NULL, yname = NULL, ylevels = NULL,
-  compress.binary = FALSE, yname.row = TRUE, indent.spaces = 3,
-  text.label = NULL, latex = TRUE, decimals = 1,
-  svychisq.list = NULL, formatp.list = NULL, n.headings = FALSE,
-  N.headings = FALSE, print.html = FALSE,
-  html.filename = "table1.html")
+tabfreq.svy(
+  formula,
+  design,
+  columns = c("xgroups", "p"),
+  cell = "col.percent",
+  parenth = "se",
+  sep.char = ", ",
+  xlevels = NULL,
+  yname = NULL,
+  ylevels = NULL,
+  compress.binary = FALSE,
+  yname.row = TRUE,
+  indent.spaces = 3,
+  text.label = NULL,
+  latex = TRUE,
+  decimals = 1,
+  svychisq.list = NULL,
+  formatp.list = NULL,
+  n.headings = FALSE,
+  N.headings = FALSE,
+  print.html = FALSE,
+  html.filename = "table1.html"
+)
 }
 \arguments{
 \item{formula}{Formula, e.g. \code{Race ~ Sex}.}

@@ -4,15 +4,32 @@
 \alias{tabfreq}
 \title{Create Frequency Table}
 \usage{
-tabfreq(formula = NULL, data = NULL, x = NULL, y = NULL,
-  columns = c("xgroups", "p"), cell = "counts",
-  parenth = "col.percent", sep.char = ", ", test = "chi.fisher",
-  xlevels = NULL, yname = NULL, ylevels = NULL,
-  compress.binary = FALSE, yname.row = TRUE, indent.spaces = 3,
-  text.label = NULL, quantiles = NULL, quantile.vals = FALSE,
-  latex = TRUE, decimals = 1, formatp.list = NULL,
-  n.headings = FALSE, print.html = FALSE,
-  html.filename = "table1.html")
+tabfreq(
+  formula = NULL,
+  data = NULL,
+  x = NULL,
+  y = NULL,
+  columns = c("xgroups", "p"),
+  cell = "counts",
+  parenth = "col.percent",
+  sep.char = ", ",
+  test = "chi.fisher",
+  xlevels = NULL,
+  yname = NULL,
+  ylevels = NULL,
+  compress.binary = FALSE,
+  yname.row = TRUE,
+  indent.spaces = 3,
+  text.label = NULL,
+  quantiles = NULL,
+  quantile.vals = FALSE,
+  latex = TRUE,
+  decimals = 1,
+  formatp.list = NULL,
+  n.headings = FALSE,
+  print.html = FALSE,
+  html.filename = "table1.html"
+)
 }
 \arguments{
 \item{formula}{Formula, e.g. \code{Sex ~ Group}.}

@@ -4,11 +4,21 @@
 \alias{tabgee}
 \title{Create Summary Table for Fitted Generalized Estimating Equation Model}
 \usage{
-tabgee(fit, data = NULL, columns = NULL, robust = TRUE,
-  var.labels = NULL, factor.compression = 1, sep.char = ", ",
-  indent.spaces = 3, latex = TRUE, decimals = 2,
-  formatp.list = NULL, print.html = FALSE,
-  html.filename = "table1.html")
+tabgee(
+  fit,
+  data = NULL,
+  columns = NULL,
+  robust = TRUE,
+  var.labels = NULL,
+  factor.compression = 1,
+  sep.char = ", ",
+  indent.spaces = 3,
+  latex = TRUE,
+  decimals = 2,
+  formatp.list = NULL,
+  print.html = FALSE,
+  html.filename = "table1.html"
+)
 }
 \arguments{
 \item{fit}{Fitted \code{\link[gee]{gee}} object.}

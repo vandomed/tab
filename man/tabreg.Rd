@@ -4,9 +4,18 @@
 \alias{tabreg}
 \title{Create Regression Table from Betas and Standard Errors}
 \usage{
-tabreg(betas, ses = NULL, varcov = NULL, columns = c("beta.se", "p"),
-  sep.char = ", ", decimals = NULL, formatp.list = NULL,
-  labels = NULL, print.html = FALSE, html.filename = "table1.html")
+tabreg(
+  betas,
+  ses = NULL,
+  varcov = NULL,
+  columns = c("beta.se", "p"),
+  sep.char = ", ",
+  decimals = NULL,
+  formatp.list = NULL,
+  labels = NULL,
+  print.html = FALSE,
+  html.filename = "table1.html"
+)
 }
 \arguments{
 \item{betas}{Numeric vector.}

@@ -4,12 +4,25 @@
 \alias{tabmedians}
 \title{Create Table Comparing Group Medians}
 \usage{
-tabmedians(formula = NULL, data = NULL, x = NULL, y = NULL,
-  columns = c("xgroups", "p"), parenth = "iqr", sep.char = ", ",
-  xlevels = NULL, yname = NULL, text.label = NULL,
-  quantiles = NULL, quantile.vals = FALSE, decimals = NULL,
-  formatp.list = NULL, n.headings = TRUE, print.html = FALSE,
-  html.filename = "table1.html")
+tabmedians(
+  formula = NULL,
+  data = NULL,
+  x = NULL,
+  y = NULL,
+  columns = c("xgroups", "p"),
+  parenth = "iqr",
+  sep.char = ", ",
+  xlevels = NULL,
+  yname = NULL,
+  text.label = NULL,
+  quantiles = NULL,
+  quantile.vals = FALSE,
+  decimals = NULL,
+  formatp.list = NULL,
+  n.headings = TRUE,
+  print.html = FALSE,
+  html.filename = "table1.html"
+)
 }
 \arguments{
 \item{formula}{Formula, e.g. \code{BMI ~ Group}.}

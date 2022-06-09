@@ -17,7 +17,7 @@ Imports:
     survey, 
     survival,
     xtable
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.1
 Suggests: 
     rmarkdown
 VignetteBuilder: knitr
